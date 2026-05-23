@@ -29,8 +29,13 @@
 
 .tpl-dir-key-nav-minimal .dk-eyebrow{font-size:12px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;opacity:.55;margin-bottom:22px;display:flex;align-items:center;gap:14px}
 .tpl-dir-key-nav-minimal .dk-eyebrow::after{content:'';flex:1;max-width:120px;height:1px;background:currentColor;opacity:.3}
-.tpl-dir-key-nav-minimal .dk-h0{font-size:160px;font-weight:900;line-height:.9;letter-spacing:-5px;margin:0 0 20px}
-.tpl-dir-key-nav-minimal .dk-h1{font-size:100px;font-weight:900;line-height:.98;letter-spacing:-3px;margin:0 0 18px}
+/* CJK headlines hit at ~88-96px before they wrap awkwardly on a 1280px
+ * canvas. Latin titles can go much bigger and keep the keynote feel —
+ * the renderer adds `lang="zh"` / `lang="en"` on the title so we branch. */
+.tpl-dir-key-nav-minimal .dk-h0{font-size:88px;font-weight:900;line-height:1.04;letter-spacing:-1px;margin:0 0 20px;max-width:1040px;word-break:break-word}
+.tpl-dir-key-nav-minimal .dk-h0:lang(en){font-size:140px;letter-spacing:-4px;line-height:.94}
+.tpl-dir-key-nav-minimal .dk-h1{font-size:72px;font-weight:900;line-height:1.04;letter-spacing:-1px;margin:0 0 18px;max-width:1040px}
+.tpl-dir-key-nav-minimal .dk-h1:lang(en){font-size:100px;letter-spacing:-3px;line-height:.98}
 .tpl-dir-key-nav-minimal .dk-h2{font-size:72px;font-weight:800;line-height:1.05;letter-spacing:-2px;margin:0 0 16px}
 .tpl-dir-key-nav-minimal .dk-lede{font-size:26px;line-height:1.45;opacity:.72;max-width:900px;font-weight:300}
 .tpl-dir-key-nav-minimal .dk-lede strong{font-weight:700;opacity:1}
