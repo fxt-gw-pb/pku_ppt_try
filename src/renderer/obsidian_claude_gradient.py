@@ -53,13 +53,6 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
-def _notes_aside(slide: dict[str, Any]) -> str:
-    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
-    if not text:
-        return ""
-    return f'<div class="oc-hl" style="margin-top:20px;font-size:15px"><b style="color:var(--oc-accent3)">讲者备注</b><br>{_rich(text)}</div>'
-
-
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
     subtitle = generic.get("subtitle") or "Generated deck · obsidian gradient edition"
@@ -138,7 +131,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div class="oc-tag">{_esc(slide.get("section") or "content")}</div>
     <h2 class="oc-h2">{_rich(slide.get("title") or "核心要点")}</h2>
     <div class="{grid_cls}">{''.join(cells)}</div>
-    {_notes_aside(slide)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
 

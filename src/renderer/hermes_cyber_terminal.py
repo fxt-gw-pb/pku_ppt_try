@@ -68,16 +68,6 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
-def _notes_aside(slide: dict[str, Any]) -> str:
-    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
-    if not text:
-        return ""
-    return (
-        '<div class="hc-codebox" style="margin-top:18px;padding:14px 22px;font-size:13px;line-height:1.7">'
-        f'<span class="cm"># speaker note</span> {_rich(text)}</div>'
-    )
-
-
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
     subtitle = generic.get("subtitle") or "Generated deck · cyber terminal edition"
@@ -179,7 +169,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
       {prompt_row}
       <div class="{grid_cls}" style="margin-top:14px">{''.join(cells)}</div>
     </div>
-    {_notes_aside(slide)}
     {_footer("content · cards", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -206,7 +195,6 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <p class="hc-lede">逐步执行；每一步可观察、可回滚。</p>
       <div class="hc-codebox" style="margin-top:18px">{code_inner}</div>
     </div>
-    {_notes_aside(slide)}
     {_footer("content · pipeline", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))

@@ -47,17 +47,6 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
-def _notes_aside(slide: dict[str, Any]) -> str:
-    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
-    if not text:
-        return ""
-    return (
-        '<div class="card" style="margin-top:18px;padding:18px 24px;display:flex;gap:16px;align-items:flex-start">'
-        '<span class="num-tag" style="flex:none">SPEAKER</span>'
-        f'<p class="dim" style="font-size:14px;line-height:1.6;margin:0">{_rich(text)}</p></div>'
-    )
-
-
 def _footer(slide_no: int, total: int, tag: str) -> str:
     return f'<div class="deck-footer"><span>{_esc(tag)}</span><span>{slide_no:02d} / {total:02d}</span></div>'
 
@@ -157,7 +146,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <h2 class="h2">{_rich(slide.get("title") or "核心要点")}</h2>
     {metric_strip}
     <div class="{grid_cls} mt-l">{''.join(cells)}</div>
-    {_notes_aside(slide)}
     {_footer(slide_no, total, "content · cards")}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -194,7 +182,6 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <div class="traction-bar">{''.join(bars)}</div>
     </div>
     <div class="grid g3 mt-l">{''.join(rows)}</div>
-    {_notes_aside(slide)}
     {_footer(slide_no, total, "content · traction")}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))

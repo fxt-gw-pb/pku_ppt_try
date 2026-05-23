@@ -48,18 +48,6 @@ def _footer(left: str, slide_no: int, total: int) -> str:
     return f'<div class="deck-footer mono"><span>{_esc(left)}</span><span>{slide_no:02d} / {total:02d}</span></div>'
 
 
-def _notes_aside(slide: dict[str, Any]) -> str:
-    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
-    if not text:
-        return ""
-    return (
-        '<div class="terminal" style="margin-top:18px">'
-        '<div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>'
-        '<span style="margin-left:8px">~/fxt-ppt $ cat notes.txt</span></div>'
-        f'<pre style="font-size:13px"><span class="cmt"># speaker note</span>\n{_rich(text)}</pre></div>'
-    )
-
-
 def _terminal(bar: str, body: str) -> str:
     return f"""
     <div class="terminal">
@@ -151,7 +139,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <p class="kicker">{_esc(slide.get("section") or "content")}</p>
       <h2 class="h2">{_rich(slide.get("title") or "核心要点")}</h2>
       <div class="{grid_cls} mt-l">{''.join(cells)}</div>
-      {_notes_aside(slide)}
       {_footer("content · cards", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -174,7 +161,6 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <p class="kicker">./pipeline</p>
       <h2 class="h2">{_rich(slide.get("title") or "过程拆解")}</h2>
       <div class="mt-l" style="max-width:980px">{_terminal('~/fxt-ppt $ ./pipeline.sh', code_inner)}</div>
-      {_notes_aside(slide)}
       {_footer("content · pipeline", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))

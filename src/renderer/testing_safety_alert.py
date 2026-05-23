@@ -46,20 +46,6 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
-def _notes_aside(slide: dict[str, Any]) -> str:
-    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
-    if not text:
-        return ""
-    return (
-        '<div style="margin-top:18px;padding:14px 22px;border-left:3px solid var(--ts-amber);'
-        'background:var(--ts-amber-soft);border-radius:0 12px 12px 0;font-size:14px;'
-        'color:var(--ts-ink2);line-height:1.6">'
-        '<strong style="color:var(--ts-amber);font-size:11px;letter-spacing:.14em;'
-        'text-transform:uppercase;display:block;margin-bottom:4px">讲者备注</strong>'
-        f'{_rich(text)}</div>'
-    )
-
-
 def _stripes() -> str:
     return '<div class="ts-stripe"></div><div class="ts-stripe-b"></div>'
 
@@ -172,7 +158,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <h2 class="ts-h2">{_rich(slide.get("title") or "核心发现")}</h2>
     {lead_alert}
     <div class="{grid_cls}" style="margin-top:18px">{''.join(cells)}</div>
-    {_notes_aside(slide)}
     {_footer("content · cards", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -198,7 +183,6 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div class="ts-kicker">runbook</div>
     <h2 class="ts-h2">{_rich(slide.get("title") or "处置清单")}</h2>
     <div class="ts-checklist">{''.join(rows)}</div>
-    {_notes_aside(slide)}
     {_footer("content · runbook", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))

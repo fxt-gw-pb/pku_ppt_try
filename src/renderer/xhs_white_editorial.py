@@ -57,17 +57,6 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     return f"<section class=\"{cls}\"{data_title}>{inner}</section>"
 
 
-def _notes_aside(slide: dict[str, Any]) -> str:
-    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
-    if not text:
-        return ""
-    return (
-        '<div class="xw-card soft-blue" style="margin-top:22px;padding:16px 24px">'
-        '<div class="xw-label">speaker note</div>'
-        f'<div class="main" style="font-size:15px;line-height:1.65">{_rich(text)}</div></div>'
-    )
-
-
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
     subtitle = generic.get("subtitle") or "把文稿整理成一份白底杂志风内容 deck"
@@ -143,7 +132,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     {_top(slide_no, total, slide.get("section") or slide.get("title") or "核心要点")}
     <h2 class="xw-title-md">{_rich(slide.get("title") or "核心要点")}</h2>
     <div class="{grid_cls}">{''.join(cards)}</div>
-    {_notes_aside(slide)}
     {_footer(slide_no, total, "Content · Cards")}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))

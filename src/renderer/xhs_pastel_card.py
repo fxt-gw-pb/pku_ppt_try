@@ -60,17 +60,6 @@ def _footer(left: str, slide_no: int, total: int) -> str:
     """
 
 
-def _notes_aside(slide: dict[str, Any]) -> str:
-    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
-    if not text:
-        return ""
-    return (
-        '<div class="xp-card cream" style="margin-top:18px;padding:16px 22px">'
-        '<span class="xp-chip rose" style="font-size:11px">💬 speaker note</span>'
-        f'<p style="font-size:14px;line-height:1.65;margin-top:8px;color:var(--xp-ink2)">{_rich(text)}</p></div>'
-    )
-
-
 def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     cls = "slide is-active" if active else "slide"
     data_title = f' data-title="{_esc(title)}"' if title else ""
@@ -174,7 +163,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <h2 class="xp-h2">{_rich(slide.get("title") or "核心要点")}</h2>
     <div class="xp-divider"></div>
     <div class="{grid_cls}">{''.join(cards)}</div>
-    {_notes_aside(slide)}
     {_footer(f"content · {grid_cls.split('-')[-1]}-up", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))

@@ -38,13 +38,6 @@ def _split_kv(bullet: str) -> tuple[str, str]:
     return "", bullet.strip()
 
 
-def _notes_aside(slide: dict[str, Any]) -> str:
-    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
-    if not text:
-        return ""
-    return f'<div class="callout" style="margin-top:22px"><b>讲者备注</b><br>{_rich(text)}</div>'
-
-
 def _section(inner: str, *, active: bool = False, title: str = "", full: bool = False) -> str:
     classes = " ".join(c for c in ["slide", "is-active" if active else "", "full" if full else ""] if c)
     data_title = f' data-title="{_esc(title)}"' if title else ""
@@ -157,7 +150,6 @@ def _cards(slide: dict[str, Any], chapters: list[str], current_idx: int, slide_n
       <p class="kicker">{_esc(slide.get("section") or "concepts")}</p>
       <h2 class="h2">{_rich(slide.get("title") or "核心概念")}</h2>
       <div class="{grid_cls} mt-l">{''.join(cells)}</div>
-      {_notes_aside(slide)}
       {_footer(slide_no, total, "content · concepts")}
     </div>
     """

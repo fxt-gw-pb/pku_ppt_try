@@ -51,17 +51,6 @@ def _page_dot(slide_no: int, total: int) -> str:
     return f'<div class="page-dot">{slide_no} / {total}</div>'
 
 
-def _notes_aside(slide: dict[str, Any]) -> str:
-    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
-    if not text:
-        return ""
-    return (
-        '<div class="hand-box" style="margin-top:18px;background:#fff8e1;border-color:#f0d265">'
-        '<span class="ht" style="background:#ffd75e">💬 小贴士</span>'
-        f'<p class="lede" style="font-size:15px;margin-top:8px">{_rich(text)}</p></div>'
-    )
-
-
 def _bottom(left: str, right: str) -> str:
     return (
         '<div class="bottom-bar">'
@@ -146,7 +135,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div style="margin-top:180px">
       <h2 class="h2">{_rich(slide.get("title") or "核心要点")}</h2>
       <div style="margin-top:24px">{''.join(items)}</div>
-      {_notes_aside(slide)}
     </div>
     {_bottom("@fxt-ppt", "content")}
     """
@@ -179,7 +167,6 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div style="margin-top:170px">
       <h2 class="h2">{_rich(slide.get("title") or "过程拆解")}</h2>
       <div style="margin-top:26px">{''.join(rows)}</div>
-      {_notes_aside(slide)}
     </div>
     {_bottom("@fxt-ppt", "steps")}
     """
