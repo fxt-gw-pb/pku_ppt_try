@@ -3,39 +3,115 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PKU 红 · 文稿生成 PPT</title>
+  <title>DeckPilot AI · PPT 生成工作台</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="bar">
-    <div class="brand">
-      <span class="dot"></span>
-      <span class="brand-title">PKU 红 · 文稿生成 PPT</span>
-    </div>
+  <header class="site-header">
+    <a class="brand" href="#templates" aria-label="DeckPilot AI 首页">
+      <span class="brand-mark">DP</span>
+      <span>
+        <strong>DeckPilot AI</strong>
+        <small>HTML / PDF PPT Generator</small>
+      </span>
+    </a>
+    <nav class="nav">
+      <a href="#templates" data-nav="templates">选模板</a>
+      <a href="#generate" data-nav="generate">输入文稿</a>
+      <a href="/html-ppt-templates/" target="_blank" rel="noopener">模板库</a>
+    </nav>
   </header>
 
-  <main class="grid">
-    <section class="panel input-panel">
-      <h2>1. 粘贴文稿</h2>
-      <p class="hint">支持中文 / Markdown。建议 1k–10k 字。生成需 10-30 秒。</p>
-      <div class="template-block">
-        <div class="template-head">
-          <span>选择模板</span>
-          <a href="/html-ppt-templates/" target="_blank" rel="noopener">预览模板库</a>
+  <main>
+    <section id="templates-view" class="view">
+      <div class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">AI PPT 生成网站原型</p>
+          <h1>先选模板，再把文稿变成可预览的 HTML 幻灯片。</h1>
+          <p class="hero-text">
+            面向答辩、技术分享、小红书图文、路演、周报和课程材料。前端不保存 API Key，只把文稿和模板选择提交给后端生成任务。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#generate">开始生成</a>
+            <a class="button ghost" href="/html-ppt-templates/templates/full-decks-index.html" target="_blank" rel="noopener">查看模板库</a>
+          </div>
         </div>
-        <div id="templates" class="template-grid"></div>
+        <div class="hero-preview" aria-label="PPT 预览示意">
+          <div class="preview-window">
+            <div class="window-dots"><span></span><span></span><span></span></div>
+            <div class="slide-mock">
+              <span id="hero-template-label">Academic</span>
+              <h2 id="hero-template-name">北大红答辩模板</h2>
+              <div class="mock-bars">
+                <i></i><i></i><i></i>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <textarea id="manuscript" placeholder="在此粘贴论文摘要、开题报告、研究方案……"></textarea>
-      <div class="controls">
-        <span class="count"><span id="count">0</span> / <span id="limit">30000</span> 字</span>
-        <button id="generate">生成 PPT</button>
-      </div>
+
+      <section class="section-head">
+        <div>
+          <p class="eyebrow">Template Repository</p>
+          <h2>选择一个模板作为生成起点</h2>
+        </div>
+        <p id="template-source" class="muted">正在加载模板...</p>
+      </section>
+
+      <section id="template-gallery" class="template-gallery" aria-live="polite"></section>
     </section>
 
-    <section class="panel status-panel">
-      <h2>2. 任务状态</h2>
-      <div id="status-empty" class="empty">尚未提交任务。</div>
-      <ul id="jobs" class="jobs"></ul>
+    <section id="generate-view" class="view" hidden>
+      <div class="workspace">
+        <section class="composer panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Generate</p>
+              <h1>输入文稿制作 PPT</h1>
+            </div>
+            <a class="button ghost small" href="#templates">换模板</a>
+          </div>
+
+          <div class="template-strip" id="template-strip"></div>
+
+          <label class="input-label" for="manuscript">文稿内容</label>
+          <textarea id="manuscript" placeholder="粘贴论文摘要、产品方案、技术分享提纲或小红书长文。AI 会根据文稿结构生成标题、章节、要点和演讲顺序。"></textarea>
+
+          <div class="controls">
+            <span class="count"><span id="count">0</span> / <span id="limit">30000</span> 字</span>
+            <button id="generate" class="button primary" type="button">生成 PPT</button>
+          </div>
+        </section>
+
+        <aside class="status panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Preview</p>
+              <h2>生成状态 / 预览</h2>
+            </div>
+            <span id="active-template-chip" class="chip">北大红答辩模板</span>
+          </div>
+
+          <div class="stage-card">
+            <div class="window-dots"><span></span><span></span><span></span></div>
+            <div class="stage-slide">
+              <span id="preview-template-label">Academic</span>
+              <h3 id="preview-title">AI PPT 生成预览</h3>
+              <div class="preview-grid"><i></i><i></i><i></i></div>
+            </div>
+          </div>
+
+          <div class="export-note">
+            <strong>导出说明</strong>
+            <p>
+              抱歉，当前 PPT 生成功能只支持导出为 HTML 和 PDF，不支持导出为 PPTX 文件。若要导出为 PDF，请点击进入预览页后，使用浏览器打印快捷键：Windows/Linux 为 <kbd>Ctrl + P</kbd>，Mac 为 <kbd>Command + P</kbd>，然后选择“另存为 PDF”或“保存为 PDF”。
+            </p>
+          </div>
+
+          <div id="status-empty" class="empty">尚未提交任务。粘贴文稿后点击生成。</div>
+          <ul id="jobs" class="jobs"></ul>
+        </aside>
+      </div>
     </section>
   </main>
 

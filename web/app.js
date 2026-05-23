@@ -1,97 +1,322 @@
-// Frontend demo for the PKU PPT generator backend.
-// The frontend holds NO API keys. It only talks to its own backend.
+// Keyless static frontend. It only talks to this project's public backend.
 
 const API_BASE = (() => {
-  // file:// preview → local dev backend.
   if (location.protocol === "file:") return "http://127.0.0.1:8787";
-  // GitHub Pages frontend → Render-hosted backend.
   if (location.hostname.endsWith("github.io")) return "https://pku-ppt-try.onrender.com";
-  // Served by the FastAPI app itself (local uvicorn) → same origin.
   return "";
 })();
 
+const FALLBACK_TEMPLATES = [
+  {
+    template_id: "pku-red",
+    name: "北大红答辩模板",
+    engine: "pku-json",
+    description: "北大红学术答辩风格，适合论文答辩、开题报告和正式学术汇报。",
+    preview_url: "demo.html",
+    label: "Academic",
+    accent: "#b91c1c",
+  },
+  {
+    template_id: "xhs-white-editorial",
+    name: "小红书白底杂志风",
+    engine: "html-ppt",
+    description: "白底杂志风、强重点块、马卡龙软色卡，适合中文内容帖和知识分享。",
+    preview_url: "html-ppt-templates/templates/full-decks/xhs-white-editorial/index.html",
+    label: "Editorial",
+    accent: "#f97316",
+  },
+  {
+    template_id: "graphify-dark-graph",
+    name: "暗底知识图谱",
+    engine: "html-ppt",
+    description: "深夜渐变、知识图谱和玻璃卡片，适合 AI、数据产品和图谱类分享。",
+    preview_url: "html-ppt-templates/templates/full-decks/graphify-dark-graph/index.html",
+    label: "Graph",
+    accent: "#22c55e",
+  },
+  {
+    template_id: "knowledge-arch-blueprint",
+    name: "奶油蓝图架构",
+    engine: "html-ppt",
+    description: "奶油纸面、蓝图网格和硬边框，适合系统架构、工程白皮书和技术路线。",
+    preview_url: "html-ppt-templates/templates/full-decks/knowledge-arch-blueprint/index.html",
+    label: "Blueprint",
+    accent: "#2563eb",
+  },
+  {
+    template_id: "hermes-cyber-terminal",
+    name: "暗终端 Cyber",
+    engine: "html-ppt",
+    description: "终端窗口、扫描线和代码感，适合 CLI、Agent、工具评测和技术复盘。",
+    preview_url: "html-ppt-templates/templates/full-decks/hermes-cyber-terminal/index.html",
+    label: "Terminal",
+    accent: "#14b8a6",
+  },
+  {
+    template_id: "obsidian-claude-gradient",
+    name: "GitHub 暗紫渐变",
+    engine: "html-ppt",
+    description: "GitHub dark 加紫蓝渐变，适合开发者工作流、LLM 产品和工具教程。",
+    preview_url: "html-ppt-templates/templates/full-decks/obsidian-claude-gradient/index.html",
+    label: "Developer",
+    accent: "#7c3aed",
+  },
+  {
+    template_id: "testing-safety-alert",
+    name: "红琥珀警示",
+    engine: "html-ppt",
+    description: "风险警示、事故复盘和安全审查风格，适合 AI 安全、风控和红队汇报。",
+    preview_url: "html-ppt-templates/templates/full-decks/testing-safety-alert/index.html",
+    label: "Safety",
+    accent: "#dc2626",
+  },
+  {
+    template_id: "xhs-pastel-card",
+    name: "小红书柔和马卡龙",
+    engine: "html-ppt",
+    description: "柔和卡片、手作杂志感，适合生活方式、成长类和轻内容分享。",
+    preview_url: "html-ppt-templates/templates/full-decks/xhs-pastel-card/index.html",
+    label: "Pastel",
+    accent: "#ec4899",
+  },
+  {
+    template_id: "dir-key-nav-minimal",
+    name: "方向键 8 色极简",
+    engine: "html-ppt",
+    description: "大留白、一页一观点、强色块切换，适合 keynote 式演讲。",
+    preview_url: "html-ppt-templates/templates/full-decks/dir-key-nav-minimal/index.html",
+    label: "Minimal",
+    accent: "#0f766e",
+  },
+  {
+    template_id: "pitch-deck",
+    name: "Pitch Deck 路演",
+    engine: "html-ppt",
+    description: "白底蓝紫渐变、指标和融资叙事，适合创业路演和投资人汇报。",
+    preview_url: "html-ppt-templates/templates/full-decks/pitch-deck/index.html",
+    label: "Startup",
+    accent: "#4f46e5",
+  },
+  {
+    template_id: "product-launch",
+    name: "Product Launch 发布会",
+    engine: "html-ppt",
+    description: "深色封面、功能卡片和 CTA，适合产品发布和方案展示。",
+    preview_url: "html-ppt-templates/templates/full-decks/product-launch/index.html",
+    label: "Launch",
+    accent: "#ea580c",
+  },
+  {
+    template_id: "tech-sharing",
+    name: "Tech Sharing 技术分享",
+    engine: "html-ppt",
+    description: "GitHub dark、代码块和终端感，适合内部技术分享和会议演讲。",
+    preview_url: "html-ppt-templates/templates/full-decks/tech-sharing/index.html",
+    label: "Tech",
+    accent: "#0891b2",
+  },
+  {
+    template_id: "weekly-report",
+    name: "Weekly Report 周报",
+    engine: "html-ppt",
+    description: "清晰商务报表风，适合周报、项目进展和业务复盘。",
+    preview_url: "html-ppt-templates/templates/full-decks/weekly-report/index.html",
+    label: "Report",
+    accent: "#0284c7",
+  },
+  {
+    template_id: "xhs-post",
+    name: "小红书 3:4 图文",
+    engine: "html-ppt",
+    description: "3:4 竖版卡片，适合小红书/社媒图文轮播。",
+    preview_url: "html-ppt-templates/templates/full-decks/xhs-post/index.html",
+    label: "Social",
+    accent: "#e11d48",
+  },
+  {
+    template_id: "course-module",
+    name: "Course Module 教学模块",
+    engine: "html-ppt",
+    description: "课程侧栏和学习目标结构，适合课程、workshop 和培训材料。",
+    preview_url: "html-ppt-templates/templates/full-decks/course-module/index.html",
+    label: "Course",
+    accent: "#ca8a04",
+  },
+  {
+    template_id: "presenter-mode-reveal",
+    name: "演讲者模式 Reveal",
+    engine: "html-ppt",
+    description: "带逐字稿和演讲者视图的模板，适合技术分享、课程和正式演讲。",
+    preview_url: "html-ppt-templates/templates/full-decks/presenter-mode-reveal/index.html",
+    label: "Speaker",
+    accent: "#4338ca",
+  },
+];
+
 const $ = (id) => document.getElementById(id);
+
+const templatesView = $("templates-view");
+const generateView = $("generate-view");
+const templateGallery = $("template-gallery");
+const templateStrip = $("template-strip");
+const templateSource = $("template-source");
 const manuscriptEl = $("manuscript");
 const countEl = $("count");
 const limitEl = $("limit");
 const generateBtn = $("generate");
 const jobsEl = $("jobs");
 const emptyEl = $("status-empty");
-const templatesEl = $("templates");
+const activeChip = $("active-template-chip");
+const heroTemplateLabel = $("hero-template-label");
+const heroTemplateName = $("hero-template-name");
+const previewTemplateLabel = $("preview-template-label");
+const previewTitle = $("preview-title");
 
 let MAX_CHARS = 30000;
+let templates = FALLBACK_TEMPLATES;
 let selectedTemplateId = "pku-red";
-const polling = new Map(); // job_id → intervalId
+const polling = new Map();
+
+function normalizeTemplates(remoteTemplates) {
+  const byId = new Map(FALLBACK_TEMPLATES.map((tpl) => [tpl.template_id, { ...tpl }]));
+  (remoteTemplates || []).forEach((tpl) => {
+    const fallback = byId.get(tpl.template_id) || {};
+    byId.set(tpl.template_id, { ...fallback, ...tpl });
+  });
+  return [...byId.values()];
+}
 
 async function loadHealth() {
   try {
-    const r = await fetch(`${API_BASE}/api/health`);
-    if (!r.ok) throw new Error(`${r.status}`);
-    const h = await r.json();
-    MAX_CHARS = h.max_input_chars || MAX_CHARS;
-    selectedTemplateId = h.default_template_id || selectedTemplateId;
-    limitEl.textContent = MAX_CHARS;
-    renderTemplates(h.templates || []);
-    updateCount();
-  } catch (e) {
-    // Backend unreachable — the Generate button will surface the error on click.
-    renderTemplates([
-      {
-        template_id: "pku-red",
-        name: "北大红答辩模板",
-        engine: "pku-json",
-        description: "北大红学术答辩风格。",
-      },
-      {
-        template_id: "xhs-white-editorial",
-        name: "小红书白底杂志风",
-        engine: "html-ppt",
-        description: "白底杂志风、强重点块、马卡龙软色卡。",
-      },
-    ]);
+    const response = await fetch(`${API_BASE}/api/health`);
+    if (!response.ok) throw new Error(`${response.status}`);
+    const health = await response.json();
+    MAX_CHARS = health.max_input_chars || MAX_CHARS;
+    selectedTemplateId = health.default_template_id || selectedTemplateId;
+    templates = normalizeTemplates(health.templates);
+    templateSource.textContent = `已加载 ${templates.length} 个模板`;
+  } catch (error) {
+    templates = normalizeTemplates([]);
+    templateSource.textContent = `离线模板列表：${templates.length} 个`;
   }
+
+  limitEl.textContent = MAX_CHARS;
+  renderTemplates();
+  selectTemplate(readTemplateFromUrl() || selectedTemplateId, false);
+  updateCount();
 }
 
-function renderTemplates(templates) {
-  if (!templatesEl) return;
-  templatesEl.innerHTML = "";
-  templates.forEach((tpl) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "template-card";
-    btn.dataset.templateId = tpl.template_id;
-    btn.classList.toggle("selected", tpl.template_id === selectedTemplateId);
-    btn.innerHTML = `
-      <span class="template-name">${escapeHtml(tpl.name)}</span>
-      <span class="template-engine">${escapeHtml(tpl.engine)}</span>
-      <span class="template-desc">${escapeHtml(tpl.description || "")}</span>
-    `;
-    btn.addEventListener("click", () => {
-      selectedTemplateId = tpl.template_id;
-      document.querySelectorAll(".template-card").forEach((el) => {
-        el.classList.toggle("selected", el.dataset.templateId === selectedTemplateId);
-      });
-    });
-    templatesEl.appendChild(btn);
+function readTemplateFromUrl() {
+  const params = new URLSearchParams(location.search);
+  return params.get("template");
+}
+
+function route() {
+  const target = location.hash === "#generate" ? "generate" : "templates";
+  templatesView.hidden = target !== "templates";
+  generateView.hidden = target !== "generate";
+  document.querySelectorAll("[data-nav]").forEach((link) => {
+    link.classList.toggle("active", link.dataset.nav === target);
   });
 }
 
-function updateCount() {
-  const n = manuscriptEl.value.length;
-  countEl.textContent = n;
-  const over = n > MAX_CHARS;
-  countEl.parentElement.classList.toggle("over", over);
-  generateBtn.disabled = n === 0 || over;
+function renderTemplates() {
+  templateGallery.innerHTML = "";
+  templateStrip.innerHTML = "";
+
+  templates.forEach((tpl) => {
+    templateGallery.appendChild(createTemplateCard(tpl));
+    templateStrip.appendChild(createTemplatePill(tpl));
+  });
 }
 
-manuscriptEl.addEventListener("input", updateCount);
+function createTemplateCard(tpl) {
+  const article = document.createElement("article");
+  article.className = "template-card";
+  article.dataset.templateId = tpl.template_id;
+  article.style.setProperty("--accent", tpl.accent || "#2563eb");
+  article.innerHTML = `
+    <div class="template-card-top">
+      <span class="template-mark">${escapeHtml(tpl.label || tpl.engine)}</span>
+      <span class="template-engine">${escapeHtml(tpl.engine)}</span>
+    </div>
+    <h3>${escapeHtml(tpl.name)}</h3>
+    <p>${escapeHtml(tpl.description || "")}</p>
+    <div class="template-actions">
+      <button class="text-button" type="button" data-action="select">使用模板</button>
+      <a href="${escapeAttr(resolvePreviewHref(tpl))}" target="_blank" rel="noopener">预览</a>
+    </div>
+  `;
+  article.querySelector("[data-action='select']").addEventListener("click", () => {
+    selectTemplate(tpl.template_id);
+    location.hash = "generate";
+  });
+  return article;
+}
 
-generateBtn.addEventListener("click", async () => {
+function createTemplatePill(tpl) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "template-pill";
+  button.dataset.templateId = tpl.template_id;
+  button.style.setProperty("--accent", tpl.accent || "#2563eb");
+  button.innerHTML = `
+    <span>${escapeHtml(tpl.name)}</span>
+    <small>${escapeHtml(tpl.label || tpl.engine)}</small>
+  `;
+  button.addEventListener("click", () => selectTemplate(tpl.template_id));
+  return button;
+}
+
+function selectTemplate(templateId, updateUrl = true) {
+  const exists = templates.some((tpl) => tpl.template_id === templateId);
+  selectedTemplateId = exists ? templateId : "pku-red";
+  const tpl = getSelectedTemplate();
+
+  document.querySelectorAll("[data-template-id]").forEach((el) => {
+    el.classList.toggle("selected", el.dataset.templateId === selectedTemplateId);
+  });
+
+  activeChip.textContent = tpl.name;
+  heroTemplateLabel.textContent = tpl.label || tpl.engine;
+  heroTemplateName.textContent = tpl.name;
+  previewTemplateLabel.textContent = tpl.label || tpl.engine;
+  updatePreviewTitle();
+
+  if (updateUrl) {
+    const url = new URL(location.href);
+    url.searchParams.set("template", selectedTemplateId);
+    history.replaceState(null, "", `${url.pathname}${url.search}${location.hash}`);
+  }
+}
+
+function getSelectedTemplate() {
+  return templates.find((tpl) => tpl.template_id === selectedTemplateId) || templates[0];
+}
+
+function updateCount() {
+  const length = manuscriptEl.value.length;
+  countEl.textContent = length;
+  const overLimit = length > MAX_CHARS;
+  countEl.parentElement.classList.toggle("over", overLimit);
+  generateBtn.disabled = length === 0 || overLimit;
+  updatePreviewTitle();
+}
+
+function updatePreviewTitle() {
+  const firstLine = manuscriptEl.value.trim().split("\n").find(Boolean);
+  previewTitle.textContent = firstLine ? firstLine.slice(0, 34) : "AI PPT 生成预览";
+}
+
+async function createJob() {
   const manuscript = manuscriptEl.value.trim();
   if (!manuscript) return;
+
   generateBtn.disabled = true;
+  generateBtn.textContent = "生成中...";
+
   try {
-    const r = await fetch(`${API_BASE}/api/jobs`, {
+    const response = await fetch(`${API_BASE}/api/jobs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -100,100 +325,129 @@ generateBtn.addEventListener("click", async () => {
         template_id: selectedTemplateId,
       }),
     });
-    if (!r.ok) {
-      const body = await r.text();
-      throw new Error(`HTTP ${r.status}: ${body}`);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`HTTP ${response.status}: ${body}`);
     }
-    const job = await r.json();
+    const job = await response.json();
     addJobCard(job);
     startPolling(job.job_id);
-  } catch (e) {
-    alert(`提交失败: ${e.message}`);
+  } catch (error) {
+    addJobCard({
+      job_id: "local-error",
+      status: "failed",
+      template_name: getSelectedTemplate().name,
+      error: `提交失败：${error.message}`,
+    });
   } finally {
-    generateBtn.disabled = false;
+    generateBtn.textContent = "生成 PPT";
+    updateCount();
   }
-});
+}
 
-function statusLabel(s) {
+function statusLabel(status) {
   return {
     pending: "等待中",
     running: "生成中",
     done: "已完成",
     failed: "失败",
-  }[s] || s;
+  }[status] || status;
 }
 
 function addJobCard(job) {
-  emptyEl.style.display = "none";
-  let li = document.getElementById(`job-${job.job_id}`);
-  if (!li) {
-    li = document.createElement("li");
-    li.id = `job-${job.job_id}`;
-    li.className = "job";
-    jobsEl.prepend(li);
+  emptyEl.hidden = true;
+  let item = document.getElementById(`job-${job.job_id}`);
+  if (!item) {
+    item = document.createElement("li");
+    item.id = `job-${job.job_id}`;
+    item.className = "job";
+    jobsEl.prepend(item);
   }
-  renderJobCard(li, job);
+  renderJobCard(item, job);
 }
 
-function renderJobCard(li, job) {
-  li.classList.remove("pending", "running", "done", "failed");
-  li.classList.add(job.status);
+function renderJobCard(item, job) {
+  item.className = `job ${job.status}`;
   const created = job.created_at ? new Date(job.created_at).toLocaleTimeString() : "";
   const slideInfo = job.slide_count ? ` · ${job.slide_count} slides` : "";
-  const tplInfo = job.template_name ? ` · ${escapeHtml(job.template_name)}` : "";
+  const templateInfo = job.template_name ? ` · ${escapeHtml(job.template_name)}` : "";
 
   let actions = "";
   if (job.status === "done") {
     actions = `
       <div class="job-actions">
-        <a href="${API_BASE}${job.preview_url}" target="_blank" rel="noopener">在线预览</a>
-        <a href="${API_BASE}${job.download_url}">下载 .zip</a>
+        <a href="${escapeAttr(resolveBackendHref(job.preview_url))}" target="_blank" rel="noopener">进入预览页</a>
+        <a href="${escapeAttr(resolveBackendHref(job.download_url))}">下载 HTML 包</a>
       </div>`;
   }
 
-  let errorBlock = "";
-  if (job.status === "failed" && job.error) {
-    errorBlock = `<div class="job-error">${escapeHtml(job.error)}</div>`;
-  }
+  const errorBlock = job.status === "failed" && job.error
+    ? `<div class="job-error">${escapeHtml(job.error)}</div>`
+    : "";
 
-  li.innerHTML = `
+  item.innerHTML = `
     <div class="job-head">
-      <span class="job-id">#${job.job_id}</span>
-      <span class="job-status ${job.status}">${statusLabel(job.status)}</span>
+      <span class="job-id">#${escapeHtml(job.job_id)}</span>
+      <span class="job-status ${escapeHtml(job.status)}">${escapeHtml(statusLabel(job.status))}</span>
     </div>
-    <div class="job-meta">${created}${slideInfo}${tplInfo}</div>
+    <div class="job-meta">${created}${slideInfo}${templateInfo}</div>
     ${actions}
     ${errorBlock}
   `;
 }
 
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-  }[c]));
-}
+function startPolling(jobId) {
+  if (polling.has(jobId)) return;
 
-function startPolling(job_id) {
-  if (polling.has(job_id)) return;
   const tick = async () => {
     try {
-      const r = await fetch(`${API_BASE}/api/jobs/${job_id}`);
-      if (!r.ok) throw new Error(`${r.status}`);
-      const job = await r.json();
-      const li = document.getElementById(`job-${job_id}`);
-      if (li) renderJobCard(li, job);
+      const response = await fetch(`${API_BASE}/api/jobs/${jobId}`);
+      if (!response.ok) throw new Error(`${response.status}`);
+      const job = await response.json();
+      const item = document.getElementById(`job-${jobId}`);
+      if (item) renderJobCard(item, job);
       if (job.status === "done" || job.status === "failed") {
-        clearInterval(polling.get(job_id));
-        polling.delete(job_id);
+        clearInterval(polling.get(jobId));
+        polling.delete(jobId);
       }
-    } catch (e) {
-      // Network blip — keep polling.
+    } catch (error) {
+      // Keep polling through short backend cold-start or network blips.
     }
   };
-  const id = setInterval(tick, 1200);
-  polling.set(job_id, id);
+
+  polling.set(jobId, setInterval(tick, 1200));
   tick();
 }
 
+function resolveBackendHref(path) {
+  if (!path) return "#";
+  if (/^https?:\/\//.test(path)) return path;
+  return `${API_BASE}${path}`;
+}
+
+function resolvePreviewHref(tpl) {
+  const href = tpl.preview_url || "";
+  if (/^https?:\/\//.test(href)) return href;
+  return href.replace(/^\//, "");
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[char]));
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value);
+}
+
+window.addEventListener("hashchange", route);
+manuscriptEl.addEventListener("input", updateCount);
+generateBtn.addEventListener("click", createJob);
+
 loadHealth();
-updateCount();
+route();
