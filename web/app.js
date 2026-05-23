@@ -2,9 +2,11 @@
 // The frontend holds NO API keys. It only talks to its own backend.
 
 const API_BASE = (() => {
-  // When served by the FastAPI app itself, "" is fine. If a user opens the
-  // file:// version of this page, fall back to localhost:8787.
+  // file:// preview → local dev backend.
   if (location.protocol === "file:") return "http://127.0.0.1:8787";
+  // GitHub Pages frontend → Render-hosted backend.
+  if (location.hostname.endsWith("github.io")) return "https://pku-ppt-try.onrender.com";
+  // Served by the FastAPI app itself (local uvicorn) → same origin.
   return "";
 })();
 

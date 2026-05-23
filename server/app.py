@@ -54,10 +54,26 @@ JOB_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="PKU PPT Generator", version="0.1.0")
 
-# Permissive CORS so the static frontend can be served from anywhere during dev.
+# CORS — only the GitHub Pages frontend and local dev are allowed to call the
+# API from a browser. (curl / server-to-server traffic isn't affected; CORS is
+# enforced by browsers.) Override via env CORS_ORIGINS="a,b,c" if you add a
+# new frontend host.
+_default_origins = [
+    "https://fxt-gw-pb.github.io",
+    "http://127.0.0.1:8787",
+    "http://localhost:8787",
+    "http://127.0.0.1:8090",
+    "http://localhost:8090",
+]
+_env_origins = os.environ.get("CORS_ORIGINS", "").strip()
+ALLOWED_ORIGINS = (
+    [o.strip() for o in _env_origins.split(",") if o.strip()]
+    if _env_origins
+    else _default_origins
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
