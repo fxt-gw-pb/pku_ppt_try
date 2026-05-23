@@ -153,6 +153,7 @@ const emptyEl = $("status-empty");
 const activeChip = $("active-template-chip");
 const heroTemplateLabel = $("hero-template-label");
 const heroTemplateName = $("hero-template-name");
+const heroTemplateNote = $("hero-template-note");
 const previewTemplateLabel = $("preview-template-label");
 const previewTitle = $("preview-title");
 const openDonationBtns = document.querySelectorAll(".donation-trigger");
@@ -267,6 +268,7 @@ function selectTemplate(templateId, updateUrl = true) {
   activeChip.textContent = tpl.name;
   heroTemplateLabel.textContent = tpl.label || tpl.engine;
   heroTemplateName.textContent = tpl.name;
+  if (heroTemplateNote) heroTemplateNote.textContent = tpl.description || "";
   previewTemplateLabel.textContent = tpl.label || tpl.engine;
   updatePreviewTitle();
 
