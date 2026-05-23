@@ -17,10 +17,10 @@ manuscript
   -> zip + static preview served by server/app.py
 ```
 
-The repository intentionally contains three related surfaces:
+The repository intentionally contains these related surfaces:
 
 - Backend: `server/app.py`, FastAPI, job state in `data/jobs/`, generated decks in `outputs/`.
-- Frontend: root `index.html` for GitHub Pages plus `web/` for local FastAPI static serving.
+- Frontend: root `index.html` for GitHub Pages plus `web/` for local FastAPI static serving. The public UI is branded `fxt ppt`.
 - PKU deck template / skill: root `demo.html`, `deck-stage.js`, `assets/`, `data/slides.json`, and the mirrored skill bundle under `pku-red-defense-ppt/`.
 
 ## Critical Constraints
@@ -33,6 +33,8 @@ The repository intentionally contains three related surfaces:
 - Render/GitHub Pages production download links must use `/decks/{id}.zip` and previews must use `/decks/{id}/index.html`. Do not switch the frontend back to `/api/jobs/{id}/download`; Render's edge has a known cross-origin `FileResponse` issue.
 - `outputs/` and `data/jobs/` are runtime artifacts and are gitignored. Render's filesystem is ephemeral, so generated files disappear on deploy/restart/cold start.
 - The backend job runner is a daemon thread in the FastAPI process. It is fine for MVP, not for production load.
+- Public UI must only expose two views: `选模板` and `输入文稿`. Do not add or relink a separate template-library page.
+- Avoid user-visible `html-ppt` / skill-origin wording in the website, API display data, or generated deck copy. Internal folder names and engine strings may remain where needed for compatibility.
 
 ## Git / Deployment Facts
 
@@ -57,6 +59,24 @@ User preference: after code or website changes are completed and verified,
 commit and push them to `origin/main` by default so GitHub Pages and Render can
 pick them up. Still check status/remote/branch first, and never include secrets
 or ignored runtime outputs.
+
+## Current Product/UI State
+
+- Brand: `fxt ppt`.
+- Public Pages URL: `https://fxt-gw-pb.github.io/pku_ppt_try/`.
+- The root page is a two-view static app:
+  - `#templates`: select a template.
+  - `#generate`: paste manuscript, generate, poll jobs, preview/download results.
+- There is intentionally no separate template library page. The files `template-preview.html`, `web/template-preview.html`, `html-ppt-templates/index.html`, and `html-ppt-templates/templates/full-decks-index.html` were deleted.
+- `server/app.py` must not mount `/html-ppt-templates` for public browsing.
+- Template cards only have `使用模板`; do not re-add `预览` links unless the user explicitly asks to restore a third page.
+- The template and generate views both include this donation note, with a clickable `.donation-trigger` opening the shared QR modal:
+  `该网页暂时免费使用，生成 PPT 需要一定的 API token 花费，该费用由作者承担，请勿滥用，如果感到有用，也欢迎 打赏给作者 <=1 元的奖赏~`
+- Donation QR image: `收款码/537a8a731804791d569387f56522fa2a.jpg`. FastAPI mounts `/收款码` for local preview.
+- Generate view warning text:
+  `PPT 生成需要约 30s，生成过程中切勿刷新页面，刷新页面也会丢失您的既往文件生成记录。`
+- Export wording in the public UI should say `网页包和 PDF`, not `HTML/PPTX` except where explicitly explaining PPTX is unsupported.
+- Generated job buttons are high contrast: `进入预览页` red filled, `下载网页包` light filled with red text/border.
 
 ## Local Development
 
@@ -139,7 +159,7 @@ Richer layouts such as `image-analysis`, `chart-analysis`, `framework`, `vs`, an
 
 ## Template Sync Rule
 
-The visual template exists in two mirrored places:
+The PKU red visual template exists in two mirrored places:
 
 - Root runtime used by `demo.html`: `deck-stage.js`, `assets/base.css`, `assets/runtime.js`, `assets/theme-pku-red.css`, `data/slides.json`
 - Skill/export template used by generated decks: `pku-red-defense-ppt/assets/template/...`
@@ -156,10 +176,16 @@ cmp -s data/slides.json pku-red-defense-ppt/assets/template/data/slides.json
 
 The exporter copies `pku-red-defense-ppt/assets/template/`, not the root template files.
 
-html-ppt templates are managed separately. Production assets for imported
-html-ppt templates live under `templates/html-ppt/`; the copied
-`html-ppt-templates/` folder is only a local preview gallery. Do not make the
-exporter depend on the preview gallery.
+Imported full-deck templates are managed separately. Production assets live
+under `templates/html-ppt/`; keep the exporter independent from
+`html-ppt-templates/`, and do not expose that copied folder as a public template
+gallery.
+
+PKU red template-specific current behavior:
+
+- The cover page no longer renders the old white metadata box for `汇报人`, `指导老师`, or `学院专业`.
+- Content slides no longer auto-render `meta.school` in the lower-left footer.
+- `DEFAULT_META`, root `data/slides.json`, and mirrored `pku-red-defense-ppt/assets/template/data/slides.json` no longer contain `X X X`, `X X X 教授`, or `X X 学院 · X X 专业` placeholders.
 
 ## Visual Rules
 
@@ -191,7 +217,7 @@ Reference files:
 - `src/llm/mock.py`: deterministic provider for keyless E2E tests.
 - `src/schema/__init__.py`: generic LLM output validator.
 - `src/renderer/__init__.py`: generic-to-PKU compiler.
-- `src/renderer/xhs_white_editorial.py`: generic-to-html-ppt renderer for the imported XHS template.
+- `src/renderer/xhs_white_editorial.py`: generic-to-imported-template renderer for the XHS template.
 - `src/exporter/__init__.py`: copy template, write `data/slides.json`, zip deck.
 - `src/templates/registry.py`: template registry used by API, CLI, and frontend.
 - `scripts/generate.py`: CLI generation entrypoint.
@@ -209,6 +235,7 @@ Endpoints:
 - `GET /api/jobs/{job_id}/download` for legacy/curl use
 - `GET /api/jobs/{job_id}/preview` for legacy/curl use
 - `/decks/...` static output mount
+- `/收款码/...` static mount for the donation QR image
 - `/` static frontend mount from `web/`
 
 Job states:
@@ -229,16 +256,20 @@ Done jobs return:
 `POST /api/jobs` accepts `template_id`. Current values:
 
 - `pku-red`: default, existing PKU JSON runtime.
-- 15 imported html-ppt full-deck templates from `html-ppt-templates/templates/full-decks/`.
+- 15 imported full-deck templates.
   `xhs-white-editorial` has a dedicated renderer; the other imported templates
   use `src/renderer/html_ppt_generic.py` until they need template-specific
   refinement.
+
+`src/templates/registry.py` intentionally hides `preview_url` from
+`public_dict()` and maps internal engines to display values (`classic` or
+`template`). Keep public API display data free of skill/source names.
 
 ## Frontend Duplication
 
 There are two `index.html` files by design:
 
-- Root `index.html`: GitHub Pages root, references `web/style.css` and `web/app.js`, links to `demo.html`.
+- Root `index.html`: GitHub Pages root, references `web/style.css` and `web/app.js`.
 - `web/index.html`: local FastAPI static frontend, references sibling `style.css` and `app.js`.
 
 Keep them in sync when changing the UI, adjusting paths as needed.
