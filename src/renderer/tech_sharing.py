@@ -86,7 +86,7 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
       <div class="agenda-row">
         <div class="num">{i + 1:02d}</div>
         <div class="t">{_rich(t)}</div>
-        <div class="d">// 本部分提炼原文关键观点</div>
+        <div class="d">// part {i + 1:02d}</div>
       </div>
             """
         )
@@ -117,12 +117,17 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     cells = []
     for i, bullet in enumerate(bullets[:6]):
         head, body = _split_kv(bullet)
+        body_html = (
+            f'<p class="lede" style="font-size:14px;line-height:1.6">{_rich(body)}</p>'
+            if (head and body)
+            else ""
+        )
         cells.append(
             f"""
       <div class="card card-accent" style="padding:22px 26px">
         <span class="tag">{i + 1:02d}</span>
         <h4 style="margin:10px 0 6px;font-size:20px">{_rich(head or bullet)}</h4>
-        <p class="lede" style="font-size:14px;line-height:1.6">{_rich(body if head else "来自原文的核心要点提炼。")}</p>
+        {body_html}
       </div>
             """
         )

@@ -81,7 +81,6 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
       <div class="xw-card {SOFT_CLASSES[i % len(SOFT_CLASSES)]}">
         <div class="xw-label">Part {i + 1:02d}</div>
         <div class="main">{_rich(title)}</div>
-        <div class="desc">本部分提炼文稿中的关键观点。</div>
       </div>
             """
         )
@@ -121,7 +120,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <div class="xw-card {SOFT_CLASSES[i % len(SOFT_CLASSES)]}">
         <div class="xw-label">{_rich(head or f"Point {i + 1:02d}")}</div>
         <div class="main">{_rich(body or bullet)}</div>
-        <div class="desc">来自原文的核心要点提炼。</div>
       </div>
             """
         )

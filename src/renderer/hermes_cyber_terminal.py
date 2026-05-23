@@ -97,7 +97,6 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
       <div class="hc-card">
         <div class="lbl">PART {i + 1:02d}</div>
         <div class="val">{_rich(t)}</div>
-        <p class="desc">本部分提炼原文的关键观点。</p>
       </div>
             """
         )
@@ -145,7 +144,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <div class="hc-card">
         <div class="lbl">{_rich(head or f"POINT {i + 1:02d}")}</div>
         <div class="val">{_rich(body or bullet)}</div>
-        <p class="desc">来自原文的内容提炼。</p>
       </div>
             """
         )

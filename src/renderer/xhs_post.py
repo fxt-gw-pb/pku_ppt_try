@@ -83,7 +83,6 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
             f"""
       <div class="hand-box" style="margin-bottom:18px">
         <b style="font-size:22px">PART {i + 1:02d} · {_rich(t)}</b>
-        <p class="lede" style="font-size:16px;margin-top:6px">本部分提炼原文的关键观点。</p>
       </div>
             """
         )

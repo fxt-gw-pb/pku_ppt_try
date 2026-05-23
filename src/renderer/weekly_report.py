@@ -85,7 +85,7 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
             f"""
       <div class="ship-item">
         <span class="tag {tag}">PART {i + 1:02d}</span>
-        <div><b>{_rich(t)}</b><div class="lede" style="font-size:13px;margin-top:2px">本部分提炼原文的关键观点。</div></div>
+        <div><b>{_rich(t)}</b></div>
         <span class="owner">@fxt-ppt</span>
       </div>
             """
@@ -134,7 +134,7 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
             f"""
       <div class="ship-item">
         <span class="tag {tag}">{_rich(head or f"item {i + 1:02d}")}</span>
-        <div><b>{_rich(body or bullet)}</b><div class="lede" style="font-size:13px;margin-top:2px">来自原文的核心要点提炼。</div></div>
+        <div><b>{_rich(body or bullet)}</b></div>
         <span class="owner">{i + 1:02d}/{len(bullets):02d}</span>
       </div>
             """

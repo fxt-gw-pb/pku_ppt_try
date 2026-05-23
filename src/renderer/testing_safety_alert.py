@@ -90,7 +90,6 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
       <div class="ts-card">
         <div class="lbl">PART {i + 1:02d}</div>
         <h4>{_rich(t)}</h4>
-        <p>本部分提炼原文的关键观点。</p>
       </div>
             """
         )
@@ -131,12 +130,13 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     cells = []
     for i, bullet in enumerate(bullets[:6]):
         head, body = _split_kv(bullet)
+        body_html = f"<p>{_rich(body)}</p>" if (head and body) else ""
         cells.append(
             f"""
       <div class="ts-card">
         <div class="lbl">FINDING {i + 1:02d}</div>
         <h4>{_rich(head or bullet)}</h4>
-        <p>{_rich(body if head else "来自原文的核心要点提炼。")}</p>
+        {body_html}
       </div>
             """
         )

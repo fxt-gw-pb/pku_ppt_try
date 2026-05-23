@@ -62,7 +62,6 @@ def _contents(chapters: list[str], current: int, total: int) -> str:
         <div class="card card-hover">
           <p class="kicker">Part {i + 1:02d}</p>
           <h4>{_rich(title)}</h4>
-          <p class="dim">本部分提炼原文中的关键论点。</p>
         </div>
             """
         )
@@ -99,7 +98,6 @@ def _cards(slide: dict[str, Any], current: int, total: int) -> str:
         <div class="card card-hover">
           <p class="kicker">{_rich(head or f"Point {i + 1:02d}")}</p>
           <h4>{_rich(body or bullet)}</h4>
-          <p class="dim">来自原文的内容提炼。</p>
         </div>
             """
         )

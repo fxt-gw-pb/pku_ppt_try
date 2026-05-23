@@ -115,7 +115,6 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
       <div class="gd-glass {tint}">
         <p class="gd-eyebrow">Part {i + 1:02d}</p>
         <h4 style="margin:8px 0 4px;font-size:18px">{_rich(t)}</h4>
-        <p class="gd-dim" style="font-size:13px;line-height:1.55">本部分提炼原文的关键观点。</p>
       </div>
             """
         )
@@ -152,12 +151,17 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     for i, bullet in enumerate(bullets[:6]):
         head, body = _split_kv(bullet)
         tint = GLASS_TINTS[i % len(GLASS_TINTS)]
+        body_html = (
+            f'<p class="gd-dim" style="font-size:13px;line-height:1.55">{_rich(body)}</p>'
+            if (head and body)
+            else ""
+        )
         cells.append(
             f"""
       <div class="gd-glass {tint}">
         <div style="font-size:24px">{["◆", "●", "▲", "◇", "■", "★"][i % 6]}</div>
         <h4 style="margin:10px 0 6px;font-size:18px">{_rich(head or bullet)}</h4>
-        <p class="gd-dim" style="font-size:13px;line-height:1.55">{_rich(body if head else "来自原文的核心要点提炼。")}</p>
+        {body_html}
       </div>
             """
         )

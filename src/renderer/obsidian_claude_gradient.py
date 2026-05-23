@@ -79,7 +79,6 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
       <div class="oc-card">
         <span class="oc-badge {badge}">PART {i + 1:02d}</span>
         <div style="font-size:18px;font-weight:700;margin:6px 0 4px">{_rich(t)}</div>
-        <p style="font-size:13px;color:var(--oc-dim);line-height:1.55">本部分提炼原文的关键观点。</p>
       </div>
             """
         )
@@ -119,7 +118,6 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <div class="oc-card">
         <span class="oc-badge {badge}">{_rich(head or f"POINT {i + 1:02d}")}</span>
         <div style="font-size:18px;font-weight:700;margin:8px 0 6px">{_rich(body or bullet)}</div>
-        <p style="font-size:13px;color:var(--oc-dim);line-height:1.55">来自原文的核心要点提炼。</p>
       </div>
             """
         )

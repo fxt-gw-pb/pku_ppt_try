@@ -79,7 +79,6 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
       <div class="kb-step{hero_cls}">
         <div class="kb-step-num">PART {i + 1:02d}</div>
         <div class="kb-step-title">{_rich(t)}</div>
-        <div class="kb-step-body">本部分提炼原文关键观点与逻辑。</div>
       </div>
             """
         )
@@ -125,12 +124,13 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     cells = []
     for i, bullet in enumerate(bullets[:6]):
         head, body = _split_kv(bullet)
+        body_html = f"<p>{_rich(body)}</p>" if (head and body) else ""
         cells.append(
             f"""
       <div class="kb-card">
         <div class="kb-step-num">POINT {i + 1:02d}</div>
         <h4>{_rich(head or bullet)}</h4>
-        <p>{_rich(body if head else "来自原文的核心要点提炼。")}</p>
+        {body_html}
       </div>
             """
         )
