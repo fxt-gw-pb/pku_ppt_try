@@ -27,8 +27,7 @@ except ImportError:
 from src.exporter import export_deck, export_html_ppt_deck  # noqa: E402
 from src.llm import generate_slide_json  # noqa: E402
 from src.renderer import compile_to_pku  # noqa: E402
-from src.renderer.html_ppt_generic import render_html_ppt_generic  # noqa: E402
-from src.renderer.xhs_white_editorial import render_xhs_white_editorial  # noqa: E402
+from src.renderer.dispatch import render_for as render_html_ppt  # noqa: E402
 from src.schema import validate_slide_json  # noqa: E402
 from src.templates import DEFAULT_TEMPLATE_ID, get_template, list_templates  # noqa: E402
 
@@ -95,14 +94,12 @@ def main() -> int:
         print(f"→ materializing deck at {out_dir}…")
         deck_path = export_deck(pku, out_dir, force=True)
     elif template.engine == "html-ppt":
-        if template.renderer == "xhs-white-editorial":
-            html = render_xhs_white_editorial(generic)
-        else:
-            html = render_html_ppt_generic(
-                generic,
-                template_id=template.template_id,
-                body_class=template.body_class,
-            )
+        html = render_html_ppt(
+            template.renderer,
+            generic,
+            template_id=template.template_id,
+            body_class=template.body_class,
+        )
         print(f"→ materializing deck at {out_dir}…")
         deck_path = export_html_ppt_deck(
             html,

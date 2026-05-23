@@ -71,7 +71,7 @@ or ignored runtime outputs.
 - `server/app.py` must not mount `/html-ppt-templates` for public browsing.
 - Template cards only have `使用模板`; do not re-add `预览` links unless the user explicitly asks to restore a third page.
 - The template and generate views both include this donation note, with a clickable `.donation-trigger` opening the shared QR modal:
-  `该网页暂时免费使用，生成 PPT 需要一定的 API token 花费，该费用由作者承担，请勿滥用，如果感到有用，也欢迎 打赏给作者 <=1 元的奖赏~`
+  `该网页暂时免费使用，生成 PPT 需要一定的 API tokens 花费，该费用由作者承担，请勿滥用，如果感到有用，也欢迎 打赏给作者 <=1 元的奖赏~`
 - Donation QR image: `收款码/537a8a731804791d569387f56522fa2a.jpg`. FastAPI mounts `/收款码` for local preview.
 - Generate view warning text:
   `PPT 生成需要约 30s，生成过程中切勿刷新页面，刷新页面也会丢失您的既往文件生成记录。`
