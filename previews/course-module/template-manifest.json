@@ -1,0 +1,7 @@
+{
+  "template_id": "course-module",
+  "name": "course-module",
+  "engine": "html-ppt",
+  "description": "Imported html-ppt full-deck template.",
+  "source": "html-ppt templates/full-decks/course-module"
+}

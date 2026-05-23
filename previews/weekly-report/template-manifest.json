@@ -1,0 +1,7 @@
+{
+  "template_id": "weekly-report",
+  "name": "weekly-report",
+  "engine": "html-ppt",
+  "description": "Imported html-ppt full-deck template.",
+  "source": "html-ppt templates/full-decks/weekly-report"
+}

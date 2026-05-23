@@ -1,0 +1,7 @@
+{
+  "template_id": "obsidian-claude-gradient",
+  "name": "obsidian-claude-gradient",
+  "engine": "html-ppt",
+  "description": "Imported html-ppt full-deck template.",
+  "source": "html-ppt templates/full-decks/obsidian-claude-gradient"
+}

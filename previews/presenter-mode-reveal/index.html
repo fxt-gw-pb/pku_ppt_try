@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>基于注意力机制的医学影像分割研究</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="tpl-presenter-mode-reveal">
+<div class="deck">
+<section class="slide is-active" data-title="基于注意力机制的医学影像分割研究" data-notes="按 P 进入演讲者视图。">
+      <p class="kicker">fxt-ppt :: presenter mode</p>
+      <h1 class="h1">基于注意力机制的医学影像分割研究</h1>
+      <p class="lede">GRADUATION DEFENSE / OPENING REPORT</p>
+      <div class="speaker"><div class="av"></div><div><b>fxt ppt</b><span>auto-generated · presenter mode</span></div></div>
+      <div class="deck-footer mono"><span>cover</span><span>01 / 14</span></div>
+    </section><section class="slide" data-title="目录">
+      <p class="kicker">agenda · 05</p>
+      <h2 class="h2">本次分享分为 5 个主题</h2>
+      <div class="stack mt-l">
+      <div class="agenda-row">
+        <div class="num">01</div>
+        <div class="t">背景与意义</div>
+        <div class="d">// auto-grouped</div>
+      </div>
+            
+      <div class="agenda-row">
+        <div class="num">02</div>
+        <div class="t">国内外研究现状</div>
+        <div class="d">// auto-grouped</div>
+      </div>
+            
+      <div class="agenda-row">
+        <div class="num">03</div>
+        <div class="t">研究思路与内容</div>
+        <div class="d">// auto-grouped</div>
+      </div>
+            
+      <div class="agenda-row">
+        <div class="num">04</div>
+        <div class="t">研究方法</div>
+        <div class="d">// auto-grouped</div>
+      </div>
+            
+      <div class="agenda-row">
+        <div class="num">05</div>
+        <div class="t">结论与展望</div>
+        <div class="d">// auto-grouped</div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>contents</span><span>02 / 14</span></div>
+    </section><section class="slide" data-title="背景与意义" data-notes="Chapter 1: 背景与意义">
+      <p class="kicker">chapter · 01</p>
+      <h1 class="h1">背景与意义</h1>
+      <p class="lede mt-s">先建立结构，再展开重点。</p>
+      <div class="mt-l">
+      <div class="rule-row">
+        <div class="num green">01</div>
+        <div><b>宏观背景</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num orange">02</div>
+        <div><b>核心问题</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num purple">03</div>
+        <div><b>理论与实践意义</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>section · 01</span><span>03 / 14</span></div>
+    </section><section class="slide" data-title="选题背景" data-notes="三个驱动力交织出现：政策端把方向拉对，技术端把可行性拉近，应用端把回报拉高。重点提一句既往三轮调研的结论是收敛的。">
+      <p class="kicker">背景与意义</p>
+      <h2 class="h2">选题背景</h2>
+      <div class="card card-accent mt-l">
+      <div class="feature-row">
+        <div class="num blue">01</div>
+        <div><b>外部环境的驱动</b><p class="dim">行业趋势、政策导向或社会需求持续上升</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num green">02</div>
+        <div><b>现有方案的局限</b><p class="dim">在关键指标上仍存在明显瓶颈</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num orange">03</div>
+        <div><b>新方向的可能性</b><p class="dim">新工具与新数据为突破提供契机</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>content · rows</span><span>04 / 14</span></div>
+    </section><section class="slide" data-title="研究意义" data-notes="三种价值不是并列的，理论是底座、方法是放大器、应用是出口。汇报时先强调底座再讲放大器，最后落到一个可测的具体场景。">
+      <p class="kicker">背景与意义</p>
+      <h2 class="h2">研究意义</h2>
+      <div class="card card-accent mt-l">
+      <div class="feature-row">
+        <div class="num blue">01</div>
+        <div><b>理论价值</b><p class="dim">完善已有理论框架</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num green">02</div>
+        <div><b>方法价值</b><p class="dim">提出可推广工作流</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num orange">03</div>
+        <div><b>应用价值</b><p class="dim">支撑具体应用场景</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>content · rows</span><span>05 / 14</span></div>
+    </section><section class="slide" data-title="国内外研究现状" data-notes="Chapter 2: 国内外研究现状">
+      <p class="kicker">chapter · 02</p>
+      <h1 class="h1">国内外研究现状</h1>
+      <p class="lede mt-s">先建立结构，再展开重点。</p>
+      <div class="mt-l">
+      <div class="rule-row">
+        <div class="num orange">01</div>
+        <div><b>主要流派</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num purple">02</div>
+        <div><b>技术演进</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num red">03</div>
+        <div><b>现有缺口</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>section · 02</span><span>06 / 14</span></div>
+    </section><section class="slide" data-title="主流路径与共性短板" data-notes="三条路径的优势-代价是互补的。本课题的定位是把 A 的理论严谨和 B 的工程化能力拼起来，同时吸取 C 的早期信号，争取在跨场景泛化这一公共痛点上突破。">
+      <p class="kicker">国内外研究现状</p>
+      <h2 class="h2">主流路径与共性短板</h2>
+      <div class="card card-accent mt-l">
+      <div class="feature-row">
+        <div class="num blue">01</div>
+        <div><b>路径 A</b><p class="dim">原创理论领先，工程化偏弱</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num green">02</div>
+        <div><b>路径 B</b><p class="dim">工程化激进，原创度有限</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num orange">03</div>
+        <div><b>路径 C</b><p class="dim">新兴方法，潜力可期</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num purple">04</div>
+        <div><b>共性</b><p class="dim">跨场景泛化能力不足</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>content · rows</span><span>07 / 14</span></div>
+    </section><section class="slide" data-title="研究思路与内容" data-notes="Chapter 3: 研究思路与内容">
+      <p class="kicker">chapter · 03</p>
+      <h1 class="h1">研究思路与内容</h1>
+      <p class="lede mt-s">先建立结构，再展开重点。</p>
+      <div class="mt-l">
+      <div class="rule-row">
+        <div class="num purple">01</div>
+        <div><b>核心问题</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num red">02</div>
+        <div><b>总体框架</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num blue">03</div>
+        <div><b>创新点定位</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>section · 03</span><span>08 / 14</span></div>
+    </section><section class="slide" data-title="总体框架" data-notes="四个步骤是闭环的：问题界定先收口，理论建模才有靶；数据采集和分析验证是放大器，每一轮迭代都要回到界定阶段重新检视边界是否还成立。">
+      <p class="kicker">研究思路与内容</p>
+      <h2 class="h2">总体框架</h2>
+      <div class="card card-accent mt-l">
+      <div class="feature-row">
+        <div class="num blue">01</div>
+        <div><b>问题界定</b><p class="dim">明确研究对象与边界</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num green">02</div>
+        <div><b>理论建模</b><p class="dim">在已有理论上提出新假设</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num orange">03</div>
+        <div><b>数据采集</b><p class="dim">梳理来源与采集方案</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num purple">04</div>
+        <div><b>分析验证</b><p class="dim">实证检验并量化结论</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>content · rows</span><span>09 / 14</span></div>
+    </section><section class="slide" data-title="研究方法" data-notes="Chapter 4: 研究方法">
+      <p class="kicker">chapter · 04</p>
+      <h1 class="h1">研究方法</h1>
+      <p class="lede mt-s">先建立结构，再展开重点。</p>
+      <div class="mt-l">
+      <div class="rule-row">
+        <div class="num red">01</div>
+        <div><b>方法体系</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num blue">02</div>
+        <div><b>技术路线</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num green">03</div>
+        <div><b>实验设计</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>section · 04</span><span>10 / 14</span></div>
+    </section><section class="slide" data-title="四类互补方法" data-notes="四类方法在不同阶段交替使用：前期偏文献和消融，明确做什么；中后期偏多中心评测和复杂度分析，回答能不能上线。汇报时按这个时间线讲会更顺。">
+      <p class="kicker">研究方法</p>
+      <h2 class="h2">四类互补方法</h2>
+      <div class="card card-accent mt-l">
+      <div class="feature-row">
+        <div class="num blue">01</div>
+        <div><b>文献调研</b><p class="dim">定位空白</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num green">02</div>
+        <div><b>消融实验</b><p class="dim">定位贡献</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num orange">03</div>
+        <div><b>多中心评测</b><p class="dim">验证泛化</p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num purple">04</div>
+        <div><b>复杂度分析</b><p class="dim">支撑工程可行性</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>content · rows</span><span>11 / 14</span></div>
+    </section><section class="slide" data-title="结论与展望" data-notes="Chapter 5: 结论与展望">
+      <p class="kicker">chapter · 05</p>
+      <h1 class="h1">结论与展望</h1>
+      <p class="lede mt-s">先建立结构，再展开重点。</p>
+      <div class="mt-l">
+      <div class="rule-row">
+        <div class="num blue">01</div>
+        <div><b>主要结论</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num green">02</div>
+        <div><b>创新点</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            
+      <div class="rule-row">
+        <div class="num orange">03</div>
+        <div><b>不足与展望</b><p class="dim">本节将围绕这一点展开。</p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>section · 05</span><span>12 / 14</span></div>
+    </section><section class="slide" data-title="主要结论" data-notes="结论部分的关键是把数据、机制、场景、工程四件事讲成同一个故事：定量关联是因，协同效应是机理，真实场景是外延，规模化扩展是落地。">
+      <p class="kicker">结论与展望</p>
+      <h2 class="h2">主要结论</h2>
+      <div class="card card-accent mt-l">
+      <div class="feature-row">
+        <div class="num blue">01</div>
+        <div><b>建立了关键变量与目标指标的定量关联</b><p class="dim"></p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num green">02</div>
+        <div><b>证实新机制 A 与 B 的协同效应</b><p class="dim"></p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num orange">03</div>
+        <div><b>在真实场景下完成多轮验证</b><p class="dim"></p></div>
+      </div>
+            
+      <div class="feature-row">
+        <div class="num purple">04</div>
+        <div><b>工程实现完成规模化扩展</b><p class="dim"></p></div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>content · rows</span><span>13 / 14</span></div>
+    </section><section class="slide" data-title="感谢您的倾听！" data-notes="感谢导师的悉心指导，感谢各位老师与同学的支持。敬请各位老师批评指正。">
+      <p class="kicker">end · presenter</p>
+      <h1 class="h1">感谢您的倾听！</h1>
+      <p class="lede">感谢导师的悉心指导，感谢各位老师与同学的支持。敬请各位老师批评指正。</p>
+      <div class="speaker mt-l"><div class="av"></div><div><b>fxt ppt</b><span>presenter-mode-reveal · auto-generated</span></div></div>
+      <div class="deck-footer mono"><span>end</span><span>14 / 14</span></div>
+    </section>
+</div>
+<script src="assets/runtime.js"></script>
+</body>
+</html>

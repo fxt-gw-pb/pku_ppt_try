@@ -161,8 +161,10 @@ The job runner is still a daemon thread inside the FastAPI process — no queue.
 
 The public UI exposes exactly two views. Do not re-add a third.
 
-- `#templates` — select a template. Cards have **only** a `使用模板` action. Do NOT re-add `预览` links unless the user explicitly asks for a third page.
+- `#templates` — select a template. Cards have two actions: `使用模板` (red filled, selects the template and jumps to `#generate`) and `预览` (light outline, opens `previews/<template_id>/index.html` in a new tab). The 预览 link is the **only** path to a preview; do not re-introduce a separate template-library page.
 - `#generate` — paste manuscript, generate, poll, download/preview the result.
+
+The per-template sample decks live under `previews/` and are committed to the repo. Regenerate them with `python scripts/build_previews.py` whenever you change a renderer, the LLM mock, or a template's bundled assets. GitHub Pages serves them as `previews/<id>/index.html`; FastAPI mounts the same path at `/previews/` for local dev. Do not link to previews from anywhere else (no nav, no list page, no embed) — the only access point is the per-card 预览 button.
 
 Removed and not coming back without an explicit ask: `template-preview.html`, `web/template-preview.html`, `html-ppt-templates/index.html`, `html-ppt-templates/templates/full-decks-index.html`. `server/app.py` must not mount `/html-ppt-templates` for public browsing.
 

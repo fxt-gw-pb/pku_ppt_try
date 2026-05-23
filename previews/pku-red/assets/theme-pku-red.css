@@ -1,0 +1,64 @@
+/* ============================================================
+   PKU Red Defense — Theme Tokens
+   Colors are sourced from the source template's theme1.xml
+   ============================================================ */
+
+:root {
+  /* Brand */
+  --pku-red:        #9A0000;
+  --pku-red-deep:   #7A0000;
+  --red-2:          #C4373D;
+  --red-3:          #EE6E7A;
+  --red-4:          #E54C5E;
+  --accent-green:   #75BD42;
+  --accent-teal:    #30C0B4;
+
+  /* Neutrals */
+  --black:          #000000;
+  --text:           #1A1A1A;
+  --text-muted:     #5A5A5A;
+  --text-light:     #8A8A8A;
+  --gray-50:        #FAFAFA;
+  --gray-100:       #F4F4F4;
+  --gray-150:       #ECECEC;
+  --gray-200:       #E7E6E6;
+  --gray-300:       #D6D6D6;
+  --white:          #FFFFFF;
+
+  /* Typography */
+  --font-display: "Source Han Sans SC", "Noto Sans SC", "PingFang SC",
+                  "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+  --font-body:    "Source Han Sans SC", "Noto Sans SC", "PingFang SC",
+                  "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+  --font-mono:    "JetBrains Mono", "SF Mono", Consolas, monospace;
+
+  /* Type scale — 1280x720 base. Tighter spread: non-decorative text is 15-32px. */
+  --type-cover-title:    56px;
+  --type-cover-subtitle: 20px;
+  --type-section-num:    200px;
+  --type-section-title:  64px;
+  --type-headline:       32px;
+  --type-eyebrow:        20px;
+  --type-body:           20px;
+  --type-small:          17px;
+  --type-tiny:           15px;
+  --type-nav:            17px;
+  --type-page:           17px;
+
+  /* Spacing */
+  --pad-x:        84px;
+  --pad-top:      24px;
+  --pad-bottom:   28px;
+  --content-top:  108px;
+  --gap-title:    20px;
+  --gap-item:     16px;
+
+  /* Geometry */
+  --radius-sm:    4px;
+  --radius-md:    6px;
+  --radius-lg:    10px;
+  --radius-pill:  999px;
+  --border-line:  1px solid var(--gray-200);
+  --border-strong:1px solid var(--gray-300);
+  --rule:         1px solid var(--pku-red);
+}

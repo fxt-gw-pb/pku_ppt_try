@@ -1,0 +1,255 @@
+{
+  "meta": {
+    "title": "基于注意力机制的医学影像分割研究",
+    "subtitle": "GRADUATION DEFENSE / OPENING REPORT",
+    "date": "",
+    "motto": "爱国 · 进步 · 民主 · 科学",
+    "logo": "assets/media/pku-logo.png"
+  },
+  "chapters": [
+    {
+      "title": "背景与意义",
+      "subtitle": ""
+    },
+    {
+      "title": "国内外研究现状",
+      "subtitle": ""
+    },
+    {
+      "title": "研究思路与内容",
+      "subtitle": ""
+    },
+    {
+      "title": "研究方法",
+      "subtitle": ""
+    },
+    {
+      "title": "结论与展望",
+      "subtitle": ""
+    }
+  ],
+  "slides": [
+    {
+      "layout": "cover"
+    },
+    {
+      "layout": "contents"
+    },
+    {
+      "layout": "section-divider",
+      "chapterIndex": 0,
+      "points": [
+        "宏观背景",
+        "核心问题",
+        "理论与实践意义"
+      ]
+    },
+    {
+      "layout": "multi-card",
+      "chapterIndex": 0,
+      "sectionTitle": "背景与意义",
+      "sectionTitleEn": "",
+      "headline": "选题背景",
+      "cols": 3,
+      "cards": [
+        {
+          "title": "外部环境的驱动",
+          "body": "行业趋势、政策导向或社会需求持续上升",
+          "tag": "01"
+        },
+        {
+          "title": "现有方案的局限",
+          "body": "在关键指标上仍存在明显瓶颈",
+          "tag": "02"
+        },
+        {
+          "title": "新方向的可能性",
+          "body": "新工具与新数据为突破提供契机",
+          "tag": "03"
+        }
+      ]
+    },
+    {
+      "layout": "multi-card",
+      "chapterIndex": 0,
+      "sectionTitle": "背景与意义",
+      "sectionTitleEn": "",
+      "headline": "研究意义",
+      "cols": 3,
+      "cards": [
+        {
+          "title": "理论价值",
+          "body": "完善已有理论框架",
+          "tag": "01"
+        },
+        {
+          "title": "方法价值",
+          "body": "提出可推广工作流",
+          "tag": "02"
+        },
+        {
+          "title": "应用价值",
+          "body": "支撑具体应用场景",
+          "tag": "03"
+        }
+      ]
+    },
+    {
+      "layout": "section-divider",
+      "chapterIndex": 1,
+      "points": [
+        "主要流派",
+        "技术演进",
+        "现有缺口"
+      ]
+    },
+    {
+      "layout": "multi-card",
+      "chapterIndex": 1,
+      "sectionTitle": "国内外研究现状",
+      "sectionTitleEn": "",
+      "headline": "主流路径与共性短板",
+      "cols": 4,
+      "cards": [
+        {
+          "title": "路径 A",
+          "body": "原创理论领先，工程化偏弱",
+          "tag": "01"
+        },
+        {
+          "title": "路径 B",
+          "body": "工程化激进，原创度有限",
+          "tag": "02"
+        },
+        {
+          "title": "路径 C",
+          "body": "新兴方法，潜力可期",
+          "tag": "03"
+        },
+        {
+          "title": "共性",
+          "body": "跨场景泛化能力不足",
+          "tag": "04"
+        }
+      ]
+    },
+    {
+      "layout": "section-divider",
+      "chapterIndex": 2,
+      "points": [
+        "核心问题",
+        "总体框架",
+        "创新点定位"
+      ]
+    },
+    {
+      "layout": "multi-card",
+      "chapterIndex": 2,
+      "sectionTitle": "研究思路与内容",
+      "sectionTitleEn": "",
+      "headline": "总体框架",
+      "cols": 4,
+      "cards": [
+        {
+          "title": "问题界定",
+          "body": "明确研究对象与边界",
+          "tag": "01"
+        },
+        {
+          "title": "理论建模",
+          "body": "在已有理论上提出新假设",
+          "tag": "02"
+        },
+        {
+          "title": "数据采集",
+          "body": "梳理来源与采集方案",
+          "tag": "03"
+        },
+        {
+          "title": "分析验证",
+          "body": "实证检验并量化结论",
+          "tag": "04"
+        }
+      ]
+    },
+    {
+      "layout": "section-divider",
+      "chapterIndex": 3,
+      "points": [
+        "方法体系",
+        "技术路线",
+        "实验设计"
+      ]
+    },
+    {
+      "layout": "multi-card",
+      "chapterIndex": 3,
+      "sectionTitle": "研究方法",
+      "sectionTitleEn": "",
+      "headline": "四类互补方法",
+      "cols": 4,
+      "cards": [
+        {
+          "title": "文献调研",
+          "body": "定位空白",
+          "tag": "01"
+        },
+        {
+          "title": "消融实验",
+          "body": "定位贡献",
+          "tag": "02"
+        },
+        {
+          "title": "多中心评测",
+          "body": "验证泛化",
+          "tag": "03"
+        },
+        {
+          "title": "复杂度分析",
+          "body": "支撑工程可行性",
+          "tag": "04"
+        }
+      ]
+    },
+    {
+      "layout": "section-divider",
+      "chapterIndex": 4,
+      "points": [
+        "主要结论",
+        "创新点",
+        "不足与展望"
+      ]
+    },
+    {
+      "layout": "section-text",
+      "chapterIndex": 4,
+      "sectionTitle": "结论与展望",
+      "sectionTitleEn": "",
+      "headline": "主要结论",
+      "blocks": [
+        {
+          "label": "要点 01",
+          "text": "建立了关键变量与目标指标的定量关联"
+        },
+        {
+          "label": "要点 02",
+          "text": "证实新机制 A 与 B 的协同效应"
+        },
+        {
+          "label": "要点 03",
+          "text": "在真实场景下完成多轮验证"
+        },
+        {
+          "label": "要点 04",
+          "text": "工程实现完成规模化扩展"
+        }
+      ]
+    },
+    {
+      "layout": "closing",
+      "title": "感谢您的倾听！",
+      "subtitle": "THANK YOU FOR LISTENING",
+      "message": "感谢导师的悉心指导，感谢各位老师与同学的支持。敬请各位老师批评指正。"
+    }
+  ]
+}

@@ -224,6 +224,7 @@ function createTemplateCard(tpl) {
   article.className = "template-card";
   article.dataset.templateId = tpl.template_id;
   article.style.setProperty("--accent", tpl.accent || "#2563eb");
+  const previewHref = `previews/${encodeURIComponent(tpl.template_id)}/index.html`;
   article.innerHTML = `
     <div class="template-card-top">
       <span class="template-mark">${escapeHtml(tpl.label || tpl.engine)}</span>
@@ -233,6 +234,8 @@ function createTemplateCard(tpl) {
     <p>${escapeHtml(tpl.description || "")}</p>
     <div class="template-actions">
       <button class="text-button" type="button" data-action="select">使用模板</button>
+      <a class="text-button ghost" data-action="preview" target="_blank" rel="noopener"
+         href="${previewHref}">预览</a>
     </div>
   `;
   article.querySelector("[data-action='select']").addEventListener("click", () => {

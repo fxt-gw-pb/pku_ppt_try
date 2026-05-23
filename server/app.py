@@ -279,6 +279,18 @@ def preview_job(job_id: str) -> RedirectResponse:
 # Serve materialized decks so /preview can resolve their fetch('data/slides.json').
 app.mount("/decks", StaticFiles(directory=str(OUTPUT_DIR), html=True), name="decks")
 
+# Pre-generated sample decks, one per template, used by the 预览 button on
+# template cards. Built by scripts/build_previews.py and committed to git so
+# GitHub Pages serves them statically without backend involvement; this mount
+# matches that path for local dev.
+PREVIEWS_DIR = REPO_ROOT / "previews"
+if PREVIEWS_DIR.is_dir():
+    app.mount(
+        "/previews",
+        StaticFiles(directory=str(PREVIEWS_DIR), html=True),
+        name="previews",
+    )
+
 # Local preview support for the donation QR code used by the static frontend.
 PAYMENT_QR_DIR = REPO_ROOT / "收款码"
 if PAYMENT_QR_DIR.is_dir():

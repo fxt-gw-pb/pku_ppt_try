@@ -33,7 +33,7 @@ The repository intentionally contains these related surfaces:
 - Render/GitHub Pages production download links must use `/decks/{id}.zip` and previews must use `/decks/{id}/index.html`. Do not switch the frontend back to `/api/jobs/{id}/download`; Render's edge has a known cross-origin `FileResponse` issue.
 - `outputs/` and `data/jobs/` are runtime artifacts and are gitignored. Render's filesystem is ephemeral, so generated files disappear on deploy/restart/cold start.
 - The backend job runner is a daemon thread in the FastAPI process. It is fine for MVP, not for production load.
-- Public UI must only expose two views: `选模板` and `输入文稿`. Do not add or relink a separate template-library page.
+- Public UI must only expose two views: `选模板` and `输入文稿`. Do not add a separate template-library page; per-card `预览` buttons that link straight to `previews/<id>/index.html` are allowed (and required).
 - Avoid user-visible `html-ppt` / skill-origin wording in the website, API display data, or generated deck copy. Internal folder names and engine strings may remain where needed for compatibility.
 
 ## Git / Deployment Facts
@@ -69,7 +69,8 @@ or ignored runtime outputs.
   - `#generate`: paste manuscript, generate, poll jobs, preview/download results.
 - There is intentionally no separate template library page. The files `template-preview.html`, `web/template-preview.html`, `html-ppt-templates/index.html`, and `html-ppt-templates/templates/full-decks-index.html` were deleted.
 - `server/app.py` must not mount `/html-ppt-templates` for public browsing.
-- Template cards only have `使用模板`; do not re-add `预览` links unless the user explicitly asks to restore a third page.
+- Each template card carries two actions: `使用模板` (red filled) and `预览` (light outline, opens `previews/<template_id>/index.html` in a new tab). The 预览 link is the only access point for previews — do not link to them from a list page, nav, or embed.
+- Sample preview decks live under `previews/<id>/` and are committed. Rebuild with `python scripts/build_previews.py` after changes to renderers, the LLM mock, or template assets. FastAPI mounts `/previews` for local dev; GitHub Pages serves the same directory natively.
 - The template and generate views both include this donation note, with a clickable `.donation-trigger` opening the shared QR modal:
   `该网页暂时免费使用，生成 PPT 需要一定的 API tokens 花费，该费用由作者承担，请勿滥用，如果感到有用，也欢迎 打赏给作者 <=1 元的奖赏~`
 - Donation QR image: `收款码/537a8a731804791d569387f56522fa2a.jpg`. FastAPI mounts `/收款码` for local preview.

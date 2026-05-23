@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>基于注意力机制的医学影像分割研究</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="tpl-tech-sharing">
+<div class="deck">
+<section class="slide is-active" data-title="基于注意力机制的医学影像分割研究">
+      <p class="kicker">fxt-ppt :: auto-generated</p>
+      <h1 class="h1">基于注意力机制的医学影像分割研究</h1>
+      <p class="lede mt-m">GRADUATION DEFENSE / OPENING REPORT</p>
+      <div class="mt-l" style="max-width:760px">
+    <div class="terminal">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">~/fxt-ppt $ ./run</span></div>
+      <pre><span class="cmt"># run the auto-deck</span>
+<span class="kw">$</span> fxt-ppt run \
+    --template <span class="str">"tech-sharing"</span> \
+    --input <span class="str">"manuscript.md"</span>
+<span class="cmt"># deck materialized in &lt;1s</span></pre>
+    </div>
+    </div>
+      <div class="speaker"><div class="av"></div><div><b>fxt ppt</b><span>template :: tech-sharing</span></div></div>
+      <div class="deck-footer mono"><span>boot · cover</span><span>01 / 14</span></div>
+    </section><section class="slide" data-title="目录">
+      <p class="kicker">cat agenda.md</p>
+      <h2 class="h2"># 目录 · 5 sections</h2>
+      <div class="mt-l">
+      <div class="agenda-row">
+        <div class="num">01</div>
+        <div class="t">背景与意义</div>
+        <div class="d">// part 01</div>
+      </div>
+            
+      <div class="agenda-row">
+        <div class="num">02</div>
+        <div class="t">国内外研究现状</div>
+        <div class="d">// part 02</div>
+      </div>
+            
+      <div class="agenda-row">
+        <div class="num">03</div>
+        <div class="t">研究思路与内容</div>
+        <div class="d">// part 03</div>
+      </div>
+            
+      <div class="agenda-row">
+        <div class="num">04</div>
+        <div class="t">研究方法</div>
+        <div class="d">// part 04</div>
+      </div>
+            
+      <div class="agenda-row">
+        <div class="num">05</div>
+        <div class="t">结论与展望</div>
+        <div class="d">// part 05</div>
+      </div>
+            </div>
+      <div class="deck-footer mono"><span>agenda</span><span>02 / 14</span></div>
+    </section><section class="slide" data-title="背景与意义">
+      <p class="kicker">chapter · 01</p>
+      <h1 class="h1 mono" style="font-size:140px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">01</h1>
+      <h2 class="h2" style="margin-top:8px">背景与意义</h2>
+      <p class="lede mt-m">先建立结构，再展开重点。</p>
+      <div class="mt-m" style="display:flex;flex-wrap:wrap;gap:8px"><span class="tag">#宏观背景</span><span class="tag">#核心问题</span><span class="tag">#理论与实践意义</span></div>
+      <div class="deck-footer mono"><span>section · chapter_01</span><span>03 / 14</span></div>
+    </section><section class="slide" data-title="选题背景">
+      <p class="kicker">背景与意义</p>
+      <h2 class="h2">选题背景</h2>
+      <div class="grid g3 mt-l">
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">01</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">外部环境的驱动</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">行业趋势、政策导向或社会需求持续上升</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">02</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">现有方案的局限</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">在关键指标上仍存在明显瓶颈</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">03</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">新方向的可能性</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">新工具与新数据为突破提供契机</p>
+      </div>
+            </div>
+      <div class="terminal" style="margin-top:18px"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">~/fxt-ppt $ cat notes.txt</span></div><pre style="font-size:13px"><span class="cmt"># speaker note</span>
+三个驱动力交织出现：政策端把方向拉对，技术端把可行性拉近，应用端把回报拉高。重点提一句既往三轮调研的结论是收敛的。</pre></div>
+      <div class="deck-footer mono"><span>content · cards</span><span>04 / 14</span></div>
+    </section><section class="slide" data-title="研究意义">
+      <p class="kicker">背景与意义</p>
+      <h2 class="h2">研究意义</h2>
+      <div class="grid g3 mt-l">
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">01</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">理论价值</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">完善已有理论框架</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">02</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">方法价值</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">提出可推广工作流</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">03</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">应用价值</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">支撑具体应用场景</p>
+      </div>
+            </div>
+      <div class="terminal" style="margin-top:18px"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">~/fxt-ppt $ cat notes.txt</span></div><pre style="font-size:13px"><span class="cmt"># speaker note</span>
+三种价值不是并列的，理论是底座、方法是放大器、应用是出口。汇报时先强调底座再讲放大器，最后落到一个可测的具体场景。</pre></div>
+      <div class="deck-footer mono"><span>content · cards</span><span>05 / 14</span></div>
+    </section><section class="slide" data-title="国内外研究现状">
+      <p class="kicker">chapter · 02</p>
+      <h1 class="h1 mono" style="font-size:140px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">02</h1>
+      <h2 class="h2" style="margin-top:8px">国内外研究现状</h2>
+      <p class="lede mt-m">先建立结构，再展开重点。</p>
+      <div class="mt-m" style="display:flex;flex-wrap:wrap;gap:8px"><span class="tag">#主要流派</span><span class="tag">#技术演进</span><span class="tag">#现有缺口</span></div>
+      <div class="deck-footer mono"><span>section · chapter_02</span><span>06 / 14</span></div>
+    </section><section class="slide" data-title="主流路径与共性短板">
+      <p class="kicker">国内外研究现状</p>
+      <h2 class="h2">主流路径与共性短板</h2>
+      <div class="grid g2 mt-l">
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">01</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">路径 A</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">原创理论领先，工程化偏弱</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">02</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">路径 B</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">工程化激进，原创度有限</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">03</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">路径 C</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">新兴方法，潜力可期</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">04</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">共性</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">跨场景泛化能力不足</p>
+      </div>
+            </div>
+      <div class="terminal" style="margin-top:18px"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">~/fxt-ppt $ cat notes.txt</span></div><pre style="font-size:13px"><span class="cmt"># speaker note</span>
+三条路径的优势-代价是互补的。本课题的定位是把 A 的理论严谨和 B 的工程化能力拼起来，同时吸取 C 的早期信号，争取在跨场景泛化这一公共痛点上突破。</pre></div>
+      <div class="deck-footer mono"><span>content · cards</span><span>07 / 14</span></div>
+    </section><section class="slide" data-title="研究思路与内容">
+      <p class="kicker">chapter · 03</p>
+      <h1 class="h1 mono" style="font-size:140px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">03</h1>
+      <h2 class="h2" style="margin-top:8px">研究思路与内容</h2>
+      <p class="lede mt-m">先建立结构，再展开重点。</p>
+      <div class="mt-m" style="display:flex;flex-wrap:wrap;gap:8px"><span class="tag">#核心问题</span><span class="tag">#总体框架</span><span class="tag">#创新点定位</span></div>
+      <div class="deck-footer mono"><span>section · chapter_03</span><span>08 / 14</span></div>
+    </section><section class="slide" data-title="总体框架">
+      <p class="kicker">研究思路与内容</p>
+      <h2 class="h2">总体框架</h2>
+      <div class="grid g2 mt-l">
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">01</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">问题界定</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">明确研究对象与边界</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">02</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">理论建模</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">在已有理论上提出新假设</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">03</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">数据采集</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">梳理来源与采集方案</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">04</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">分析验证</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">实证检验并量化结论</p>
+      </div>
+            </div>
+      <div class="terminal" style="margin-top:18px"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">~/fxt-ppt $ cat notes.txt</span></div><pre style="font-size:13px"><span class="cmt"># speaker note</span>
+四个步骤是闭环的：问题界定先收口，理论建模才有靶；数据采集和分析验证是放大器，每一轮迭代都要回到界定阶段重新检视边界是否还成立。</pre></div>
+      <div class="deck-footer mono"><span>content · cards</span><span>09 / 14</span></div>
+    </section><section class="slide" data-title="研究方法">
+      <p class="kicker">chapter · 04</p>
+      <h1 class="h1 mono" style="font-size:140px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">04</h1>
+      <h2 class="h2" style="margin-top:8px">研究方法</h2>
+      <p class="lede mt-m">先建立结构，再展开重点。</p>
+      <div class="mt-m" style="display:flex;flex-wrap:wrap;gap:8px"><span class="tag">#方法体系</span><span class="tag">#技术路线</span><span class="tag">#实验设计</span></div>
+      <div class="deck-footer mono"><span>section · chapter_04</span><span>10 / 14</span></div>
+    </section><section class="slide" data-title="四类互补方法">
+      <p class="kicker">研究方法</p>
+      <h2 class="h2">四类互补方法</h2>
+      <div class="grid g2 mt-l">
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">01</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">文献调研</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">定位空白</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">02</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">消融实验</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">定位贡献</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">03</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">多中心评测</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">验证泛化</p>
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">04</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">复杂度分析</h4>
+        <p class="lede" style="font-size:14px;line-height:1.6">支撑工程可行性</p>
+      </div>
+            </div>
+      <div class="terminal" style="margin-top:18px"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">~/fxt-ppt $ cat notes.txt</span></div><pre style="font-size:13px"><span class="cmt"># speaker note</span>
+四类方法在不同阶段交替使用：前期偏文献和消融，明确做什么；中后期偏多中心评测和复杂度分析，回答能不能上线。汇报时按这个时间线讲会更顺。</pre></div>
+      <div class="deck-footer mono"><span>content · cards</span><span>11 / 14</span></div>
+    </section><section class="slide" data-title="结论与展望">
+      <p class="kicker">chapter · 05</p>
+      <h1 class="h1 mono" style="font-size:140px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">05</h1>
+      <h2 class="h2" style="margin-top:8px">结论与展望</h2>
+      <p class="lede mt-m">先建立结构，再展开重点。</p>
+      <div class="mt-m" style="display:flex;flex-wrap:wrap;gap:8px"><span class="tag">#主要结论</span><span class="tag">#创新点</span><span class="tag">#不足与展望</span></div>
+      <div class="deck-footer mono"><span>section · chapter_05</span><span>12 / 14</span></div>
+    </section><section class="slide" data-title="主要结论">
+      <p class="kicker">结论与展望</p>
+      <h2 class="h2">主要结论</h2>
+      <div class="grid g2 mt-l">
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">01</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">建立了关键变量与目标指标的定量关联</h4>
+        
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">02</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">证实新机制 A 与 B 的协同效应</h4>
+        
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">03</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">在真实场景下完成多轮验证</h4>
+        
+      </div>
+            
+      <div class="card card-accent" style="padding:22px 26px">
+        <span class="tag">04</span>
+        <h4 style="margin:10px 0 6px;font-size:20px">工程实现完成规模化扩展</h4>
+        
+      </div>
+            </div>
+      <div class="terminal" style="margin-top:18px"><div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">~/fxt-ppt $ cat notes.txt</span></div><pre style="font-size:13px"><span class="cmt"># speaker note</span>
+结论部分的关键是把数据、机制、场景、工程四件事讲成同一个故事：定量关联是因，协同效应是机理，真实场景是外延，规模化扩展是落地。</pre></div>
+      <div class="deck-footer mono"><span>content · cards</span><span>13 / 14</span></div>
+    </section><section class="slide" data-title="感谢您的倾听！">
+      <p class="kicker">exit 0</p>
+      <h1 class="h1">感谢您的倾听！</h1>
+      <p class="lede mt-m">感谢导师的悉心指导，感谢各位老师与同学的支持。敬请各位老师批评指正。</p>
+      <div class="mt-l">
+        <span class="tag">fxt ppt</span>
+        <span class="tag">tech-sharing</span>
+        <span class="tag">auto-generated</span>
+      </div>
+      <div class="deck-footer mono"><span>end · eof</span><span>14 / 14</span></div>
+    </section>
+</div>
+<script src="assets/runtime.js"></script>
+</body>
+</html>

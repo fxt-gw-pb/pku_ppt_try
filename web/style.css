@@ -427,10 +427,26 @@ button {
   background: var(--accent);
 }
 
+.text-button.ghost {
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid currentColor;
+  text-decoration: none;
+}
+
+.text-button.ghost:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
 .template-actions a {
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
+}
+
+.template-actions a.text-button.ghost {
+  color: var(--accent);
+  font-size: inherit;
 }
 
 .donation-note {
