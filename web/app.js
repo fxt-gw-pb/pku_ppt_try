@@ -171,6 +171,9 @@ const heroTemplateLabel = $("hero-template-label");
 const heroTemplateName = $("hero-template-name");
 const previewTemplateLabel = $("preview-template-label");
 const previewTitle = $("preview-title");
+const openDonationBtn = $("open-donation");
+const closeDonationBtn = $("close-donation");
+const donationModal = $("donation-modal");
 
 let MAX_CHARS = 30000;
 let templates = FALLBACK_TEMPLATES;
@@ -445,9 +448,31 @@ function escapeAttr(value) {
   return escapeHtml(value);
 }
 
+function openDonationModal() {
+  donationModal.hidden = false;
+  closeDonationBtn.focus();
+}
+
+function closeDonationModal() {
+  donationModal.hidden = true;
+  openDonationBtn.focus();
+}
+
 window.addEventListener("hashchange", route);
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !donationModal.hidden) {
+    closeDonationModal();
+  }
+});
 manuscriptEl.addEventListener("input", updateCount);
 generateBtn.addEventListener("click", createJob);
+openDonationBtn.addEventListener("click", openDonationModal);
+closeDonationBtn.addEventListener("click", closeDonationModal);
+donationModal.addEventListener("click", (event) => {
+  if (event.target === donationModal) {
+    closeDonationModal();
+  }
+});
 
 loadHealth();
 route();

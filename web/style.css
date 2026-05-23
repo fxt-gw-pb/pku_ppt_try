@@ -426,6 +426,45 @@ button {
   font-weight: 800;
 }
 
+.donation-note {
+  margin-top: 28px;
+  border: 1px solid rgba(185, 28, 28, 0.16);
+  border-radius: 22px;
+  padding: 18px 20px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.54);
+  box-shadow: 0 14px 36px rgba(52, 39, 26, 0.06);
+}
+
+.donation-note p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.inline-link {
+  border: 0;
+  padding: 0;
+  color: var(--primary);
+  font: inherit;
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: transparent;
+}
+
+.generate-warning {
+  margin-bottom: 18px;
+  border: 1px solid rgba(185, 28, 28, 0.22);
+  border-radius: 18px;
+  padding: 14px 16px;
+  color: #7f1d1d;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.7;
+  background: rgba(254, 226, 226, 0.72);
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
@@ -681,6 +720,65 @@ kbd {
   white-space: pre-wrap;
 }
 
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(20, 17, 15, 0.58);
+  backdrop-filter: blur(12px);
+}
+
+.donation-modal {
+  position: relative;
+  width: min(420px, 100%);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 28px;
+  padding: 24px;
+  text-align: center;
+  background: var(--card-solid);
+  box-shadow: var(--shadow);
+}
+
+.donation-modal h2 {
+  margin: 4px 0 16px;
+  font-size: 28px;
+}
+
+.donation-modal img {
+  display: block;
+  width: min(100%, 300px);
+  max-height: 62vh;
+  margin: 0 auto;
+  border-radius: 18px;
+  object-fit: contain;
+  background: #fff;
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1;
+  background: rgba(20, 17, 15, 0.08);
+}
+
+.modal-hint {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 @media (max-width: 1020px) {
   .hero,
   .workspace {
@@ -777,5 +875,14 @@ kbd {
   .export-note {
     color: #fde68a;
     background: rgba(120, 53, 15, 0.32);
+  }
+
+  .donation-note {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .generate-warning {
+    color: #fecaca;
+    background: rgba(127, 29, 29, 0.28);
   }
 }

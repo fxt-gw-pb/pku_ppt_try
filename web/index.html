@@ -59,9 +59,20 @@
       </section>
 
       <section id="template-gallery" class="template-gallery" aria-live="polite"></section>
+
+      <div class="donation-note">
+        <p>
+          生成 PPT 需要一定的 API token 花费，该费用由作者承担，请勿滥用，如果感到有用，也欢迎
+          <button id="open-donation" class="inline-link" type="button">打赏给作者 &lt;=1 元的奖赏~</button>
+        </p>
+      </div>
     </section>
 
     <section id="generate-view" class="view" hidden>
+      <div class="generate-warning">
+        PPT 生成需要约 30s，生成过程中切勿刷新页面，刷新页面也会丢失您的既往文件生成记录。
+      </div>
+
       <div class="workspace">
         <section class="composer panel">
           <div class="panel-head">
@@ -114,6 +125,16 @@
       </div>
     </section>
   </main>
+
+  <div id="donation-modal" class="modal-backdrop" hidden>
+    <div class="donation-modal" role="dialog" aria-modal="true" aria-labelledby="donation-title">
+      <button id="close-donation" class="modal-close" type="button" aria-label="关闭收款码">×</button>
+      <p class="eyebrow">Support</p>
+      <h2 id="donation-title">微信打赏</h2>
+      <img src="收款码/537a8a731804791d569387f56522fa2a.jpg" alt="微信收款码">
+      <p class="modal-hint">感谢支持，金额随意，&lt;=1 元即可。</p>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

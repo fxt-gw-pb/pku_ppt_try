@@ -291,6 +291,15 @@ if HTML_PPT_PREVIEW_DIR.is_dir():
         name="html-ppt-templates",
     )
 
+# Local preview support for the donation QR code used by the static frontend.
+PAYMENT_QR_DIR = REPO_ROOT / "收款码"
+if PAYMENT_QR_DIR.is_dir():
+    app.mount(
+        "/收款码",
+        StaticFiles(directory=str(PAYMENT_QR_DIR), html=False),
+        name="payment-qr",
+    )
+
 # Frontend demo. Mounting at "/" must be last so /api/* and /decks/* still win.
 WEB_DIR = REPO_ROOT / "web"
 if WEB_DIR.is_dir():
