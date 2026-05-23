@@ -1,0 +1,344 @@
+{
+  "meta": {
+    "title": "论文答辩 / 开题报告 通用 PPT 模板",
+    "subtitle": "GRADUATION DEFENSE  /  OPENING REPORT",
+    "presenter": "X X X",
+    "advisor": "X X X 教授",
+    "school": "X X 学院 · X X 专业",
+    "date": "20XX 年 XX 月",
+    "motto": "爱国 · 进步 · 民主 · 科学",
+    "logo": "assets/media/pku-logo.png"
+  },
+  "chapters": [
+    { "title": "背景和意义", "subtitle": "Background & Significance" },
+    { "title": "综述和评述", "subtitle": "Literature Review" },
+    { "title": "思路和内容", "subtitle": "Approach & Content" },
+    { "title": "过程和方法", "subtitle": "Process & Method" },
+    { "title": "成果与展望", "subtitle": "Results & Outlook" }
+  ],
+  "slides": [
+    {
+      "layout": "cover",
+      "label": "01 封面"
+    },
+    {
+      "layout": "contents",
+      "label": "02 目录"
+    },
+
+    {
+      "layout": "section-divider",
+      "label": "03 第一章扉页",
+      "chapterIndex": 0,
+      "points": ["宏观背景与趋势", "核心研究问题", "理论与实践意义"]
+    },
+    {
+      "layout": "image-analysis",
+      "label": "04 1.1 选题背景",
+      "chapterIndex": 0,
+      "sectionTitle": "1.1 选题背景",
+      "sectionTitleEn": "RESEARCH BACKGROUND",
+      "headline": "宏观环境推动 <span class=\"accent\">XX 领域</span> 进入新发展阶段",
+      "images": [
+        {
+          "src": "assets/media/world-map.png",
+          "alt": "示意图占位",
+          "fit": "contain",
+          "caption": "图 1.1 示意图占位 · 替换为您的论据图、数据图或场景图"
+        }
+      ],
+      "items": [
+        {
+          "title": "外部环境的驱动",
+          "body": "简述行业宏观趋势、政策导向或社会需求，建议控制在 50 字以内，突出推动本研究的外部动因。"
+        },
+        {
+          "title": "现有方案的局限",
+          "body": "概括当前主流方法在效率、稳定性、成本或泛化能力上的代表性瓶颈，为本研究的切入点提供铺垫。"
+        },
+        {
+          "title": "新方向的可能性",
+          "body": "点出可能突破上述瓶颈的新工具、新理论或新数据，并简要说明为何当下是合适的研究时机。"
+        }
+      ]
+    },
+    {
+      "layout": "theory-cards",
+      "label": "05 1.2 研究意义",
+      "chapterIndex": 0,
+      "sectionTitle": "1.2 研究意义",
+      "sectionTitleEn": "SIGNIFICANCE",
+      "headline": "三个层面共同构成本研究的学术与实践价值",
+      "cards": [
+        { "label": "理论价值", "title": "完善已有理论框架", "body": "说明本研究将在哪个具体维度补足或拓展现有理论模型，避免笼统措辞。" },
+        { "label": "方法价值", "title": "提出可推广工作流", "body": "概括本研究在方法层面的可迁移贡献，例如新流程、新指标或新评估范式。" },
+        { "label": "应用价值", "title": "支撑具体应用场景", "body": "指出研究成果可服务的真实场景与受益对象，让评委直观感受落地意义。" }
+      ]
+    },
+
+    {
+      "layout": "section-divider",
+      "label": "06 第二章扉页",
+      "chapterIndex": 1,
+      "points": ["国内外研究现状", "技术演进脉络", "现有缺口与机会"]
+    },
+    {
+      "layout": "chart-analysis",
+      "label": "07 2.1 国内外现状",
+      "chapterIndex": 1,
+      "sectionTitle": "2.1 国内外研究现状",
+      "sectionTitleEn": "RESEARCH STATUS",
+      "headline": "全球 XX 领域研究呈现 <span class=\"accent\">三足鼎立</span> 格局",
+      "images": [
+        {
+          "src": "assets/media/network-diagram.png",
+          "alt": "研究合作网络示意",
+          "fit": "contain",
+          "caption": "图 2.1 示意图占位 · 替换为文献合作网络、引用图谱或数据图表"
+        }
+      ],
+      "insights": [
+        { "title": "地区 A 的优势", "body": "概括该地区在原创理论或方法论上的代表性贡献，并给出 1-2 个量化指标。" },
+        { "title": "地区 B 的优势", "body": "说明该地区偏重的方向（如工程化、产业化）以及对应的发展阶段。" },
+        { "title": "地区 C 的优势", "body": "用一两句话指出该地区在体量或速度上的领先以及仍需补足的环节。" },
+        { "title": "全行业共性短板", "body": "总结上述三方共同面临的瓶颈，为本研究的定位埋下伏笔。" }
+      ]
+    },
+    {
+      "layout": "timeline",
+      "label": "08 2.2 技术演进",
+      "chapterIndex": 1,
+      "sectionTitle": "2.2 技术演进脉络",
+      "sectionTitleEn": "TECHNOLOGY EVOLUTION",
+      "headline": "近三十年 XX 领域经历了 四代 演进",
+      "steps": [
+        { "label": "1995", "title": "第一代 · 基础方法", "body": "概括该阶段的核心技术与主要局限。" },
+        { "label": "2005", "title": "第二代 · 改进方法", "body": "说明本阶段相比上一代的主要突破。" },
+        { "label": "2015", "title": "第三代 · 融合方法", "body": "突出本阶段跨学科融合或工程化的特征。" },
+        { "label": "2024", "title": "第四代 · 智能方法", "body": "点出当下数据驱动 / 智能化等新趋势。" }
+      ]
+    },
+    {
+      "layout": "theory-cards",
+      "label": "09 2.3 文献评述",
+      "chapterIndex": 1,
+      "sectionTitle": "2.3 文献评述",
+      "sectionTitleEn": "LITERATURE REVIEW",
+      "headline": "三种主流研究路径 · 各有突破亦各有局限",
+      "cards": [
+        { "title": "路径 A", "label": "APPROACH A", "body": "简介该路径的核心思想、典型工作与已有突破，再点明其代表性瓶颈。" },
+        { "title": "路径 B", "label": "APPROACH B", "body": "对比 A 路径，说明 B 路径的差异点、适用场景以及尚未解决的关键问题。" },
+        { "title": "路径 C", "label": "APPROACH C", "body": "指出新兴路径 C 的潜力与不足，并交代为何选择此路径作为本研究的切入点。" }
+      ]
+    },
+
+    {
+      "layout": "section-divider",
+      "label": "10 第三章扉页",
+      "chapterIndex": 2,
+      "points": ["核心研究问题", "总体研究框架", "创新点定位"]
+    },
+    {
+      "layout": "framework",
+      "label": "11 3.1 总体框架",
+      "chapterIndex": 2,
+      "sectionTitle": "3.1 研究思路",
+      "sectionTitleEn": "RESEARCH FRAMEWORK",
+      "headline": "以「<span class=\"accent\">问题界定 → 方法构建 → 验证迭代</span>」为闭环",
+      "nodes": [
+        { "title": "问题界定", "body": "明确研究对象、关键变量与边界条件。", "tags": ["问题"] },
+        { "title": "理论建模", "body": "在已有理论基础上提出本研究的假设与模型。", "tags": ["假设", "模型"], "primary": true },
+        { "title": "数据采集", "body": "梳理一手 / 二手数据来源与采集方案。", "tags": ["实验", "调研"] },
+        { "title": "分析验证", "body": "对模型与假设进行实证检验并量化结论。", "tags": ["统计", "评测"] },
+        { "title": "反馈迭代", "body": "据验证结果回流修正方法，进入下一轮闭环。", "tags": ["迭代"] }
+      ]
+    },
+    {
+      "layout": "multi-card",
+      "label": "12 3.2 研究内容",
+      "chapterIndex": 2,
+      "sectionTitle": "3.2 主要内容",
+      "sectionTitleEn": "RESEARCH CONTENTS",
+      "headline": "围绕 四个 子课题展开，从基础到应用层层递进",
+      "cols": 4,
+      "cards": [
+        { "title": "子课题一", "body": "简要描述本子课题的核心问题与预期产出。", "tag": "基础研究" },
+        { "title": "子课题二", "body": "说明在子课题一基础上的进一步推进方向。", "tag": "方法构建" },
+        { "title": "子课题三", "body": "概括针对核心机制或机理的深入研究内容。", "tag": "机理研究" },
+        { "title": "子课题四", "body": "面向真实场景的验证与工程评估环节。", "tag": "应用验证" }
+      ]
+    },
+    {
+      "layout": "vs",
+      "label": "13 3.3 路径对比",
+      "chapterIndex": 2,
+      "sectionTitle": "3.3 路径对比",
+      "sectionTitleEn": "PATH COMPARISON",
+      "headline": "本研究与传统路径的 <span class=\"accent\">根本差异</span>",
+      "leftKicker": "本研究 · NEW PATH",
+      "leftTitle": "新路径",
+      "leftItems": [
+        { "title": "可调性强",   "body": "在关键参数上可连续调节，覆盖更宽工作区间。" },
+        { "title": "稳健性高",   "body": "在常见扰动条件下性能保持稳定，泛化能力更优。" },
+        { "title": "易于放大",   "body": "在样本量或场景规模扩张时仍能保持可控成本。" },
+        { "title": "数据自洽",   "body": "理论预测与实证结果误差在可接受区间内。" }
+      ],
+      "rightKicker": "传统 · CURRENT PATH",
+      "rightTitle": "已有路径",
+      "rightItems": [
+        { "title": "调节空间窄",   "body": "受限于原有假设，关键参数仅能在小范围内调整。" },
+        { "title": "扰动敏感",     "body": "在场景或数据分布变化下性能明显下降。" },
+        { "title": "放大成本高",   "body": "规模扩张时所需的资源与时间成本快速上升。" },
+        { "title": "经验拟合为主", "body": "缺乏可迁移的统一理论框架，结论可复现性有限。" }
+      ]
+    },
+    {
+      "layout": "swot",
+      "label": "14 3.4 SWOT",
+      "chapterIndex": 2,
+      "sectionTitle": "3.4 SWOT 分析",
+      "sectionTitleEn": "SWOT ANALYSIS",
+      "headline": "对研究路线进行 内外部 综合评估",
+      "strengths": [
+        "理论与实证形成闭环，可快速迭代",
+        "已有相关方向的前期积累",
+        "团队 / 平台资源充足"
+      ],
+      "weaknesses": [
+        "部分关键资源仍较紧张",
+        "工程实现经验有待补足",
+        "数据获取存在一定门槛"
+      ],
+      "opportunities": [
+        "政策与产业需求同向利好",
+        "周边工具生态持续完善",
+        "国际学界对原创框架接受度高"
+      ],
+      "threats": [
+        "同类研究竞争密集",
+        "替代技术演进迅速",
+        "原料 / 成本波动带来不确定性"
+      ]
+    },
+
+    {
+      "layout": "section-divider",
+      "label": "15 第四章扉页",
+      "chapterIndex": 3,
+      "points": ["研究方法体系", "技术路线节点", "实验 / 调研设计"]
+    },
+    {
+      "layout": "method",
+      "label": "16 4.1 研究方法",
+      "chapterIndex": 3,
+      "sectionTitle": "4.1 研究方法",
+      "sectionTitleEn": "METHODOLOGY",
+      "headline": "四类方法相互验证，构成完整证据链",
+      "cols": 4,
+      "methods": [
+        { "title": "方法一",   "en": "METHOD A", "body": "用一两句话说明该方法的角色、输入与产出。" },
+        { "title": "方法二",   "en": "METHOD B", "body": "强调该方法相对方法一的互补性或差异化价值。" },
+        { "title": "方法三",   "en": "METHOD C", "body": "适用范围与本研究中的具体应用环节。" },
+        { "title": "方法四",   "en": "METHOD D", "body": "说明该方法承担的验证或机理解析职能。" }
+      ]
+    },
+    {
+      "layout": "timeline",
+      "label": "17 4.2 技术路线",
+      "chapterIndex": 3,
+      "sectionTitle": "4.2 技术路线",
+      "sectionTitleEn": "TECHNICAL ROUTE",
+      "headline": "按学期划分的 六 阶段技术路线",
+      "steps": [
+        { "label": "S1", "title": "前期准备",   "body": "完成文献调研与候选方案梳理。" },
+        { "label": "S2", "title": "方案设计",   "body": "构建模型框架并完成关键参数标定。" },
+        { "label": "S3", "title": "初步实验",   "body": "完成小规模试点并形成第一轮反馈。" },
+        { "label": "S4", "title": "扩展验证",   "body": "扩大样本量与场景覆盖，完成主要分析。" },
+        { "label": "S5", "title": "机理解析",   "body": "通过补充实验解释关键现象的成因。" },
+        { "label": "S6", "title": "成果整理",   "body": "撰写学位论文并完成论文投稿。" }
+      ]
+    },
+    {
+      "layout": "image-analysis",
+      "label": "18 4.3 关键示意",
+      "chapterIndex": 3,
+      "sectionTitle": "4.3 实验设计",
+      "sectionTitleEn": "EXPERIMENTAL DESIGN",
+      "headline": "关键机制示意 · 概括本研究的核心设计思路",
+      "images": [
+        {
+          "src": "assets/media/co2-site.png",
+          "alt": "关键机制示意",
+          "fit": "contain",
+          "caption": "图 4.3 示意图占位 · 替换为您的机制图、流程图或实验装置图"
+        }
+      ],
+      "items": [
+        { "title": "结构层面的设计",   "body": "概括关键结构 / 模块的设计要点及其针对性解决的问题。" },
+        { "title": "机理层面的创新",   "body": "说明该设计在原理层面带来的新现象或新性质。" },
+        { "title": "性能层面的提升",   "body": "用 1-2 个核心指标量化设计带来的可观察改进。" }
+      ]
+    },
+
+    {
+      "layout": "section-divider",
+      "label": "19 第五章扉页",
+      "chapterIndex": 4,
+      "points": ["主要结论", "创新点", "不足与展望"]
+    },
+    {
+      "layout": "section-text",
+      "label": "20 5.1 主要结论",
+      "chapterIndex": 4,
+      "sectionTitle": "5.1 主要结论",
+      "sectionTitleEn": "KEY CONCLUSIONS",
+      "headline": "围绕子课题，本研究形成如下核心结论",
+      "sideMark": "01",
+      "sideMeta": "Chapter Five",
+      "blocks": [
+        { "label": "结论一", "text": "建立了关于 <em>关键变量与目标指标</em> 的定量关联模型，在外推区间上保持较高精度。" },
+        { "label": "结论二", "text": "证实「<em>新机制 A + 新机制 B</em>」的协同效应，相比单一方法提升约 <em>N 倍</em>。" },
+        { "label": "结论三", "text": "在 <em>真实场景条件</em> 下完成多轮验证，关键指标稳定优于已有方法。" },
+        { "label": "结论四", "text": "在工程实现层面完成 <em>规模化扩展</em>，单次实验成本下降约 <em>N%</em>。" }
+      ]
+    },
+    {
+      "layout": "multi-card",
+      "label": "21 5.2 创新点",
+      "chapterIndex": 4,
+      "sectionTitle": "5.2 创新点",
+      "sectionTitleEn": "INNOVATION POINTS",
+      "headline": "三项可独立发表的核心创新",
+      "cols": 3,
+      "cards": [
+        { "title": "理论创新", "body": "提出可迁移的定量描述子或新模型，弥补已有理论框架的缺口。", "tag": "理论" },
+        { "title": "方法创新", "body": "构建可复用的工作流或评估范式，可推广至同类问题。", "tag": "方法" },
+        { "title": "工艺 / 应用创新", "body": "在实现层面验证大规模可行性，为同类研究的产业化提供参考路径。", "tag": "应用" }
+      ]
+    },
+    {
+      "layout": "section-text",
+      "label": "22 5.3 不足与展望",
+      "chapterIndex": 4,
+      "sectionTitle": "5.3 不足与展望",
+      "sectionTitleEn": "OUTLOOK",
+      "headline": "诚实面对研究不足 · 明确后续工作方向",
+      "sideMark": "02",
+      "sideMeta": "Future Work",
+      "blocks": [
+        { "label": "不足一", "text": "当前数据 / 样本覆盖范围有限，<em>外推与泛化</em> 仍需进一步验证。" },
+        { "label": "不足二", "text": "实验周期与资源约束下，<em>长期稳定性</em> 的评估仍存在不确定性。" },
+        { "label": "展望一", "text": "下一阶段将引入 <em>更广样本与跨场景验证</em>，进一步提升模型可靠性。" },
+        { "label": "展望二", "text": "联合相关团队推进 <em>工程化与产业化</em> 试点，对接真实应用场景。" }
+      ]
+    },
+
+    {
+      "layout": "closing",
+      "label": "23 致谢",
+      "title": "感谢您的倾听！",
+      "subtitle": "THANK YOU FOR LISTENING",
+      "message": "感谢导师的悉心指导，感谢课题组各位老师与同学的支持，感谢家人一路以来的陪伴。敬请各位老师批评指正。"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PKU 红 · 文稿生成 PPT</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="brand-title">PKU 红 · 文稿生成 PPT</span>
+    </div>
+    <div class="meta" id="meta">provider: ? · max: ? 字</div>
+  </header>
+
+  <main class="grid">
+    <section class="panel input-panel">
+      <h2>1. 粘贴文稿</h2>
+      <p class="hint">支持中文 / Markdown。建议 1k–10k 字。生成需 10-30 秒。</p>
+      <textarea id="manuscript" placeholder="在此粘贴论文摘要、开题报告、研究方案……"></textarea>
+      <div class="controls">
+        <span class="count"><span id="count">0</span> / <span id="limit">30000</span> 字</span>
+        <button id="generate">生成 PPT</button>
+      </div>
+    </section>
+
+    <section class="panel status-panel">
+      <h2>2. 任务状态</h2>
+      <div id="status-empty" class="empty">尚未提交任务。</div>
+      <ul id="jobs" class="jobs"></ul>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>真实 API Key 只填写在后端 <code>.env</code> 或部署平台的环境变量。前端不持有 key。</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+:root {
+  --pku-red: #9A0000;
+  --pku-red-soft: #c43d3d;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --line: #e6e6e6;
+  --bg: #f6f6f4;
+  --card: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "PingFang SC", "Source Han Sans SC", "Noto Sans SC",
+               -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--pku-red);
+}
+.brand-title { font-weight: 700; letter-spacing: 0.04em; }
+
+.meta { color: var(--muted); font-size: 13px; font-feature-settings: "tnum" 1; }
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 22px;
+  padding: 28px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+@media (max-width: 880px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+}
+
+.hint { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+
+textarea {
+  width: 100%;
+  min-height: 360px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  background: #fafaf8;
+  color: var(--ink);
+}
+textarea:focus {
+  outline: none;
+  border-color: var(--pku-red-soft);
+  background: #fff;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.count { color: var(--muted); font-size: 13px; font-feature-settings: "tnum" 1; }
+.count.over { color: var(--pku-red); font-weight: 600; }
+
+button {
+  background: var(--pku-red);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+button:hover { background: #b81515; }
+button:disabled { background: #ccc; cursor: not-allowed; }
+
+.empty { color: var(--muted); font-size: 14px; padding: 12px 0; }
+
+.jobs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.job {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px 14px;
+  background: #fafaf8;
+}
+.job.done { border-left: 3px solid var(--pku-red); }
+.job.failed { border-left: 3px solid #c43d3d; background: #fff4f4; }
+
+.job-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+}
+.job-id { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); }
+.job-status {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-size: 12px;
+}
+.job-status.pending { color: var(--muted); }
+.job-status.running { color: #8a6d00; }
+.job-status.done { color: var(--pku-red); }
+.job-status.failed { color: #c43d3d; }
+
+.job-meta { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+.job-actions { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+.job-actions a {
+  color: var(--pku-red);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  border: 1px solid var(--pku-red);
+  border-radius: 4px;
+  padding: 5px 12px;
+}
+.job-actions a:hover { background: var(--pku-red); color: #fff; }
+
+.job-error {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid #f0caca;
+  border-radius: 4px;
+  color: #8a1d1d;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap;
+}
+
+.foot {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 24px 16px 32px;
+}
+.foot code {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 1px 6px;
+}
