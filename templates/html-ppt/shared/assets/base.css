@@ -144,7 +144,67 @@ h4,.h4{font-size:22px;line-height:1.3;font-weight:600;margin:0 0 8px}
 .uppercase{text-transform:uppercase;letter-spacing:.12em}
 
 /* ================= PRINT ================= */
+/* One page per slide at the authored 1280×720 canvas. Browsers must be
+ * told (a) the page size, (b) to print background colors/gradients, and
+ * (c) to drop the deck container's overflow:hidden so every slide flows
+ * onto its own sheet. */
 @media print{
-  .slide{position:relative;opacity:1!important;transform:none!important;page-break-after:always;height:100vh}
-  .deck-header,.deck-footer,.progress-bar,.notes-overlay,.overview{display:none!important}
+  @page{ size:1280px 720px; margin:0; }
+
+  html,body{
+    width:1280px!important;
+    margin:0!important;
+    padding:0!important;
+    background:var(--bg)!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+  *,*::before,*::after{
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+
+  .deck{
+    position:static!important;
+    width:1280px!important;
+    height:auto!important;
+    overflow:visible!important;
+    background:var(--bg)!important;
+  }
+
+  .slide{
+    position:relative!important;
+    inset:auto!important;
+    left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;
+    width:1280px!important;
+    height:720px!important;
+    opacity:1!important;
+    visibility:visible!important;
+    transform:none!important;
+    transition:none!important;
+    animation:none!important;
+    pointer-events:auto!important;
+    overflow:hidden!important;
+    page-break-after:always!important;
+    break-after:page!important;
+    page-break-inside:avoid!important;
+    break-inside:avoid!important;
+  }
+  .slide:last-child{
+    page-break-after:auto!important;
+    break-after:auto!important;
+  }
+
+  /* Hide ephemeral chrome — but keep per-slide footers/headers that are
+   * part of the slide layout itself. */
+  .progress-bar,
+  .notes-overlay,
+  .overview,
+  .notes,
+  aside.notes,
+  .speaker-notes,
+  .pdf-export-btn,
+  .deck-toolbar{
+    display:none!important;
+  }
 }

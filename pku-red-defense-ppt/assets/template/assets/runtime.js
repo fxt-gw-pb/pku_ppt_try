@@ -507,6 +507,50 @@
     }
     NS.deck = deck;
     renderDeck(deck, stage);
+    injectPdfButton();
+  }
+
+  function injectPdfButton() {
+    if (document.querySelector(".pdf-export-btn")) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "pdf-export-btn";
+    btn.title = "导出 PDF（在打印对话框中选择「另存为 PDF」）";
+    btn.innerHTML = '<span>⇩</span><span>导出 PDF</span>';
+    btn.style.cssText = [
+      "position:fixed", "right:24px", "bottom:24px", "z-index:2147483600",
+      "display:inline-flex", "align-items:center", "gap:8px",
+      "padding:10px 16px", "border-radius:999px",
+      "background:#9A0000", "color:#fff", "border:1px solid rgba(255,255,255,.18)",
+      'font:600 13px/1 "Source Han Sans SC","Noto Sans SC","PingFang SC",-apple-system,sans-serif',
+      "letter-spacing:.04em", "cursor:pointer",
+      "box-shadow:0 8px 24px rgba(154,0,0,.35)",
+      "transition:transform .18s ease, background .18s ease",
+    ].join(";");
+    btn.addEventListener("mouseenter", () => {
+      btn.style.background = "#b50000";
+      btn.style.transform = "translateY(-1px)";
+    });
+    btn.addEventListener("mouseleave", () => {
+      btn.style.background = "#9A0000";
+      btn.style.transform = "translateY(0)";
+    });
+    btn.addEventListener("click", () => {
+      setTimeout(() => window.print(), 60);
+    });
+    document.body.appendChild(btn);
+    /* hide button in print */
+    const tag = document.createElement("style");
+    tag.textContent = "@media print{.pdf-export-btn{display:none!important}}";
+    document.head.appendChild(tag);
+    /* P-key shortcut */
+    document.addEventListener("keydown", (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "p" || e.key === "P") {
+        e.preventDefault();
+        setTimeout(() => window.print(), 60);
+      }
+    });
   }
 
   NS.render = renderDeck;

@@ -126,6 +126,46 @@
     }
     const barFill = bar.querySelector('span');
 
+    /* ===== PDF export button (calls window.print → "另存为 PDF") =====
+     * Floating bottom-right pill; hidden in print via base.css. Pressing it
+     * briefly clears the active-slide transform and reveals all slides
+     * before triggering print, so Chromium captures every slide. The
+     * @media print rules in base.css force 1280×720 page size and exact
+     * color reproduction. */
+    if (!document.querySelector('.pdf-export-btn')) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pdf-export-btn';
+      btn.title = '导出 PDF（在打印对话框中选择「另存为 PDF」）';
+      btn.innerHTML = '<span class="pdf-export-icon">⇩</span><span>导出 PDF</span>';
+      btn.style.cssText = [
+        'position:fixed','right:24px','bottom:24px','z-index:30',
+        'display:inline-flex','align-items:center','gap:8px',
+        'padding:10px 16px','border-radius:999px',
+        'background:rgba(20,22,30,.88)','color:#fff','border:1px solid rgba(255,255,255,.18)',
+        'font:600 13px/1 -apple-system,BlinkMacSystemFont,"Noto Sans SC",sans-serif',
+        'letter-spacing:.04em','cursor:pointer',
+        'box-shadow:0 8px 24px rgba(0,0,0,.25)',
+        'backdrop-filter:blur(10px)','-webkit-backdrop-filter:blur(10px)',
+        'transition:transform .18s ease, background .18s ease'
+      ].join(';');
+      btn.addEventListener('mouseenter', () => { btn.style.background = 'rgba(20,22,30,1)'; btn.style.transform = 'translateY(-1px)'; });
+      btn.addEventListener('mouseleave', () => { btn.style.background = 'rgba(20,22,30,.88)'; btn.style.transform = 'translateY(0)'; });
+      btn.addEventListener('click', () => exportPdf());
+      document.body.appendChild(btn);
+    }
+
+    function exportPdf() {
+      const html = document.documentElement;
+      html.setAttribute('data-printing', '1');
+      const after = () => {
+        html.removeAttribute('data-printing');
+        window.removeEventListener('afterprint', after);
+      };
+      window.addEventListener('afterprint', after);
+      setTimeout(() => { window.print(); }, 60);
+    }
+
     /* ===== notes overlay (N key) ===== */
     let notes = document.querySelector('.notes-overlay');
     if (!notes) {
@@ -944,6 +984,7 @@
         case 'o': case 'O': toggleOverview(); break;
         case 't': case 'T': cycleTheme(); break;
         case 'a': case 'A': cycleAnim(); break;
+        case 'p': case 'P': exportPdf(); e.preventDefault(); break;
         case 'Escape': toggleOverview(false); toggleNotes(false); break;
       }
     });
