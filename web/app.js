@@ -155,9 +155,10 @@ const heroTemplateLabel = $("hero-template-label");
 const heroTemplateName = $("hero-template-name");
 const previewTemplateLabel = $("preview-template-label");
 const previewTitle = $("preview-title");
-const openDonationBtn = $("open-donation");
+const openDonationBtns = document.querySelectorAll(".donation-trigger");
 const closeDonationBtn = $("close-donation");
 const donationModal = $("donation-modal");
+let activeDonationTrigger = null;
 
 let MAX_CHARS = 30000;
 let templates = FALLBACK_TEMPLATES;
@@ -431,13 +432,16 @@ function escapeAttr(value) {
 }
 
 function openDonationModal() {
+  activeDonationTrigger = document.activeElement;
   donationModal.hidden = false;
   closeDonationBtn.focus();
 }
 
 function closeDonationModal() {
   donationModal.hidden = true;
-  openDonationBtn.focus();
+  if (activeDonationTrigger) {
+    activeDonationTrigger.focus();
+  }
 }
 
 window.addEventListener("hashchange", route);
@@ -448,7 +452,9 @@ window.addEventListener("keydown", (event) => {
 });
 manuscriptEl.addEventListener("input", updateCount);
 generateBtn.addEventListener("click", createJob);
-openDonationBtn.addEventListener("click", openDonationModal);
+openDonationBtns.forEach((button) => {
+  button.addEventListener("click", openDonationModal);
+});
 closeDonationBtn.addEventListener("click", closeDonationModal);
 donationModal.addEventListener("click", (event) => {
   if (event.target === donationModal) {
