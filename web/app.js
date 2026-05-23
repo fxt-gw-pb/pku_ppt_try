@@ -17,7 +17,6 @@ const limitEl = $("limit");
 const generateBtn = $("generate");
 const jobsEl = $("jobs");
 const emptyEl = $("status-empty");
-const metaEl = $("meta");
 
 let MAX_CHARS = 30000;
 const polling = new Map(); // job_id → intervalId
@@ -29,10 +28,9 @@ async function loadHealth() {
     const h = await r.json();
     MAX_CHARS = h.max_input_chars || MAX_CHARS;
     limitEl.textContent = MAX_CHARS;
-    metaEl.textContent = `provider: ${h.provider} · max: ${MAX_CHARS} 字`;
     updateCount();
   } catch (e) {
-    metaEl.textContent = "backend offline — start with: uvicorn server.app:app --reload";
+    // Backend unreachable — the Generate button will surface the error on click.
   }
 }
 
