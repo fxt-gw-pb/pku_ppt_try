@@ -707,12 +707,21 @@ kbd {
 }
 
 .job-actions a {
+  border: 1px solid transparent;
   border-radius: 999px;
   padding: 8px 12px;
-  color: #fff;
+  color: #fff7ed;
   font-size: 13px;
   font-weight: 900;
-  background: var(--ink);
+  background: #b91c1c;
+  box-shadow: 0 10px 22px rgba(185, 28, 28, 0.22);
+}
+
+.job-actions a:nth-child(2) {
+  color: #7f1d1d;
+  border-color: rgba(185, 28, 28, 0.32);
+  background: #fff7ed;
+  box-shadow: none;
 }
 
 .job-error {
