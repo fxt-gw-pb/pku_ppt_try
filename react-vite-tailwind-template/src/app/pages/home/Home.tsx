@@ -14,7 +14,7 @@ const Home = () => {
           <div className="mx-auto max-w-5xl text-center">
             <span className="inline-flex items-center rounded-full border border-blue-200 bg-white/70 px-4 py-2 text-sm font-medium text-blue-700 shadow-sm backdrop-blur dark:border-blue-900/60 dark:bg-gray-900/70 dark:text-blue-300">
               <Sparkles className="mr-2 h-4 w-4" />
-              AI-powered PPT Studio
+              fxt ppt Studio
             </span>
             <h1 className="mt-8 text-5xl font-bold tracking-tight text-gray-950 dark:text-white md:text-7xl">
               从一段文稿开始，选择模板生成
@@ -24,7 +24,7 @@ const Home = () => {
               </span>
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-xl leading-8 text-gray-600 dark:text-gray-300">
-              面向答辩、技术分享、小红书图文、路演和周报的 AI PPT 生成网站原型。先选模板，再粘贴文稿。
+              面向答辩、技术分享、小红书图文、路演和周报的 fxt ppt 生成网站原型。先选模板，再粘贴文稿。
             </p>
             <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
               <Link to="/generate">

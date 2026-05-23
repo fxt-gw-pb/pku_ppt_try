@@ -167,7 +167,7 @@ const Generate = () => {
                     {activeTemplate.label}
                   </p>
                   <h3 className="mt-3 text-2xl font-black leading-tight">
-                    {manuscript.trim() ? manuscript.trim().split('\n')[0].slice(0, 34) : 'AI PPT 生成预览'}
+                    {manuscript.trim() ? manuscript.trim().split('\n')[0].slice(0, 34) : 'fxt ppt 生成预览'}
                   </h3>
                 </div>
                 <div className="grid grid-cols-3 gap-3">

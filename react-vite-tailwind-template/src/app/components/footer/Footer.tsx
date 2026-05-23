@@ -10,8 +10,8 @@ const Footer = () => {
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <div className="font-bold text-gray-950 dark:text-white">DeckPilot AI</div>
-            <div className="text-sm">两页式 AI PPT 生成网站原型</div>
+            <div className="font-bold text-gray-950 dark:text-white">fxt ppt</div>
+            <div className="text-sm">两页式 fxt ppt 生成网站原型</div>
           </div>
         </Link>
 

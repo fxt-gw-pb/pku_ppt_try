@@ -23,10 +23,10 @@ const Header = () => {
             </div>
             <div>
               <span className="block text-xl font-black tracking-tight text-gray-950 dark:text-white">
-                DeckPilot AI
+                fxt ppt
               </span>
               <span className="hidden text-xs text-gray-500 dark:text-gray-400 sm:block">
-                AI PPT 生成网站原型
+                fxt ppt 生成网站原型
               </span>
             </div>
           </Link>

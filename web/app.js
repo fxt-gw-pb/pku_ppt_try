@@ -305,7 +305,7 @@ function updateCount() {
 
 function updatePreviewTitle() {
   const firstLine = manuscriptEl.value.trim().split("\n").find(Boolean);
-  previewTitle.textContent = firstLine ? firstLine.slice(0, 34) : "AI PPT 生成预览";
+  previewTitle.textContent = firstLine ? firstLine.slice(0, 34) : "fxt ppt 生成预览";
 }
 
 async function createJob() {
