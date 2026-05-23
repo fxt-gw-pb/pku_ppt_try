@@ -10,144 +10,128 @@ const FALLBACK_TEMPLATES = [
   {
     template_id: "pku-red",
     name: "北大红答辩模板",
-    engine: "pku-json",
-    description: "北大红学术答辩风格，适合论文答辩、开题报告和正式学术汇报。",
-    preview_url: "demo.html",
+    engine: "classic",
+    description: "北大红学术答辩风格，适合论文答辩、开题报告和正式学术汇报。作者自制，最不推荐(bushi)。",
     label: "Academic",
     accent: "#b91c1c",
   },
   {
     template_id: "xhs-white-editorial",
     name: "小红书白底杂志风",
-    engine: "html-ppt",
+    engine: "editorial",
     description: "白底杂志风、强重点块、马卡龙软色卡，适合中文内容帖和知识分享。",
-    preview_url: "html-ppt-templates/templates/full-decks/xhs-white-editorial/index.html",
     label: "Editorial",
     accent: "#f97316",
   },
   {
     template_id: "graphify-dark-graph",
     name: "暗底知识图谱",
-    engine: "html-ppt",
+    engine: "graph",
     description: "深夜渐变、知识图谱和玻璃卡片，适合 AI、数据产品和图谱类分享。",
-    preview_url: "html-ppt-templates/templates/full-decks/graphify-dark-graph/index.html",
     label: "Graph",
     accent: "#22c55e",
   },
   {
     template_id: "knowledge-arch-blueprint",
     name: "奶油蓝图架构",
-    engine: "html-ppt",
+    engine: "blueprint",
     description: "奶油纸面、蓝图网格和硬边框，适合系统架构、工程白皮书和技术路线。",
-    preview_url: "html-ppt-templates/templates/full-decks/knowledge-arch-blueprint/index.html",
     label: "Blueprint",
     accent: "#2563eb",
   },
   {
     template_id: "hermes-cyber-terminal",
     name: "暗终端 Cyber",
-    engine: "html-ppt",
+    engine: "terminal",
     description: "终端窗口、扫描线和代码感，适合 CLI、Agent、工具评测和技术复盘。",
-    preview_url: "html-ppt-templates/templates/full-decks/hermes-cyber-terminal/index.html",
     label: "Terminal",
     accent: "#14b8a6",
   },
   {
     template_id: "obsidian-claude-gradient",
     name: "GitHub 暗紫渐变",
-    engine: "html-ppt",
+    engine: "developer",
     description: "GitHub dark 加紫蓝渐变，适合开发者工作流、LLM 产品和工具教程。",
-    preview_url: "html-ppt-templates/templates/full-decks/obsidian-claude-gradient/index.html",
     label: "Developer",
     accent: "#7c3aed",
   },
   {
     template_id: "testing-safety-alert",
     name: "红琥珀警示",
-    engine: "html-ppt",
+    engine: "safety",
     description: "风险警示、事故复盘和安全审查风格，适合 AI 安全、风控和红队汇报。",
-    preview_url: "html-ppt-templates/templates/full-decks/testing-safety-alert/index.html",
     label: "Safety",
     accent: "#dc2626",
   },
   {
     template_id: "xhs-pastel-card",
     name: "小红书柔和马卡龙",
-    engine: "html-ppt",
+    engine: "pastel",
     description: "柔和卡片、手作杂志感，适合生活方式、成长类和轻内容分享。",
-    preview_url: "html-ppt-templates/templates/full-decks/xhs-pastel-card/index.html",
     label: "Pastel",
     accent: "#ec4899",
   },
   {
     template_id: "dir-key-nav-minimal",
     name: "方向键 8 色极简",
-    engine: "html-ppt",
+    engine: "minimal",
     description: "大留白、一页一观点、强色块切换，适合 keynote 式演讲。",
-    preview_url: "html-ppt-templates/templates/full-decks/dir-key-nav-minimal/index.html",
     label: "Minimal",
     accent: "#0f766e",
   },
   {
     template_id: "pitch-deck",
     name: "Pitch Deck 路演",
-    engine: "html-ppt",
+    engine: "startup",
     description: "白底蓝紫渐变、指标和融资叙事，适合创业路演和投资人汇报。",
-    preview_url: "html-ppt-templates/templates/full-decks/pitch-deck/index.html",
     label: "Startup",
     accent: "#4f46e5",
   },
   {
     template_id: "product-launch",
     name: "Product Launch 发布会",
-    engine: "html-ppt",
+    engine: "launch",
     description: "深色封面、功能卡片和 CTA，适合产品发布和方案展示。",
-    preview_url: "html-ppt-templates/templates/full-decks/product-launch/index.html",
     label: "Launch",
     accent: "#ea580c",
   },
   {
     template_id: "tech-sharing",
     name: "Tech Sharing 技术分享",
-    engine: "html-ppt",
+    engine: "tech",
     description: "GitHub dark、代码块和终端感，适合内部技术分享和会议演讲。",
-    preview_url: "html-ppt-templates/templates/full-decks/tech-sharing/index.html",
     label: "Tech",
     accent: "#0891b2",
   },
   {
     template_id: "weekly-report",
     name: "Weekly Report 周报",
-    engine: "html-ppt",
+    engine: "report",
     description: "清晰商务报表风，适合周报、项目进展和业务复盘。",
-    preview_url: "html-ppt-templates/templates/full-decks/weekly-report/index.html",
     label: "Report",
     accent: "#0284c7",
   },
   {
     template_id: "xhs-post",
     name: "小红书 3:4 图文",
-    engine: "html-ppt",
+    engine: "social",
     description: "3:4 竖版卡片，适合小红书/社媒图文轮播。",
-    preview_url: "html-ppt-templates/templates/full-decks/xhs-post/index.html",
     label: "Social",
     accent: "#e11d48",
   },
   {
     template_id: "course-module",
     name: "Course Module 教学模块",
-    engine: "html-ppt",
+    engine: "course",
     description: "课程侧栏和学习目标结构，适合课程、workshop 和培训材料。",
-    preview_url: "html-ppt-templates/templates/full-decks/course-module/index.html",
     label: "Course",
     accent: "#ca8a04",
   },
   {
     template_id: "presenter-mode-reveal",
     name: "演讲者模式 Reveal",
-    engine: "html-ppt",
+    engine: "speaker",
     description: "带逐字稿和演讲者视图的模板，适合技术分享、课程和正式演讲。",
-    preview_url: "html-ppt-templates/templates/full-decks/presenter-mode-reveal/index.html",
     label: "Speaker",
     accent: "#4338ca",
   },
@@ -241,7 +225,7 @@ function createTemplateCard(tpl) {
   article.innerHTML = `
     <div class="template-card-top">
       <span class="template-mark">${escapeHtml(tpl.label || tpl.engine)}</span>
-      <span class="template-engine">${escapeHtml(tpl.engine)}</span>
+      <span class="template-engine">${escapeHtml(tpl.template_id)}</span>
     </div>
     <h3>${escapeHtml(tpl.name)}</h3>
     <p>${escapeHtml(tpl.description || "")}</p>
@@ -380,7 +364,7 @@ function renderJobCard(item, job) {
     actions = `
       <div class="job-actions">
         <a href="${escapeAttr(resolveBackendHref(job.preview_url))}" target="_blank" rel="noopener">进入预览页</a>
-        <a href="${escapeAttr(resolveBackendHref(job.download_url))}">下载 HTML 包</a>
+        <a href="${escapeAttr(resolveBackendHref(job.download_url))}">下载网页包</a>
       </div>`;
   }
 
@@ -429,9 +413,7 @@ function resolveBackendHref(path) {
 }
 
 function resolvePreviewHref(tpl) {
-  const href = tpl.preview_url || "";
-  if (/^https?:\/\//.test(href)) return href;
-  return href.replace(/^\//, "");
+  return `template-preview.html#${encodeURIComponent(tpl.template_id)}`;
 }
 
 function escapeHtml(value) {

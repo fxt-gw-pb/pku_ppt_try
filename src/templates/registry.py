@@ -21,6 +21,8 @@ class DeckTemplate:
 
     def public_dict(self) -> dict[str, str]:
         data = asdict(self)
+        data["engine"] = "classic" if self.engine == "pku-json" else "template"
+        data["preview_url"] = f"/template-preview.html#{self.template_id}"
         # Keep absolute filesystem details out of the public API.
         data.pop("path", None)
         data.pop("body_class", None)
@@ -52,7 +54,7 @@ _TEMPLATES: dict[str, DeckTemplate] = {
         template_id="pku-red",
         name="北大红答辩模板",
         engine="pku-json",
-        description="北大红学术答辩风格，适合论文答辩、开题报告和正式学术汇报。",
+        description="北大红学术答辩风格，适合论文答辩、开题报告和正式学术汇报。作者自制，最不推荐(bushi)。",
         preview_url="/demo.html",
         path=str(REPO_ROOT / "pku-red-defense-ppt" / "assets" / "template"),
     ),

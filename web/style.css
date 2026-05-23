@@ -313,6 +313,13 @@ button {
   width: 58%;
 }
 
+.mock-note {
+  margin: -22px 0 22px;
+  color: rgba(20, 17, 15, 0.58);
+  font-size: 14px;
+  font-weight: 800;
+}
+
 .section-head,
 .panel-head {
   display: flex;
@@ -779,6 +786,106 @@ kbd {
   font-size: 13px;
 }
 
+.preview-page {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 54px 0 72px;
+}
+
+.preview-hero {
+  max-width: 800px;
+  margin-bottom: 28px;
+}
+
+.preview-hero h1 {
+  margin: 12px 0 12px;
+  font-size: clamp(44px, 7vw, 82px);
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+}
+
+.preview-hero p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+.preview-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.preview-template {
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 20px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--accent), transparent 86%), transparent 55%),
+    var(--card);
+  box-shadow: 0 14px 36px rgba(52, 39, 26, 0.08);
+}
+
+.preview-template::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: var(--accent);
+}
+
+.preview-template.is-featured {
+  grid-column: span 2;
+}
+
+.preview-template span {
+  align-self: flex-start;
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--accent);
+}
+
+.preview-template h2 {
+  margin: 18px 0 10px;
+  font-size: 25px;
+  line-height: 1.08;
+}
+
+.preview-template p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.preview-template strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.preview-template a {
+  align-self: flex-start;
+  margin-top: auto;
+  border-radius: 999px;
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  background: var(--accent);
+}
+
 @media (max-width: 1020px) {
   .hero,
   .workspace {
@@ -790,6 +897,10 @@ kbd {
   }
 
   .template-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .preview-gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -825,8 +936,13 @@ kbd {
   }
 
   .template-gallery,
-  .template-strip {
+  .template-strip,
+  .preview-gallery {
     grid-template-columns: 1fr;
+  }
+
+  .preview-template.is-featured {
+    grid-column: span 1;
   }
 }
 

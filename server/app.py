@@ -282,7 +282,7 @@ def preview_job(job_id: str) -> RedirectResponse:
 # Serve materialized decks so /preview can resolve their fetch('data/slides.json').
 app.mount("/decks", StaticFiles(directory=str(OUTPUT_DIR), html=True), name="decks")
 
-# Optional local template gallery copied from the html-ppt skill.
+# Optional local template gallery for static previews.
 HTML_PPT_PREVIEW_DIR = REPO_ROOT / "html-ppt-templates"
 if HTML_PPT_PREVIEW_DIR.is_dir():
     app.mount(

@@ -1,4 +1,4 @@
-"""Render generic slide_json into the html-ppt xhs-white-editorial deck."""
+"""Render generic slide_json into the xhs-white-editorial deck."""
 from __future__ import annotations
 
 import html
@@ -173,7 +173,7 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <div class="xw-big-stat xw-grad">{_rich(title)}<small> · thanks</small></div>
       <p class="xw-sub" style="font-size:28px;margin-top:36px">{_rich(message)}</p>
       <div style="margin-top:40px">
-        <span class="xw-pill">html-ppt</span>
+        <span class="xw-pill">fxt ppt</span>
         <span class="xw-pill">xhs-white-editorial</span>
         <span class="xw-pill">generated deck</span>
       </div>
@@ -260,4 +260,3 @@ def render_xhs_white_editorial(generic: dict[str, Any]) -> str:
 
 
 __all__ = ["render_xhs_white_editorial"]
-

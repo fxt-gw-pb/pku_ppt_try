@@ -1,4 +1,4 @@
-"""Generic renderer for imported html-ppt full-deck templates."""
+"""Generic renderer for imported full-deck templates."""
 from __future__ import annotations
 
 import html
@@ -39,13 +39,13 @@ def _footer(current: int, total: int) -> str:
 
 def _cover(generic: dict[str, Any], current: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Generated with html-ppt"
+    subtitle = generic.get("subtitle") or "Generated with fxt ppt"
     inner = f"""
       <p class="kicker">Generated deck</p>
       <h1 class="h1">{_rich(title)}</h1>
       <p class="lede mt-m">{_rich(subtitle)}</p>
       <div class="row wrap mt-l">
-        <span class="pill pill-accent">HTML PPT</span>
+        <span class="pill pill-accent">fxt ppt</span>
         <span class="pill">模板生成</span>
         <span class="pill">文稿整理</span>
       </div>

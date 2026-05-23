@@ -3,144 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HTML PPT 模板预览</title>
+  <meta http-equiv="refresh" content="0; url=../template-preview.html">
+  <title>fxt ppt · 模板库</title>
   <style>
-    :root {
-      --bg: #0f1117;
-      --panel: #171a23;
-      --line: rgba(255,255,255,.12);
-      --text: #f3f5f7;
-      --muted: #a7adba;
-      --accent: #7aa2f7;
-    }
-    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-        "Microsoft YaHei", sans-serif;
-      color: var(--text);
-      background: var(--bg);
-    }
-    main {
-      width: min(1180px, calc(100vw - 48px));
-      margin: 0 auto;
-      padding: 48px 0 64px;
-    }
-    h1 {
-      margin: 0;
-      font-size: 42px;
-      letter-spacing: 0;
-    }
-    .sub {
-      margin: 10px 0 30px;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.7;
-    }
-    .section-title {
-      margin: 34px 0 14px;
-      color: #d7dce8;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 14px;
+      place-items: center;
+      font-family: "Avenir Next", "PingFang SC", "Noto Sans SC", sans-serif;
+      color: #14110f;
+      background: #f6f2ea;
     }
-    a.card {
-      min-height: 104px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel);
-      color: inherit;
-      text-decoration: none;
-    }
-    a.card:hover {
-      border-color: rgba(122,162,247,.65);
-      background: #1d2230;
-    }
-    .name {
-      font-size: 17px;
-      font-weight: 700;
-      overflow-wrap: anywhere;
-    }
-    .desc {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-    .pill {
-      align-self: flex-start;
-      padding: 3px 8px;
-      border: 1px solid rgba(122,162,247,.38);
-      border-radius: 999px;
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
+    a {
+      color: #b91c1c;
+      font-weight: 800;
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>HTML PPT 模板预览</h1>
-    <p class="sub">
-      已从 html-ppt skill 复制完整模板库。推荐先看 Full-Deck Gallery，再逐个打开完整模板。
-      所有 deck 支持方向键翻页，部分模板支持 <strong>S</strong> 键演讲者模式。
-    </p>
-
-    <div class="section-title">Showcases</div>
-    <div class="grid">
-      <a class="card" href="templates/full-decks-index.html">
-        <span class="pill">Gallery</span>
-        <span class="name">Full-Deck Gallery</span>
-        <span class="desc">15 个完整 deck 的 iframe 总览，适合快速横向比较。</span>
-      </a>
-      <a class="card" href="templates/theme-showcase.html">
-        <span class="pill">Themes</span>
-        <span class="name">Theme Showcase</span>
-        <span class="desc">36 个主题 token 预览。</span>
-      </a>
-      <a class="card" href="templates/layout-showcase.html">
-        <span class="pill">Layouts</span>
-        <span class="name">Layout Showcase</span>
-        <span class="desc">31 个单页布局预览。</span>
-      </a>
-      <a class="card" href="templates/animation-showcase.html">
-        <span class="pill">Motion</span>
-        <span class="name">Animation Showcase</span>
-        <span class="desc">CSS 入场动画与 canvas FX 效果。</span>
-      </a>
-    </div>
-
-    <div class="section-title">Full-Deck Templates</div>
-    <div class="grid">
-      <a class="card" href="templates/full-decks/xhs-white-editorial/index.html"><span class="name">xhs-white-editorial</span><span class="desc">白底杂志风，小红书 / 中文图文。</span></a>
-      <a class="card" href="templates/full-decks/graphify-dark-graph/index.html"><span class="name">graphify-dark-graph</span><span class="desc">暗底知识图谱，AI / 数据产品。</span></a>
-      <a class="card" href="templates/full-decks/knowledge-arch-blueprint/index.html"><span class="name">knowledge-arch-blueprint</span><span class="desc">奶油蓝图架构，系统设计 / 工程白皮书。</span></a>
-      <a class="card" href="templates/full-decks/hermes-cyber-terminal/index.html"><span class="name">hermes-cyber-terminal</span><span class="desc">暗终端风，CLI / Agent / 技术评测。</span></a>
-      <a class="card" href="templates/full-decks/obsidian-claude-gradient/index.html"><span class="name">obsidian-claude-gradient</span><span class="desc">GitHub 暗紫渐变，开发者工作流。</span></a>
-      <a class="card" href="templates/full-decks/testing-safety-alert/index.html"><span class="name">testing-safety-alert</span><span class="desc">红琥珀警示，安全 / 事故复盘。</span></a>
-      <a class="card" href="templates/full-decks/xhs-pastel-card/index.html"><span class="name">xhs-pastel-card</span><span class="desc">柔和马卡龙，生活方式 / 轻内容。</span></a>
-      <a class="card" href="templates/full-decks/dir-key-nav-minimal/index.html"><span class="name">dir-key-nav-minimal</span><span class="desc">八色极简 keynote，一页一个观点。</span></a>
-      <a class="card" href="templates/full-decks/pitch-deck/index.html"><span class="name">pitch-deck</span><span class="desc">融资路演，VC / YC 风。</span></a>
-      <a class="card" href="templates/full-decks/product-launch/index.html"><span class="name">product-launch</span><span class="desc">产品发布，深色 hero + 功能页。</span></a>
-      <a class="card" href="templates/full-decks/tech-sharing/index.html"><span class="name">tech-sharing</span><span class="desc">技术分享，GitHub dark + 代码块。</span></a>
-      <a class="card" href="templates/full-decks/weekly-report/index.html"><span class="name">weekly-report</span><span class="desc">周报 / 业务复盘，KPI 和计划表。</span></a>
-      <a class="card" href="templates/full-decks/xhs-post/index.html"><span class="name">xhs-post</span><span class="desc">小红书 3:4 图文轮播。</span></a>
-      <a class="card" href="templates/full-decks/course-module/index.html"><span class="name">course-module</span><span class="desc">课程模块 / workshop。</span></a>
-      <a class="card" href="templates/full-decks/presenter-mode-reveal/index.html"><span class="name">presenter-mode-reveal</span><span class="desc">演讲者模式专用，逐字稿示例。</span></a>
-    </div>
-  </main>
+  <p>正在打开 fxt ppt 模板库。若未自动跳转，请 <a href="../template-preview.html">点击这里</a>。</p>
 </body>
 </html>
