@@ -232,7 +232,6 @@ function createTemplateCard(tpl) {
     <p>${escapeHtml(tpl.description || "")}</p>
     <div class="template-actions">
       <button class="text-button" type="button" data-action="select">使用模板</button>
-      <a href="${escapeAttr(resolvePreviewHref(tpl))}" target="_blank" rel="noopener">预览</a>
     </div>
   `;
   article.querySelector("[data-action='select']").addEventListener("click", () => {
@@ -411,10 +410,6 @@ function resolveBackendHref(path) {
   if (!path) return "#";
   if (/^https?:\/\//.test(path)) return path;
   return `${API_BASE}${path}`;
-}
-
-function resolvePreviewHref(tpl) {
-  return `template-preview.html#${encodeURIComponent(tpl.template_id)}`;
 }
 
 function escapeHtml(value) {

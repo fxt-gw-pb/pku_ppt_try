@@ -282,15 +282,6 @@ def preview_job(job_id: str) -> RedirectResponse:
 # Serve materialized decks so /preview can resolve their fetch('data/slides.json').
 app.mount("/decks", StaticFiles(directory=str(OUTPUT_DIR), html=True), name="decks")
 
-# Optional local template gallery for static previews.
-HTML_PPT_PREVIEW_DIR = REPO_ROOT / "html-ppt-templates"
-if HTML_PPT_PREVIEW_DIR.is_dir():
-    app.mount(
-        "/html-ppt-templates",
-        StaticFiles(directory=str(HTML_PPT_PREVIEW_DIR), html=True),
-        name="html-ppt-templates",
-    )
-
 # Local preview support for the donation QR code used by the static frontend.
 PAYMENT_QR_DIR = REPO_ROOT / "收款码"
 if PAYMENT_QR_DIR.is_dir():

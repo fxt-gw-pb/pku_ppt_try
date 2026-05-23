@@ -22,11 +22,11 @@ class DeckTemplate:
     def public_dict(self) -> dict[str, str]:
         data = asdict(self)
         data["engine"] = "classic" if self.engine == "pku-json" else "template"
-        data["preview_url"] = f"/template-preview.html#{self.template_id}"
         # Keep absolute filesystem details out of the public API.
         data.pop("path", None)
         data.pop("body_class", None)
         data.pop("renderer", None)
+        data.pop("preview_url", None)
         return data
 
 
@@ -42,7 +42,7 @@ def _html_ppt(
         name=name,
         engine="html-ppt",
         description=description,
-        preview_url=f"/html-ppt-templates/templates/full-decks/{template_id}/index.html",
+        preview_url="",
         path=str(REPO_ROOT / "templates" / "html-ppt" / template_id),
         body_class=f"tpl-{template_id}",
         renderer=renderer,
@@ -55,7 +55,7 @@ _TEMPLATES: dict[str, DeckTemplate] = {
         name="北大红答辩模板",
         engine="pku-json",
         description="北大红学术答辩风格，适合论文答辩、开题报告和正式学术汇报。作者自制，最不推荐(bushi)。",
-        preview_url="/demo.html",
+        preview_url="",
         path=str(REPO_ROOT / "pku-red-defense-ppt" / "assets" / "template"),
     ),
     "xhs-white-editorial": _html_ppt(
