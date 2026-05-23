@@ -16,8 +16,10 @@
 .tpl-product-launch .slide.dark .lede,.tpl-product-launch .slide.dark .dim{color:rgba(245,245,247,.72)}
 .tpl-product-launch .slide.dark .card{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);box-shadow:none;backdrop-filter:blur(20px)}
 .tpl-product-launch .slide.dark .kicker{color:var(--accent-2)}
-.tpl-product-launch .h1{font-size:96px;line-height:.98;font-weight:900;letter-spacing:-.045em}
-.tpl-product-launch .h2{font-size:64px;font-weight:800;letter-spacing:-.035em}
+.tpl-product-launch .h1{font-size:74px;line-height:1.08;font-weight:900;letter-spacing:-.01em;max-width:760px}
+.tpl-product-launch .h1:lang(en){font-size:92px;line-height:1;letter-spacing:-.04em}
+.tpl-product-launch .h2{font-size:48px;font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.tpl-product-launch .h2:lang(en){font-size:60px;letter-spacing:-.03em;line-height:1.05}
 .tpl-product-launch .hero-shot{position:absolute;right:-60px;top:50%;transform:translateY(-50%);width:640px;height:640px;border-radius:50%;background:var(--grad);filter:blur(2px);opacity:.85}
 .tpl-product-launch .hero-shot::after{content:"";position:absolute;inset:80px;border-radius:40px;background:linear-gradient(160deg,rgba(255,255,255,.3),transparent 60%),#1a1a28;box-shadow:inset 0 2px 0 rgba(255,255,255,.2)}
 .tpl-product-launch .hero-shot::before{content:"Halo v2";position:absolute;inset:80px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:44px;font-weight:900;letter-spacing:-.02em;z-index:2;border-radius:40px}

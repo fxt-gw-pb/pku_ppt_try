@@ -28,8 +28,10 @@
 .tpl-hermes-cyber-terminal .hc-chrome .dots span:nth-child(3){background:var(--hc-green)}
 .tpl-hermes-cyber-terminal .hc-prompt{color:var(--hc-green);font-weight:500}
 .tpl-hermes-cyber-terminal .hc-prompt::before{content:'$ ';color:var(--hc-cyan)}
-.tpl-hermes-cyber-terminal .hc-h1{font-family:'JetBrains Mono',monospace;font-size:72px;font-weight:700;line-height:1.05;letter-spacing:-.02em;color:var(--hc-green);text-shadow:0 0 30px rgba(126,211,164,.35),0 0 60px rgba(126,211,164,.1);margin:14px 0 12px}
-.tpl-hermes-cyber-terminal .hc-h2{font-size:46px;font-weight:600;color:var(--hc-ink);margin:0 0 10px;letter-spacing:-.015em}
+.tpl-hermes-cyber-terminal .hc-h1{font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:60px;font-weight:700;line-height:1.18;letter-spacing:-.005em;color:var(--hc-green);text-shadow:0 0 24px rgba(126,211,164,.3),0 0 60px rgba(126,211,164,.08);margin:14px 0 12px;max-width:1080px;word-break:break-word}
+.tpl-hermes-cyber-terminal .hc-h1:lang(en){font-size:72px;letter-spacing:-.02em;line-height:1.05}
+.tpl-hermes-cyber-terminal .hc-h2{font-size:42px;font-weight:600;color:var(--hc-ink);margin:0 0 10px;letter-spacing:-.005em;line-height:1.2}
+.tpl-hermes-cyber-terminal .hc-h2:lang(en){font-size:46px;letter-spacing:-.015em;line-height:1.1}
 .tpl-hermes-cyber-terminal .hc-h3{font-size:22px;font-weight:600;color:var(--hc-amber);margin:0 0 10px}
 .tpl-hermes-cyber-terminal .hc-lede{font-size:18px;line-height:1.7;color:var(--hc-ink2);max-width:780px;font-family:'Inter','Noto Sans SC',sans-serif}
 .tpl-hermes-cyber-terminal .hc-cursor{display:inline-block;width:12px;height:1em;background:var(--hc-green);vertical-align:middle;margin-left:6px;animation:hcBlink 1s steps(2) infinite}

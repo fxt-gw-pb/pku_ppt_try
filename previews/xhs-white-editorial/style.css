@@ -25,8 +25,10 @@
 .tpl-xhs-white-editorial .xw-tag .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(90deg,#7b61ff,#4e8cff,#17b26a,#ff9d42,#ff5fa2)}
 .tpl-xhs-white-editorial .xw-page{font-size:14px;color:var(--xw-muted);letter-spacing:.1em}
 .tpl-xhs-white-editorial .xw-kicker{font-size:18px;color:var(--xw-ink2);margin-top:6px;font-weight:500}
-.tpl-xhs-white-editorial .xw-title{font-size:84px;line-height:1.02;letter-spacing:-2px;font-weight:850;margin:18px 0 0;color:var(--xw-ink)}
-.tpl-xhs-white-editorial .xw-title-md{font-size:60px;line-height:1.05;letter-spacing:-1.5px;font-weight:800;margin:14px 0 0}
+.tpl-xhs-white-editorial .xw-title{font-size:72px;line-height:1.16;letter-spacing:-.5px;font-weight:850;margin:18px 0 0;color:var(--xw-ink);max-width:1040px;word-break:break-word}
+.tpl-xhs-white-editorial .xw-title:lang(en){font-size:84px;letter-spacing:-2px;line-height:1.02}
+.tpl-xhs-white-editorial .xw-title-md{font-size:46px;line-height:1.2;letter-spacing:-.5px;font-weight:800;margin:14px 0 0}
+.tpl-xhs-white-editorial .xw-title-md:lang(en){font-size:60px;letter-spacing:-1.5px;line-height:1.05}
 .tpl-xhs-white-editorial .xw-grad{background:linear-gradient(90deg,#7b61ff 0%,#4e8cff 25%,#17b26a 48%,#ff9d42 72%,#ff5fa2 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tpl-xhs-white-editorial .xw-sub{font-size:24px;line-height:1.45;color:#1f2937;margin-top:22px;max-width:900px}
 .tpl-xhs-white-editorial .xw-focus{display:inline-block;padding:6px 14px;border-radius:14px;background:#111318;color:#fff;font-weight:700}

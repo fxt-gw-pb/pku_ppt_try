@@ -16,8 +16,10 @@
   radial-gradient(50% 50% at 10% 90%,rgba(126,231,135,.08),transparent 60%);
   pointer-events:none;z-index:0}
 .tpl-tech-sharing .slide>*{position:relative;z-index:1}
-.tpl-tech-sharing .h1{font-size:78px;line-height:1.03;font-weight:800;letter-spacing:-.03em;color:#fff}
-.tpl-tech-sharing .h2{font-size:54px;font-weight:700;letter-spacing:-.025em;color:#fff}
+.tpl-tech-sharing .h1{font-size:64px;line-height:1.18;font-weight:800;letter-spacing:-.005em;color:#fff;max-width:1080px;word-break:break-word}
+.tpl-tech-sharing .h1:lang(en){font-size:78px;letter-spacing:-.03em;line-height:1.03}
+.tpl-tech-sharing .h2{font-size:46px;font-weight:700;letter-spacing:-.005em;color:#fff;line-height:1.2}
+.tpl-tech-sharing .h2:lang(en){font-size:54px;letter-spacing:-.025em;line-height:1.1}
 .tpl-tech-sharing h3,.tpl-tech-sharing h4{color:#fff}
 .tpl-tech-sharing .kicker{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;text-transform:none;letter-spacing:.02em}
 .tpl-tech-sharing .kicker::before{content:"> "}

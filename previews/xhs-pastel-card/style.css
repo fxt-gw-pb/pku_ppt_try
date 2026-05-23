@@ -35,11 +35,13 @@
 .tpl-xhs-pastel-card .xp-chip.rose::before{background:var(--xp-rose-d)}
 .tpl-xhs-pastel-card .xp-page{font-family:'Inter',sans-serif;font-size:13px;color:var(--xp-muted);letter-spacing:.12em;font-weight:600}
 .tpl-xhs-pastel-card .xp-kicker{font-family:'Inter',sans-serif;font-size:14px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--xp-peach-d);margin-bottom:14px}
-.tpl-xhs-pastel-card .xp-h1{font-size:96px;font-weight:900;line-height:1.05;letter-spacing:-2px;margin:0 0 18px;color:var(--xp-ink);font-family:'Playfair Display','Noto Serif SC',serif}
+.tpl-xhs-pastel-card .xp-h1{font-size:72px;font-weight:900;line-height:1.15;letter-spacing:-.5px;margin:0 0 18px;color:var(--xp-ink);font-family:'Playfair Display','Noto Serif SC',serif;max-width:1040px;word-break:break-word}
+.tpl-xhs-pastel-card .xp-h1:lang(en){font-size:88px;letter-spacing:-1.5px;line-height:1.06}
 .tpl-xhs-pastel-card .xp-h1 em{font-style:italic;color:var(--xp-peach-d);font-family:'Playfair Display',serif}
 .tpl-xhs-pastel-card .xp-h1 .rose{color:var(--xp-rose-d);font-style:italic}
 .tpl-xhs-pastel-card .xp-h1 .mint{color:var(--xp-mint-d);font-style:italic}
-.tpl-xhs-pastel-card .xp-h2{font-size:60px;font-weight:800;line-height:1.1;letter-spacing:-1px;margin:0 0 14px;font-family:'Playfair Display','Noto Serif SC',serif}
+.tpl-xhs-pastel-card .xp-h2{font-size:44px;font-weight:800;line-height:1.2;letter-spacing:-.5px;margin:0 0 14px;font-family:'Playfair Display','Noto Serif SC',serif}
+.tpl-xhs-pastel-card .xp-h2:lang(en){font-size:56px;letter-spacing:-1px;line-height:1.1}
 .tpl-xhs-pastel-card .xp-sub{font-family:'Inter','Noto Sans SC',sans-serif;font-size:21px;line-height:1.6;color:var(--xp-ink2);max-width:800px;font-weight:400}
 .tpl-xhs-pastel-card .xp-card{border-radius:28px;padding:30px 34px;background:#fff;box-shadow:0 14px 40px rgba(42,35,64,.08);position:relative;overflow:hidden}
 .tpl-xhs-pastel-card .xp-card.peach{background:var(--xp-peach)}

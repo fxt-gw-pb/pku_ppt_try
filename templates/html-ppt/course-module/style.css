@@ -22,8 +22,10 @@
 .tpl-course-module .obj-list li.current{color:var(--text-1);font-weight:700}
 .tpl-course-module .obj-list li.current::before{content:"▸";color:var(--accent-2)}
 .tpl-course-module .main{min-width:0}
-.tpl-course-module .h1{font-family:'Playfair Display',serif;font-size:72px;line-height:1.02;font-weight:800;letter-spacing:-.02em;color:var(--text-1)}
-.tpl-course-module .h2{font-family:'Playfair Display',serif;font-size:48px;line-height:1.1;font-weight:700;letter-spacing:-.015em;color:var(--text-1)}
+.tpl-course-module .h1{font-family:'Playfair Display','Noto Serif SC',serif;font-size:60px;line-height:1.16;font-weight:800;letter-spacing:-.005em;color:var(--text-1);max-width:880px}
+.tpl-course-module .h1:lang(en){font-size:76px;letter-spacing:-.02em;line-height:1.04}
+.tpl-course-module .h2{font-family:'Playfair Display','Noto Serif SC',serif;font-size:40px;line-height:1.2;font-weight:700;letter-spacing:-.005em;color:var(--text-1)}
+.tpl-course-module .h2:lang(en){font-size:48px;letter-spacing:-.015em;line-height:1.1}
 .tpl-course-module h3,.tpl-course-module h4{color:var(--text-1)}
 .tpl-course-module .kicker{color:var(--accent-2);font-size:12px;font-weight:700;letter-spacing:.14em}
 .tpl-course-module .lede{font-size:20px;color:var(--text-2);line-height:1.7}

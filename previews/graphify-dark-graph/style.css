@@ -26,8 +26,10 @@
 .tpl-graphify-dark-graph .slide > *{position:relative;z-index:2}
 .tpl-graphify-dark-graph .gd-snum{position:absolute;top:28px;right:40px;font-size:12px;letter-spacing:.25em;color:var(--gd-text3);z-index:3}
 .tpl-graphify-dark-graph .gd-eyebrow{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gd-text3);font-weight:500}
-.tpl-graphify-dark-graph .gd-h1{font-size:74px;font-weight:800;line-height:1.08;letter-spacing:-.02em;margin:16px 0 10px;color:var(--gd-text)}
-.tpl-graphify-dark-graph .gd-h2{font-size:52px;font-weight:700;line-height:1.12;margin:0 0 14px}
+.tpl-graphify-dark-graph .gd-h1{font-size:64px;font-weight:800;line-height:1.18;letter-spacing:-.005em;margin:16px 0 10px;color:var(--gd-text);max-width:1080px;word-break:break-word}
+.tpl-graphify-dark-graph .gd-h1:lang(en){font-size:74px;letter-spacing:-.02em;line-height:1.08}
+.tpl-graphify-dark-graph .gd-h2{font-size:44px;font-weight:700;line-height:1.2;margin:0 0 14px;letter-spacing:-.005em}
+.tpl-graphify-dark-graph .gd-h2:lang(en){font-size:52px;letter-spacing:-.015em;line-height:1.12}
 .tpl-graphify-dark-graph .gd-lede{font-size:22px;line-height:1.65;font-weight:300;color:var(--gd-text2);max-width:850px}
 .tpl-graphify-dark-graph .gd-rainbow{background:linear-gradient(90deg,#ff0080,#ff4d00,#ff9900,#ffe600,#00c853,#0091ea,#6200ea,#ff0080);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gdRainbow 4s linear infinite}
 @keyframes gdRainbow{0%{background-position:0% center}100%{background-position:200% center}}
