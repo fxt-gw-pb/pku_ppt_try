@@ -36,9 +36,6 @@ DEFAULT_CHAPTERS = [
 DEFAULT_META = {
     "title": "",
     "subtitle": "GRADUATION DEFENSE / OPENING REPORT",
-    "presenter": "X X X",
-    "advisor": "X X X 教授",
-    "school": "X X 学院 · X X 专业",
     "date": "",
     "motto": "爱国 · 进步 · 民主 · 科学",
     "logo": "assets/media/pku-logo.png",

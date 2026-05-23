@@ -83,8 +83,6 @@
 
     const footerTag = slide.footerTag
       ? `<div class="footer-tag">${esc(slide.footerTag)}</div>`
-      : ctx.deck.meta?.school
-      ? `<div class="footer-tag">${esc(ctx.deck.meta.school)}</div>`
       : "";
 
     return `
@@ -103,11 +101,6 @@
 
   layouts.cover = (s, ctx) => {
     const m = ctx.deck.meta || {};
-    const pills = [
-      m.presenter && { label: "汇报人", val: m.presenter },
-      m.advisor && { label: "指导老师", val: m.advisor },
-      m.school && { label: "学院专业", val: m.school },
-    ].filter(Boolean);
     const deco = Array.from({ length: 18 })
       .map((_, i) => {
         // sparse pattern, top-right
@@ -124,14 +117,6 @@
       <div class="cover-body">
         <div class="cover-title">${rich(s.title || m.title || "")}</div>
         ${s.subtitle || m.subtitle ? `<div class="cover-subtitle">${esc(s.subtitle || m.subtitle)}</div>` : ""}
-        <div class="cover-meta">
-          ${pills
-            .map(
-              (p) =>
-                `<span class="pill">${esc(p.label)}：${esc(p.val)}</span>`
-            )
-            .join("")}
-        </div>
       </div>
       <div class="cover-footer">
         <div>
