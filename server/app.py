@@ -131,8 +131,12 @@ def _run_job(job_id: str, manuscript: str) -> None:
 
         job["status"] = "done"
         job["finished_at"] = _now()
-        job["download_url"] = f"/api/jobs/{job_id}/download"
-        job["preview_url"] = f"/api/jobs/{job_id}/preview"
+        # Point clients directly at the static mount. Render's edge layer has
+        # an interaction with FileResponse + cross-origin requests that returns
+        # `x-render-routing: no-server` for /api/jobs/{id}/download. StaticFiles
+        # at /decks/ serves the same bytes and works in all contexts.
+        job["download_url"] = f"/decks/{job_id}.zip"
+        job["preview_url"] = f"/decks/{job_id}/index.html"
         job["slide_count"] = len(pku.get("slides", []))
         job["deck_path"] = str(deck_out.relative_to(REPO_ROOT))
         job["zip_path"] = str(zip_path.relative_to(REPO_ROOT))
