@@ -3,32 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PKU 红 · 论文答辩 / 开题报告 模板</title>
-
-  <link rel="stylesheet" href="assets/theme-pku-red.css">
-  <link rel="stylesheet" href="assets/base.css">
-
-  <style>
-    /* Make sure the dark page background frames the deck nicely */
-    body { background: #1a1a1a; }
-    /* Tighten deck-stage's own letterbox color */
-    deck-stage { --letterbox-bg: #1a1a1a; }
-  </style>
+  <title>PKU 红 · 文稿生成 PPT</title>
+  <link rel="stylesheet" href="web/style.css">
 </head>
 <body>
+  <header class="bar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="brand-title">PKU 红 · 文稿生成 PPT</span>
+    </div>
+    <div class="meta" id="meta">provider: ? · max: ? 字</div>
+  </header>
 
-  <!-- Deck shell. The runtime injects <section> children into this stage. -->
-  <deck-stage width="1280" height="720" data-deck="data/slides.json">
-    <!-- Skeleton splash before runtime renders -->
-    <section class="slide" style="display:flex;align-items:center;justify-content:center;background:#9A0000;color:#fff;font-family:'Source Han Sans SC','Noto Sans SC','PingFang SC',sans-serif">
-      <div style="text-align:center">
-        <div style="font-size:28px;letter-spacing:0.4em;opacity:0.7">LOADING</div>
-        <div style="margin-top:14px;font-size:48px;font-weight:800;letter-spacing:0.06em">PKU · 论文答辩模板</div>
+  <main class="grid">
+    <section class="panel input-panel">
+      <h2>1. 粘贴文稿</h2>
+      <p class="hint">支持中文 / Markdown。建议 1k–10k 字。生成需 10-30 秒。</p>
+      <textarea id="manuscript" placeholder="在此粘贴论文摘要、开题报告、研究方案……"></textarea>
+      <div class="controls">
+        <span class="count"><span id="count">0</span> / <span id="limit">30000</span> 字</span>
+        <button id="generate">生成 PPT</button>
       </div>
     </section>
-  </deck-stage>
 
-  <script src="deck-stage.js"></script>
-  <script src="assets/runtime.js"></script>
+    <section class="panel status-panel">
+      <h2>2. 任务状态</h2>
+      <div id="status-empty" class="empty">尚未提交任务 · 或者先 <a href="demo.html">查看示例 deck</a></div>
+      <ul id="jobs" class="jobs"></ul>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>真实 API Key 只填写在后端 <code>.env</code> 或部署平台的环境变量。前端不持有 key。 · <a href="demo.html">查看示例 deck</a></span>
+  </footer>
+
+  <script src="web/app.js"></script>
 </body>
 </html>

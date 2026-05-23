@@ -8,7 +8,7 @@ A data-driven, static HTML PPT template for PKU-style (北京大学) Chinese aca
 
 The repo currently contains **two parallel things**:
 
-1. **The deck at the root** (`index.html`, `deck-stage.js`, `assets/`, `data/slides.json`) — a runnable, intermediate-artifact reference deck.
+1. **The deck at the root** (`demo.html`, `deck-stage.js`, `assets/`, `data/slides.json`) — a runnable, intermediate-artifact reference deck. (Root `index.html` is the **web frontend**, served on GitHub Pages; the deck moved to `demo.html` so Pages' root URL surfaces the manuscript-→-PPT site, not a finished deck.)
 2. **The packaged Claude skill at `pku-red-defense-ppt/`** — `SKILL.md` + `references/` + `scripts/` + `assets/template/`. `assets/template/` is a **copy** of the root deck files; the skill produces decks by cloning that template and overwriting `data/slides.json`.
 
 When editing the renderer/CSS/layouts, propagate changes to **both** the root files and `pku-red-defense-ppt/assets/template/` — they will silently drift otherwise.
