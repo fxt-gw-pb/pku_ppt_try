@@ -24,10 +24,12 @@ try:
 except ImportError:
     pass
 
-from src.exporter import export_deck  # noqa: E402
+from src.exporter import export_deck, export_html_ppt_deck  # noqa: E402
 from src.llm import generate_slide_json  # noqa: E402
 from src.renderer import compile_to_pku  # noqa: E402
+from src.renderer.xhs_white_editorial import render_xhs_white_editorial  # noqa: E402
 from src.schema import validate_slide_json  # noqa: E402
+from src.templates import DEFAULT_TEMPLATE_ID, get_template, list_templates  # noqa: E402
 
 
 def main() -> int:
@@ -41,6 +43,12 @@ def main() -> int:
     p.add_argument(
         "--provider",
         help="Override LLM_PROVIDER (deepseek | mock). Defaults to env LLM_PROVIDER or 'mock'.",
+    )
+    p.add_argument(
+        "--template",
+        default=DEFAULT_TEMPLATE_ID,
+        choices=[t["template_id"] for t in list_templates()],
+        help="Deck template to use.",
     )
     p.add_argument(
         "--max-chars",
@@ -77,14 +85,29 @@ def main() -> int:
             print(f"  - {e}", file=sys.stderr)
         return 1
 
-    print("→ compiling to PKU slides.json…")
-    pku = compile_to_pku(generic)
-
     out_dir = Path(args.output).resolve()
-    print(f"→ materializing deck at {out_dir}…")
-    deck_path = export_deck(pku, out_dir, force=True)
+    template = get_template(args.template)
+    print(f"→ rendering with template={template.template_id} ({template.name})…")
+    if template.engine == "pku-json":
+        pku = compile_to_pku(generic)
+        print("→ compiling to PKU slides.json…")
+        print(f"→ materializing deck at {out_dir}…")
+        deck_path = export_deck(pku, out_dir, force=True)
+    elif template.template_id == "xhs-white-editorial":
+        html = render_xhs_white_editorial(generic)
+        print(f"→ materializing deck at {out_dir}…")
+        deck_path = export_html_ppt_deck(
+            html,
+            out_dir,
+            template_id=template.template_id,
+            force=True,
+        )
+    else:
+        print(f"unsupported template: {template.template_id}", file=sys.stderr)
+        return 2
 
     # Drop the raw LLM JSON alongside for debugging / re-runs.
+    (deck_path / "data").mkdir(parents=True, exist_ok=True)
     (deck_path / "data" / "slide.json").write_text(
         json.dumps(generic, ensure_ascii=False, indent=2), encoding="utf-8"
     )

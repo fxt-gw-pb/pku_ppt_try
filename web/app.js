@@ -17,8 +17,10 @@ const limitEl = $("limit");
 const generateBtn = $("generate");
 const jobsEl = $("jobs");
 const emptyEl = $("status-empty");
+const templatesEl = $("templates");
 
 let MAX_CHARS = 30000;
+let selectedTemplateId = "pku-red";
 const polling = new Map(); // job_id → intervalId
 
 async function loadHealth() {
@@ -27,11 +29,51 @@ async function loadHealth() {
     if (!r.ok) throw new Error(`${r.status}`);
     const h = await r.json();
     MAX_CHARS = h.max_input_chars || MAX_CHARS;
+    selectedTemplateId = h.default_template_id || selectedTemplateId;
     limitEl.textContent = MAX_CHARS;
+    renderTemplates(h.templates || []);
     updateCount();
   } catch (e) {
     // Backend unreachable — the Generate button will surface the error on click.
+    renderTemplates([
+      {
+        template_id: "pku-red",
+        name: "北大红答辩模板",
+        engine: "pku-json",
+        description: "北大红学术答辩风格。",
+      },
+      {
+        template_id: "xhs-white-editorial",
+        name: "小红书白底杂志风",
+        engine: "html-ppt",
+        description: "白底杂志风、强重点块、马卡龙软色卡。",
+      },
+    ]);
   }
+}
+
+function renderTemplates(templates) {
+  if (!templatesEl) return;
+  templatesEl.innerHTML = "";
+  templates.forEach((tpl) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "template-card";
+    btn.dataset.templateId = tpl.template_id;
+    btn.classList.toggle("selected", tpl.template_id === selectedTemplateId);
+    btn.innerHTML = `
+      <span class="template-name">${escapeHtml(tpl.name)}</span>
+      <span class="template-engine">${escapeHtml(tpl.engine)}</span>
+      <span class="template-desc">${escapeHtml(tpl.description || "")}</span>
+    `;
+    btn.addEventListener("click", () => {
+      selectedTemplateId = tpl.template_id;
+      document.querySelectorAll(".template-card").forEach((el) => {
+        el.classList.toggle("selected", el.dataset.templateId === selectedTemplateId);
+      });
+    });
+    templatesEl.appendChild(btn);
+  });
 }
 
 function updateCount() {
@@ -52,7 +94,11 @@ generateBtn.addEventListener("click", async () => {
     const r = await fetch(`${API_BASE}/api/jobs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ manuscript, style: "academic" }),
+      body: JSON.stringify({
+        manuscript,
+        style: "academic",
+        template_id: selectedTemplateId,
+      }),
     });
     if (!r.ok) {
       const body = await r.text();
@@ -94,6 +140,7 @@ function renderJobCard(li, job) {
   li.classList.add(job.status);
   const created = job.created_at ? new Date(job.created_at).toLocaleTimeString() : "";
   const slideInfo = job.slide_count ? ` · ${job.slide_count} slides` : "";
+  const tplInfo = job.template_name ? ` · ${escapeHtml(job.template_name)}` : "";
 
   let actions = "";
   if (job.status === "done") {
@@ -114,7 +161,7 @@ function renderJobCard(li, job) {
       <span class="job-id">#${job.job_id}</span>
       <span class="job-status ${job.status}">${statusLabel(job.status)}</span>
     </div>
-    <div class="job-meta">${created}${slideInfo}</div>
+    <div class="job-meta">${created}${slideInfo}${tplInfo}</div>
     ${actions}
     ${errorBlock}
   `;

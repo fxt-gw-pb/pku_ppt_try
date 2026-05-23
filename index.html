@@ -18,6 +18,13 @@
     <section class="panel input-panel">
       <h2>1. 粘贴文稿</h2>
       <p class="hint">支持中文 / Markdown。建议 1k–10k 字。生成需 10-30 秒。</p>
+      <div class="template-block">
+        <div class="template-head">
+          <span>选择模板</span>
+          <a href="html-ppt-templates/" target="_blank" rel="noopener">预览模板库</a>
+        </div>
+        <div id="templates" class="template-grid"></div>
+      </div>
       <textarea id="manuscript" placeholder="在此粘贴论文摘要、开题报告、研究方案……"></textarea>
       <div class="controls">
         <span class="count"><span id="count">0</span> / <span id="limit">30000</span> 字</span>

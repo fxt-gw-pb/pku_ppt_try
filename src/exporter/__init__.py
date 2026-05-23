@@ -16,6 +16,8 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE_DIR = REPO_ROOT / "pku-red-defense-ppt" / "assets" / "template"
+HTML_PPT_SHARED_DIR = REPO_ROOT / "templates" / "html-ppt" / "shared" / "assets"
+HTML_PPT_TEMPLATE_ROOT = REPO_ROOT / "templates" / "html-ppt"
 
 
 def export_deck(
@@ -62,4 +64,49 @@ def zip_deck(deck_dir: str | Path, zip_path: str | Path) -> Path:
     return zip_path
 
 
-__all__ = ["export_deck", "zip_deck", "TEMPLATE_DIR", "REPO_ROOT"]
+def export_html_ppt_deck(
+    html_text: str,
+    output_dir: str | Path,
+    *,
+    template_id: str,
+    force: bool = True,
+) -> Path:
+    """Materialize an html-ppt deck with shared runtime assets.
+
+    html-ppt full-deck templates are static HTML sections, so the renderer
+    returns a complete index.html. The exporter copies only the production
+    assets needed at runtime, not the entire preview gallery.
+    """
+    template_dir = HTML_PPT_TEMPLATE_ROOT / template_id
+    style_src = template_dir / "style.css"
+    if not HTML_PPT_SHARED_DIR.is_dir():
+        raise FileNotFoundError(f"html-ppt shared assets missing: {HTML_PPT_SHARED_DIR}")
+    if not style_src.is_file():
+        raise FileNotFoundError(f"html-ppt template style missing: {style_src}")
+
+    out = Path(output_dir).resolve()
+    if out.exists():
+        if not force:
+            raise FileExistsError(f"output dir already exists: {out}")
+        shutil.rmtree(out)
+
+    out.mkdir(parents=True)
+    assets_out = out / "assets"
+    shutil.copytree(HTML_PPT_SHARED_DIR, assets_out)
+    shutil.copy2(style_src, out / "style.css")
+    manifest = template_dir / "manifest.json"
+    if manifest.is_file():
+        shutil.copy2(manifest, out / "template-manifest.json")
+    (out / "index.html").write_text(html_text, encoding="utf-8")
+    return out
+
+
+__all__ = [
+    "export_deck",
+    "export_html_ppt_deck",
+    "zip_deck",
+    "TEMPLATE_DIR",
+    "HTML_PPT_SHARED_DIR",
+    "HTML_PPT_TEMPLATE_ROOT",
+    "REPO_ROOT",
+]

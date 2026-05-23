@@ -40,10 +40,12 @@ from fastapi.responses import FileResponse, RedirectResponse  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
-from src.exporter import export_deck, zip_deck  # noqa: E402
+from src.exporter import export_deck, export_html_ppt_deck, zip_deck  # noqa: E402
 from src.llm import generate_slide_json  # noqa: E402
 from src.renderer import compile_to_pku  # noqa: E402
+from src.renderer.xhs_white_editorial import render_xhs_white_editorial  # noqa: E402
 from src.schema import validate_slide_json  # noqa: E402
+from src.templates import DEFAULT_TEMPLATE_ID, get_template, list_templates  # noqa: E402
 
 OUTPUT_DIR = (REPO_ROOT / os.environ.get("OUTPUT_DIR", "outputs")).resolve()
 JOB_DIR = (REPO_ROOT / os.environ.get("JOB_DIR", "data/jobs")).resolve()
@@ -82,6 +84,7 @@ app.add_middleware(
 class JobRequest(BaseModel):
     manuscript: str
     style: str | None = "academic"
+    template_id: str | None = DEFAULT_TEMPLATE_ID
 
 
 def _job_path(job_id: str) -> Path:
@@ -105,11 +108,14 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _run_job(job_id: str, manuscript: str) -> None:
+def _run_job(job_id: str, manuscript: str, template_id: str) -> None:
     job = _load_job(job_id) or {"job_id": job_id}
     try:
+        template = get_template(template_id)
         job["status"] = "running"
         job["started_at"] = _now()
+        job["template_id"] = template.template_id
+        job["template_name"] = template.name
         _save_job(job)
 
         generic = generate_slide_json(manuscript, {})
@@ -118,10 +124,24 @@ def _run_job(job_id: str, manuscript: str) -> None:
             raise RuntimeError(
                 "slide_json validation failed: " + "; ".join(errors)
             )
-        pku = compile_to_pku(generic)
-
         deck_out = OUTPUT_DIR / job_id
-        export_deck(pku, deck_out, force=True)
+        if template.engine == "pku-json":
+            pku = compile_to_pku(generic)
+            export_deck(pku, deck_out, force=True)
+            slide_count = len(pku.get("slides", []))
+        elif template.template_id == "xhs-white-editorial":
+            html = render_xhs_white_editorial(generic)
+            export_html_ppt_deck(
+                html,
+                deck_out,
+                template_id=template.template_id,
+                force=True,
+            )
+            slide_count = html.count("<section class=\"slide")
+        else:
+            raise RuntimeError(f"unsupported template engine: {template.engine}")
+
+        (deck_out / "data").mkdir(parents=True, exist_ok=True)
         (deck_out / "data" / "slide.json").write_text(
             json.dumps(generic, ensure_ascii=False, indent=2), encoding="utf-8"
         )
@@ -137,7 +157,7 @@ def _run_job(job_id: str, manuscript: str) -> None:
         # at /decks/ serves the same bytes and works in all contexts.
         job["download_url"] = f"/decks/{job_id}.zip"
         job["preview_url"] = f"/decks/{job_id}/index.html"
-        job["slide_count"] = len(pku.get("slides", []))
+        job["slide_count"] = slide_count
         job["deck_path"] = str(deck_out.relative_to(REPO_ROOT))
         job["zip_path"] = str(zip_path.relative_to(REPO_ROOT))
         _save_job(job)
@@ -156,6 +176,16 @@ def health() -> dict[str, Any]:
         "status": "ok",
         "provider": os.environ.get("LLM_PROVIDER", "mock"),
         "max_input_chars": MAX_INPUT_CHARS,
+        "default_template_id": DEFAULT_TEMPLATE_ID,
+        "templates": list_templates(),
+    }
+
+
+@app.get("/api/templates")
+def templates() -> dict[str, Any]:
+    return {
+        "default_template_id": DEFAULT_TEMPLATE_ID,
+        "templates": list_templates(),
     }
 
 
@@ -172,6 +202,10 @@ def create_job(req: JobRequest) -> dict[str, Any]:
                 f"(got {len(manuscript)})"
             ),
         )
+    try:
+        template = get_template(req.template_id)
+    except KeyError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
     job_id = uuid.uuid4().hex[:12]
     job = {
@@ -179,6 +213,8 @@ def create_job(req: JobRequest) -> dict[str, Any]:
         "status": "pending",
         "created_at": _now(),
         "style": req.style or "academic",
+        "template_id": template.template_id,
+        "template_name": template.name,
         "download_url": None,
         "preview_url": None,
         "error": None,
@@ -186,7 +222,7 @@ def create_job(req: JobRequest) -> dict[str, Any]:
     _save_job(job)
 
     threading.Thread(
-        target=_run_job, args=(job_id, manuscript), daemon=True
+        target=_run_job, args=(job_id, manuscript, template.template_id), daemon=True
     ).start()
     return job
 
@@ -237,6 +273,15 @@ def preview_job(job_id: str) -> RedirectResponse:
 
 # Serve materialized decks so /preview can resolve their fetch('data/slides.json').
 app.mount("/decks", StaticFiles(directory=str(OUTPUT_DIR), html=True), name="decks")
+
+# Optional local template gallery copied from the html-ppt skill.
+HTML_PPT_PREVIEW_DIR = REPO_ROOT / "html-ppt-templates"
+if HTML_PPT_PREVIEW_DIR.is_dir():
+    app.mount(
+        "/html-ppt-templates",
+        StaticFiles(directory=str(HTML_PPT_PREVIEW_DIR), html=True),
+        name="html-ppt-templates",
+    )
 
 # Frontend demo. Mounting at "/" must be last so /api/* and /decks/* still win.
 WEB_DIR = REPO_ROOT / "web"
