@@ -39,6 +39,17 @@ def _split_kv(bullet: str) -> tuple[str, str]:
     return "", bullet.strip()
 
 
+def _notes_aside(slide: dict[str, Any]) -> str:
+    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
+    if not text:
+        return ""
+    return (
+        '<div style="margin-top:20px;padding:16px 22px;border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 12px 12px 0;font-size:14px;color:var(--text-2);line-height:1.6">'
+        '<strong style="color:var(--accent);font-size:11px;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:4px">speaker note</strong>'
+        f'{_rich(text)}</div>'
+    )
+
+
 def _section(inner: str, *, active: bool = False, title: str = "", extra_class: str = "") -> str:
     classes = " ".join(c for c in ["slide", "is-active" if active else "", extra_class] if c)
     data_title = f' data-title="{_esc(title)}"' if title else ""
@@ -131,6 +142,7 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <p class="kicker mt-l">{_esc(slide.get("section") or "feature")}</p>
     <h2 class="h2">{_rich(slide.get("title") or "核心特性")}</h2>
     <div class="{grid_cls} mt-l">{''.join(cells)}</div>
+    {_notes_aside(slide)}
     {_footer(slide_no, total, "content · features")}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -157,6 +169,7 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <p class="kicker mt-l">{_esc(slide.get("section") or "how it works")}</p>
     <h2 class="h2">{_rich(slide.get("title") or "工作流程")}</h2>
     <div class="mt-l" style="max-width:980px">{''.join(rows)}</div>
+    {_notes_aside(slide)}
     {_footer(slide_no, total, "content · steps")}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))

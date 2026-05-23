@@ -46,6 +46,20 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
+def _notes_aside(slide: dict[str, Any]) -> str:
+    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
+    if not text:
+        return ""
+    return (
+        '<div style="margin-top:18px;padding:14px 22px;border-left:3px solid var(--ts-amber);'
+        'background:var(--ts-amber-soft);border-radius:0 12px 12px 0;font-size:14px;'
+        'color:var(--ts-ink2);line-height:1.6">'
+        '<strong style="color:var(--ts-amber);font-size:11px;letter-spacing:.14em;'
+        'text-transform:uppercase;display:block;margin-bottom:4px">讲者备注</strong>'
+        f'{_rich(text)}</div>'
+    )
+
+
 def _stripes() -> str:
     return '<div class="ts-stripe"></div><div class="ts-stripe-b"></div>'
 
@@ -145,12 +159,20 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     n = len(cells)
     grid_cls = "ts-grid-3" if n in {3, 6} else "ts-grid-2"
     tone = ALERT_TONES[slide_no % len(ALERT_TONES)]
+    box_tone = "amber" if slide_no % 2 == 0 else ""
+    lead_alert = (
+        f'<div class="ts-alert-box {box_tone}" style="margin-top:16px">'
+        f'<h3>本节聚焦：{_esc(slide.get("title") or "")}</h3>'
+        f'<p>共 {n:02d} 项发现，按编号逐项展开分析。</p></div>'
+    )
     inner = f"""
     {_stripes()}
     {_chrome(slide.get("section") or "finding", tone, slide_no, total)}
     <div class="ts-kicker">findings</div>
     <h2 class="ts-h2">{_rich(slide.get("title") or "核心发现")}</h2>
-    <div class="{grid_cls}">{''.join(cells)}</div>
+    {lead_alert}
+    <div class="{grid_cls}" style="margin-top:18px">{''.join(cells)}</div>
+    {_notes_aside(slide)}
     {_footer("content · cards", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -176,6 +198,7 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div class="ts-kicker">runbook</div>
     <h2 class="ts-h2">{_rich(slide.get("title") or "处置清单")}</h2>
     <div class="ts-checklist">{''.join(rows)}</div>
+    {_notes_aside(slide)}
     {_footer("content · runbook", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))

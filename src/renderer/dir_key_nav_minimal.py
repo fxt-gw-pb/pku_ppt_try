@@ -45,6 +45,18 @@ def _section(inner: str, theme: str, *, active: bool = False, title: str = "") -
     return f'<section class="{classes}"{data_title}>{inner}</section>'
 
 
+def _notes_aside(slide: dict[str, Any]) -> str:
+    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
+    if not text:
+        return ""
+    return (
+        '<div style="margin-top:22px;padding:14px 0 0;border-top:1px solid currentColor;opacity:.78;'
+        'font-size:13px;line-height:1.65;max-width:780px">'
+        '<span style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.7">note · </span>'
+        f'{_rich(text)}</div>'
+    )
+
+
 def _meta(slide_no: int, total: int, eyebrow: str) -> str:
     return (
         f'<div class="dk-snum">{slide_no:02d} / {total:02d}</div>'
@@ -119,6 +131,7 @@ def _cards(slide: dict[str, Any], theme: str, slide_no: int, total: int) -> str:
     <h2 class="dk-h2">{_rich(slide.get("title") or "key idea")}</h2>
     <span class="dk-line"></span>
     {body}
+    {_notes_aside(slide)}
     {_keyhint()}
     """
     return _section(inner, theme, title=str(slide.get("title") or "内容"))
@@ -133,6 +146,7 @@ def _steps(slide: dict[str, Any], theme: str, slide_no: int, total: int) -> str:
     <div class="dk-eyebrow">{_esc(eyebrow)}</div>
     <h2 class="dk-h2">{_rich(slide.get("title") or "step by step")}</h2>
     <ul class="dk-list">{items}</ul>
+    {_notes_aside(slide)}
     {_keyhint()}
     """
     return _section(inner, theme, title=str(slide.get("title") or "过程"))

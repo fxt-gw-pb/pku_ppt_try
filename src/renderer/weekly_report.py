@@ -46,6 +46,17 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
+def _notes_aside(slide: dict[str, Any]) -> str:
+    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
+    if not text:
+        return ""
+    return (
+        '<div class="blocker" style="border-left-color:var(--accent);margin-top:18px">'
+        '<h4 style="color:var(--accent)">讲者备注</h4>'
+        f'<p>{_rich(text)}</p></div>'
+    )
+
+
 def _footer(left: str, slide_no: int, total: int) -> str:
     return f'<div class="deck-footer"><span>{_esc(left)}</span><span>{slide_no:02d} / {total:02d}</span></div>'
 
@@ -141,11 +152,21 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
         )
     if not rows:
         rows.append(f'<div class="ship-item"><span class="tag feat">item</span><div><b>{_rich(slide.get("title", ""))}</b></div></div>')
+    n_items = max(len(bullets), 1)
+    kpi_strip = f"""
+    <div class="grid g3 mt-m" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+      <div class="kpi good"><div class="label">items shipped</div><div class="value">{n_items:02d}</div><span class="delta up">▲ this week</span></div>
+      <div class="kpi"><div class="label">slide</div><div class="value">{slide_no:02d}<span style="font-size:24px;color:var(--text-3)"> / {total:02d}</span></div><span class="delta flat">on track</span></div>
+      <div class="kpi warn"><div class="label">section</div><div class="value" style="font-size:24px;line-height:1.2">{_esc((slide.get("section") or "core")[:14])}</div><span class="delta up">in scope</span></div>
+    </div>
+    """
     inner = f"""
     {_cover_head()}
     <p class="kicker">{_esc(slide.get("section") or "content")}</p>
     <h2 class="h2">{_rich(slide.get("title") or "本周内容")}</h2>
+    {kpi_strip}
     <div class="mt-l">{''.join(rows)}</div>
+    {_notes_aside(slide)}
     {_footer("content · cards", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -169,6 +190,7 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <p class="kicker">{_esc(slide.get("section") or "next week")}</p>
     <h2 class="h2">{_rich(slide.get("title") or "下一步计划")}</h2>
     <div class="mt-l">{''.join(rows)}</div>
+    {_notes_aside(slide)}
     {_footer("content · pipeline", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))

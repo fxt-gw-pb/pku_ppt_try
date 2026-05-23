@@ -37,6 +37,17 @@ def _footer(current: int, total: int) -> str:
     return f'<div class="deck-footer"><span>Generated deck</span><span>{current:02d} / {total:02d}</span></div>'
 
 
+def _notes_aside(slide: dict[str, Any]) -> str:
+    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
+    if not text:
+        return ""
+    return (
+        '<div class="card mt-m" style="padding:16px 22px;display:flex;gap:14px;align-items:flex-start">'
+        '<span class="pill pill-accent" style="flex:none">speaker</span>'
+        f'<p class="dim" style="font-size:14px;line-height:1.6;margin:0">{_rich(text)}</p></div>'
+    )
+
+
 def _cover(generic: dict[str, Any], current: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
     subtitle = generic.get("subtitle") or "Generated with fxt ppt"
@@ -108,6 +119,7 @@ def _cards(slide: dict[str, Any], current: int, total: int) -> str:
       <p class="kicker">{_rich(slide.get("section") or "Content")}</p>
       <h2 class="h2">{_rich(slide.get("title") or "核心要点")}</h2>
       <div class="grid {grid_class} mt-l">{''.join(cards)}</div>
+      {_notes_aside(slide)}
       {_footer(current, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -133,6 +145,7 @@ def _steps(slide: dict[str, Any], current: int, total: int) -> str:
       <p class="kicker">Process</p>
       <h2 class="h2">{_rich(slide.get("title") or "过程拆解")}</h2>
       <div class="mt-l">{''.join(rows)}</div>
+      {_notes_aside(slide)}
       {_footer(current, total)}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))

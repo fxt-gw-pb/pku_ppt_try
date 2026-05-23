@@ -68,6 +68,16 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
+def _notes_aside(slide: dict[str, Any]) -> str:
+    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
+    if not text:
+        return ""
+    return (
+        '<div class="hc-codebox" style="margin-top:18px;padding:14px 22px;font-size:13px;line-height:1.7">'
+        f'<span class="cm"># speaker note</span> {_rich(text)}</div>'
+    )
+
+
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
     subtitle = generic.get("subtitle") or "Generated deck · cyber terminal edition"
@@ -152,14 +162,24 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     n = len(cells)
     grid_cls = "hc-grid-3" if n in {3, 6} else "hc-grid-2"
     bar_left = f"cat {(slide.get('section') or 'content').lower().replace(' ', '_')}.md"
+    tag_class = "hc-tag amber" if slide_no % 2 == 0 else "hc-tag"
+    prompt_row = (
+        f'<div class="hc-prompt" style="margin-top:10px;font-size:14px">'
+        f'<span class="{tag_class}">{n:02d} POINTS</span> '
+        f'<span class="hc-tag">slide_{slide_no:02d}.md</span> '
+        f'<span class="hc-tag amber">{_esc((slide.get("section") or "content").upper())}</span>'
+        f'<span class="hc-cursor"></span></div>'
+    )
     inner = f"""
     {_chrome_overlay()}
     {_chrome_bar(bar_left, slide.get("section") or "content")}
     <div style="margin-top:20px">
       <h3 class="hc-h3">> {_rich(slide.get("title") or "核心要点")}</h3>
       <h2 class="hc-h2">{_rich(slide.get("title") or "核心要点")}</h2>
-      <div class="{grid_cls}">{''.join(cells)}</div>
+      {prompt_row}
+      <div class="{grid_cls}" style="margin-top:14px">{''.join(cells)}</div>
     </div>
+    {_notes_aside(slide)}
     {_footer("content · cards", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -186,6 +206,7 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <p class="hc-lede">逐步执行；每一步可观察、可回滚。</p>
       <div class="hc-codebox" style="margin-top:18px">{code_inner}</div>
     </div>
+    {_notes_aside(slide)}
     {_footer("content · pipeline", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))

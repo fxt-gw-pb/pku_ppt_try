@@ -51,6 +51,17 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
+def _notes_aside(slide: dict[str, Any]) -> str:
+    text = (slide.get("notes") or slide.get("speaker_notes") or "").strip()
+    if not text:
+        return ""
+    return (
+        '<div style="margin-top:20px;border:2px solid #1a1a1a;border-radius:12px;padding:16px 20px;background:#fff;display:flex;gap:14px;align-items:flex-start">'
+        '<div style="font-size:10px;font-weight:800;letter-spacing:2.5px;color:var(--kb-rust);background:rgba(181,57,42,.1);padding:4px 10px;border-radius:6px;flex:none;margin-top:2px">SPEAKER</div>'
+        f'<div style="font-size:14px;line-height:1.6;color:var(--kb-ink2)">{_rich(text)}</div></div>'
+    )
+
+
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
     subtitle = generic.get("subtitle") or "Generated deck · blueprint edition"
@@ -136,12 +147,20 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
         )
     if not cells:
         cells.append(f'<div class="kb-card"><h4>{_rich(slide.get("title", ""))}</h4></div>')
+    section_label = _esc(slide.get("section") or "core blueprint")
+    insight_block = (
+        f'<div style="margin-top:22px"><span class="kb-insight">'
+        f'<span class="kk">{section_label.upper()} · {n_cells:02d} POINTS</span>'
+        f'本部分共 {n_cells:02d} 个要点，覆盖 {_esc(slide.get("title") or "核心议题")} 的关键面。</span></div>'
+    ) if (n_cells := len(cells)) else ""
     inner = f"""
     {_grid_bg()}
     <div class="kb-kicker">{_esc(slide.get("section") or "content")}</div>
     <h2 class="kb-h1" style="font-size:48px">{_rich(slide.get("title") or "核心要点")}</h2>
     <div class="kb-section-label">key cards</div>
     <div class="kb-grid-2">{''.join(cells)}</div>
+    {insight_block}
+    {_notes_aside(slide)}
     {_footer("content · cards", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
@@ -169,6 +188,7 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <h2 class="kb-h1" style="font-size:48px">{_rich(slide.get("title") or "过程拆解")}</h2>
     <div class="kb-section-label">pipeline</div>
     <div class="kb-pipeline">{''.join(steps)}</div>
+    {_notes_aside(slide)}
     {_footer("content · pipeline", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))
