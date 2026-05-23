@@ -1,8 +1,7 @@
 {
   "template_id": "xhs-white-editorial",
-  "name": "小红书白底杂志风",
+  "name": "xhs-white-editorial",
   "engine": "html-ppt",
-  "description": "白底杂志风、强重点块、马卡龙软色卡，适合中文内容帖和知识分享。",
+  "description": "Imported html-ppt full-deck template.",
   "source": "html-ppt templates/full-decks/xhs-white-editorial"
 }
-

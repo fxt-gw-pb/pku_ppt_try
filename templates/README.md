@@ -8,8 +8,12 @@ but exporters should depend on this directory.
 - `pku-red` is managed by the existing skill bundle at
   `pku-red-defense-ppt/assets/template/`. It remains the default backend
   template and is intentionally not duplicated here.
-- `html-ppt/xhs-white-editorial/` is the first imported html-ppt template.
-  It uses shared html-ppt assets from `html-ppt/shared/assets/`.
+- `html-ppt/<template-id>/` contains production CSS/manifest for imported
+  html-ppt full-deck templates. All imported html-ppt templates use shared
+  runtime assets from `html-ppt/shared/assets/`.
+- `xhs-white-editorial` has a dedicated renderer. The other imported
+  full-deck templates use the generic html-ppt renderer until they need
+  template-specific refinement.
 
 ## Rules
 
@@ -18,4 +22,3 @@ but exporters should depend on this directory.
   local preview copy of the original skill.
 - Add a template entry in `src/templates/registry.py` before exposing it in
   the API or frontend.
-

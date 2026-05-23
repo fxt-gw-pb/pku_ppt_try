@@ -229,7 +229,10 @@ Done jobs return:
 `POST /api/jobs` accepts `template_id`. Current values:
 
 - `pku-red`: default, existing PKU JSON runtime.
-- `xhs-white-editorial`: html-ppt static-section renderer.
+- 15 imported html-ppt full-deck templates from `html-ppt-templates/templates/full-decks/`.
+  `xhs-white-editorial` has a dedicated renderer; the other imported templates
+  use `src/renderer/html_ppt_generic.py` until they need template-specific
+  refinement.
 
 ## Frontend Duplication
 

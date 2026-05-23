@@ -43,6 +43,7 @@ from pydantic import BaseModel  # noqa: E402
 from src.exporter import export_deck, export_html_ppt_deck, zip_deck  # noqa: E402
 from src.llm import generate_slide_json  # noqa: E402
 from src.renderer import compile_to_pku  # noqa: E402
+from src.renderer.html_ppt_generic import render_html_ppt_generic  # noqa: E402
 from src.renderer.xhs_white_editorial import render_xhs_white_editorial  # noqa: E402
 from src.schema import validate_slide_json  # noqa: E402
 from src.templates import DEFAULT_TEMPLATE_ID, get_template, list_templates  # noqa: E402
@@ -129,8 +130,15 @@ def _run_job(job_id: str, manuscript: str, template_id: str) -> None:
             pku = compile_to_pku(generic)
             export_deck(pku, deck_out, force=True)
             slide_count = len(pku.get("slides", []))
-        elif template.template_id == "xhs-white-editorial":
-            html = render_xhs_white_editorial(generic)
+        elif template.engine == "html-ppt":
+            if template.renderer == "xhs-white-editorial":
+                html = render_xhs_white_editorial(generic)
+            else:
+                html = render_html_ppt_generic(
+                    generic,
+                    template_id=template.template_id,
+                    body_class=template.body_class,
+                )
             export_html_ppt_deck(
                 html,
                 deck_out,

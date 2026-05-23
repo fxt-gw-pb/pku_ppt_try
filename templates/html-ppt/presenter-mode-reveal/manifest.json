@@ -1,0 +1,7 @@
+{
+  "template_id": "presenter-mode-reveal",
+  "name": "presenter-mode-reveal",
+  "engine": "html-ppt",
+  "description": "Imported html-ppt full-deck template.",
+  "source": "html-ppt templates/full-decks/presenter-mode-reveal"
+}

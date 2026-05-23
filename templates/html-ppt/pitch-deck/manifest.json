@@ -1,0 +1,7 @@
+{
+  "template_id": "pitch-deck",
+  "name": "pitch-deck",
+  "engine": "html-ppt",
+  "description": "Imported html-ppt full-deck template.",
+  "source": "html-ppt templates/full-decks/pitch-deck"
+}

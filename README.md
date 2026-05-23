@@ -213,6 +213,7 @@ curl -s -o deck.zip http://127.0.0.1:8787/api/jobs/abc123/download
 |-------------|------|------|--------|
 | `pku-red` | 北大红答辩模板 | `pku-json` | `pku-red-defense-ppt/assets/template/` |
 | `xhs-white-editorial` | 小红书白底杂志风 | `html-ppt` | `templates/html-ppt/xhs-white-editorial/` |
+| 其余 14 个 html-ppt full-deck | 技术分享、路演、发布会、周报、课程、小红书图文等 | `html-ppt` | `templates/html-ppt/<template_id>/` |
 
 前端可通过：
 
@@ -231,7 +232,28 @@ GET /api/templates
 ```
 
 `pku-red` 继续走原来的 `generic slide_json → PKU slides.json → runtime.js` 流程。
-`xhs-white-editorial` 走新的 `generic slide_json → 静态 HTML section.slide` 适配器。
+`xhs-white-editorial` 走专属 html-ppt renderer，其余 html-ppt full-deck 模板先走通用 `generic slide_json → 静态 HTML section.slide` renderer，并保留各自的 `style.css` 视觉风格。
+
+当前可选 `template_id`：
+
+```text
+pku-red
+xhs-white-editorial
+graphify-dark-graph
+knowledge-arch-blueprint
+hermes-cyber-terminal
+obsidian-claude-gradient
+testing-safety-alert
+xhs-pastel-card
+dir-key-nav-minimal
+pitch-deck
+product-launch
+tech-sharing
+weekly-report
+xhs-post
+course-module
+presenter-mode-reveal
+```
 
 `html-ppt-templates/` 是从 html-ppt skill 复制来的本地预览库，便于浏览模板，不作为生产生成器的依赖源。生产生成器只依赖 `templates/html-ppt/` 下整理过的最小模板资产。
 
