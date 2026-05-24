@@ -11,6 +11,21 @@
   --gd-rose:#d4a0b9;
   --gd-purple:#b8a4d6;
   --gd-danger:#e07070;
+  /* Re-map base.css tokens so shared .content-* layouts inherit dark palette. */
+  --bg:var(--gd-bg);
+  --surface:rgba(255,255,255,.045);
+  --surface-2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.1);
+  --border-strong:rgba(255,255,255,.2);
+  --text-1:var(--gd-text);
+  --text-2:var(--gd-text2);
+  --text-3:var(--gd-text3);
+  --accent:var(--gd-warm);
+  --accent-2:var(--gd-blue);
+  --accent-3:var(--gd-rose);
+  --good:var(--gd-green);
+  --warn:var(--gd-warm);
+  --bad:var(--gd-danger);
   background:var(--gd-bg);
   color:var(--gd-text);
   font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;

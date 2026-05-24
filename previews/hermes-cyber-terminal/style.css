@@ -11,6 +11,21 @@
   --hc-amber:#e9c58a;
   --hc-rose:#d4a0b9;
   --hc-red:#ff6b6b;
+  /* Re-map base.css tokens so shared .content-* layouts inherit dark palette. */
+  --bg:var(--hc-bg);
+  --surface:var(--hc-surface);
+  --surface-2:var(--hc-bg2);
+  --border:var(--hc-border);
+  --border-strong:rgba(126,211,164,.32);
+  --text-1:var(--hc-ink);
+  --text-2:var(--hc-ink2);
+  --text-3:var(--hc-ink2);
+  --accent:var(--hc-green);
+  --accent-2:var(--hc-cyan);
+  --accent-3:var(--hc-amber);
+  --good:var(--hc-green);
+  --warn:var(--hc-amber);
+  --bad:var(--hc-red);
   background:var(--hc-bg);
   color:var(--hc-ink);
   font-family:'JetBrains Mono','SF Mono','Inter','Noto Sans SC',monospace;

@@ -8,14 +8,46 @@
 }
 .tpl-dir-key-nav-minimal .slide{padding:80px 104px;overflow:hidden;position:absolute;inset:0}
 /* 8 background themes */
-.tpl-dir-key-nav-minimal .t-indigo{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%);color:#fff}
-.tpl-dir-key-nav-minimal .t-cream{background:#F5F0E8;color:#1a1a1a}
-.tpl-dir-key-nav-minimal .t-crimson{background:linear-gradient(135deg,#7f1d1d 0%,#991b1b 100%);color:#fff}
-.tpl-dir-key-nav-minimal .t-emerald{background:linear-gradient(135deg,#052e16 0%,#064e3b 100%);color:#ecfdf5}
-.tpl-dir-key-nav-minimal .t-slate{background:linear-gradient(135deg,#0f1923 0%,#1a2942 100%);color:#e6edf3}
-.tpl-dir-key-nav-minimal .t-violet{background:linear-gradient(135deg,#1e0a2e 0%,#2e1065 100%);color:#f5f3ff}
-.tpl-dir-key-nav-minimal .t-white{background:#ffffff;color:#111216}
-.tpl-dir-key-nav-minimal .t-charcoal{background:linear-gradient(135deg,#111827 0%,#1f2937 100%);color:#f3f4f6}
+.tpl-dir-key-nav-minimal .t-indigo{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%);color:#fff;
+  --bg:#0f172a;--surface:rgba(255,255,255,.06);--surface-2:rgba(255,255,255,.1);
+  --border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.22);
+  --text-1:#fff;--text-2:rgba(255,255,255,.78);--text-3:rgba(255,255,255,.5);
+  --accent:#a5b4fc;--accent-2:#818cf8;--accent-3:#c4b5fd}
+.tpl-dir-key-nav-minimal .t-cream{background:#F5F0E8;color:#1a1a1a;
+  --bg:#F5F0E8;--surface:#fff;--surface-2:#eee7dc;
+  --border:rgba(0,0,0,.1);--border-strong:rgba(0,0,0,.22);
+  --text-1:#1a1a1a;--text-2:#555;--text-3:#888;
+  --accent:#B5392A;--accent-2:#1e3a8a;--accent-3:#0f766e}
+.tpl-dir-key-nav-minimal .t-crimson{background:linear-gradient(135deg,#7f1d1d 0%,#991b1b 100%);color:#fff;
+  --bg:#7f1d1d;--surface:rgba(255,255,255,.08);--surface-2:rgba(255,255,255,.13);
+  --border:rgba(255,255,255,.16);--border-strong:rgba(255,255,255,.28);
+  --text-1:#fff;--text-2:rgba(255,255,255,.82);--text-3:rgba(255,255,255,.55);
+  --accent:#fecaca;--accent-2:#fda4af;--accent-3:#fcd34d}
+.tpl-dir-key-nav-minimal .t-emerald{background:linear-gradient(135deg,#052e16 0%,#064e3b 100%);color:#ecfdf5;
+  --bg:#052e16;--surface:rgba(255,255,255,.06);--surface-2:rgba(255,255,255,.1);
+  --border:rgba(255,255,255,.13);--border-strong:rgba(255,255,255,.24);
+  --text-1:#ecfdf5;--text-2:rgba(236,253,245,.78);--text-3:rgba(236,253,245,.5);
+  --accent:#6ee7b7;--accent-2:#5eead4;--accent-3:#a7f3d0}
+.tpl-dir-key-nav-minimal .t-slate{background:linear-gradient(135deg,#0f1923 0%,#1a2942 100%);color:#e6edf3;
+  --bg:#0f1923;--surface:rgba(255,255,255,.05);--surface-2:rgba(255,255,255,.09);
+  --border:rgba(255,255,255,.11);--border-strong:rgba(255,255,255,.22);
+  --text-1:#e6edf3;--text-2:rgba(230,237,243,.78);--text-3:rgba(230,237,243,.5);
+  --accent:#7dd3fc;--accent-2:#38bdf8;--accent-3:#a5f3fc}
+.tpl-dir-key-nav-minimal .t-violet{background:linear-gradient(135deg,#1e0a2e 0%,#2e1065 100%);color:#f5f3ff;
+  --bg:#1e0a2e;--surface:rgba(255,255,255,.06);--surface-2:rgba(255,255,255,.1);
+  --border:rgba(255,255,255,.13);--border-strong:rgba(255,255,255,.24);
+  --text-1:#f5f3ff;--text-2:rgba(245,243,255,.78);--text-3:rgba(245,243,255,.5);
+  --accent:#c4b5fd;--accent-2:#a78bfa;--accent-3:#e9d5ff}
+.tpl-dir-key-nav-minimal .t-white{background:#ffffff;color:#111216;
+  --bg:#fff;--surface:#fff;--surface-2:#f5f5f6;
+  --border:rgba(0,0,0,.1);--border-strong:rgba(0,0,0,.22);
+  --text-1:#111216;--text-2:#55596a;--text-3:#8a8f9e;
+  --accent:#6366f1;--accent-2:#0ea5e9;--accent-3:#ec4899}
+.tpl-dir-key-nav-minimal .t-charcoal{background:linear-gradient(135deg,#111827 0%,#1f2937 100%);color:#f3f4f6;
+  --bg:#111827;--surface:rgba(255,255,255,.05);--surface-2:rgba(255,255,255,.09);
+  --border:rgba(255,255,255,.11);--border-strong:rgba(255,255,255,.22);
+  --text-1:#f3f4f6;--text-2:rgba(243,244,246,.78);--text-3:rgba(243,244,246,.5);
+  --accent:#fbbf24;--accent-2:#f59e0b;--accent-3:#fcd34d}
 
 .tpl-dir-key-nav-minimal .dk-snum{position:absolute;top:30px;right:48px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;font-family:var(--dk-mono)}
 .tpl-dir-key-nav-minimal .t-cream .dk-snum,

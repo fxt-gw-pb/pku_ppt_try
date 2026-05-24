@@ -15,6 +15,21 @@
   --oc-text:#e6edf3;
   --oc-dim:#8b949e;
   --oc-dimmer:#484f58;
+  /* Re-map base.css tokens so shared .content-* layouts inherit dark palette. */
+  --bg:var(--oc-bg);
+  --surface:var(--oc-surface);
+  --surface-2:var(--oc-surface2);
+  --border:var(--oc-border);
+  --border-strong:#3e4651;
+  --text-1:var(--oc-text);
+  --text-2:var(--oc-dim);
+  --text-3:var(--oc-dimmer);
+  --accent:var(--oc-accent2);
+  --accent-2:var(--oc-blue);
+  --accent-3:var(--oc-accent3);
+  --good:var(--oc-green);
+  --warn:var(--oc-yellow);
+  --bad:var(--oc-red);
   background:var(--oc-bg);
   color:var(--oc-text);
   font-family:'Inter','Noto Sans SC','PingFang SC',-apple-system,sans-serif;
