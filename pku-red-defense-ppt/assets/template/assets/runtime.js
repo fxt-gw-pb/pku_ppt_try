@@ -509,6 +509,7 @@
     renderDeck(deck, stage);
     injectPdfButton();
     injectEditPanel();
+    injectNavArrows();
   }
 
   function injectPdfButton() {
@@ -692,6 +693,42 @@
       setOpen(!document.body.classList.contains("has-edit-panel"));
     });
     document.body.appendChild(btn);
+  }
+
+  /* ---------- on-screen prev/next nav arrows ----------
+   * Small, semi-transparent, grouped at the bottom-left so users can keep
+   * navigating while the field-edit panel claims the keyboard. */
+  function injectNavArrows() {
+    if (document.querySelector(".nav-arrows")) return;
+    const css = document.createElement("style");
+    css.textContent = [
+      '.nav-arrows{position:fixed;left:18px;bottom:18px;z-index:2147483601;',
+      ' display:inline-flex;gap:6px;opacity:.35;transition:opacity .18s ease}',
+      '.nav-arrows:hover{opacity:.95}',
+      '.nav-arrow{appearance:none;width:30px;height:30px;border-radius:50%;',
+      ' display:inline-flex;align-items:center;justify-content:center;',
+      ' background:rgba(154,0,0,.7);color:#fff;border:1px solid rgba(255,255,255,.22);',
+      ' font:600 16px/1 -apple-system,sans-serif;cursor:pointer;padding:0;',
+      ' box-shadow:0 4px 12px rgba(0,0,0,.25)}',
+      '.nav-arrow:hover{background:rgba(154,0,0,.95)}',
+      '.nav-arrow:active{transform:scale(.92)}',
+      '@media print{.nav-arrows{display:none!important}}'
+    ].join("\n");
+    document.head.appendChild(css);
+
+    const nav = document.createElement("div");
+    nav.className = "nav-arrows";
+    nav.innerHTML =
+      '<button type="button" class="nav-arrow nav-prev" title="上一页">‹</button>' +
+      '<button type="button" class="nav-arrow nav-next" title="下一页">›</button>';
+    const stage = document.querySelector("deck-stage");
+    nav.querySelector(".nav-prev").addEventListener("click", () => {
+      if (stage && typeof stage.prev === "function") stage.prev();
+    });
+    nav.querySelector(".nav-next").addEventListener("click", () => {
+      if (stage && typeof stage.next === "function") stage.next();
+    });
+    document.body.appendChild(nav);
   }
 
   NS.render = renderDeck;

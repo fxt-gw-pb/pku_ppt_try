@@ -1266,6 +1266,9 @@
       // Ignore when the user is typing.
       const t = e.target;
       if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      // Field-edit panel takes precedence: while it's open, the keyboard
+      // belongs to the textareas. The on-screen ◀ ▶ buttons remain available.
+      if (document.body.classList.contains('has-edit-panel')) return;
       // Confirm dialog swallows nav keys while open; Escape cancels. Enter
       // is left to the focused button's native activation so Tab→Cancel
       // →Enter activates Cancel, not the window-level confirm path.

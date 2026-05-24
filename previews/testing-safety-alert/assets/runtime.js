@@ -1058,6 +1058,16 @@
 
     document.addEventListener('keydown', function (e) {
       if (e.metaKey||e.ctrlKey||e.altKey) return;
+      /* Field-edit panel takes precedence: while it's open, the keyboard
+       * belongs to the textareas. Use the on-screen ◀ ▶ buttons to navigate. */
+      if (document.body.classList.contains('has-edit-panel')) {
+        if (e.key === 'Escape') toggleEditPanel(false);
+        return;
+      }
+      /* Also skip when the user is typing into any input/textarea outside
+       * the panel (e.g. third-party widgets). */
+      const tgt = e.target;
+      if (tgt && (tgt.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(tgt.tagName))) return;
       switch (e.key) {
         case 'ArrowRight': case ' ': case 'PageDown': case 'Enter': go(idx+1); e.preventDefault(); break;
         case 'ArrowLeft': case 'PageUp': case 'Backspace': go(idx-1); e.preventDefault(); break;
@@ -1073,6 +1083,21 @@
         case 'Escape': toggleOverview(false); toggleNotes(false); break;
       }
     });
+
+    /* ===== Manual on-screen prev/next arrows =====
+     * Small, semi-transparent, grouped at the bottom-left. Provide a
+     * mouse-driven alternative to ←/→ — important when the field-edit
+     * panel claims the keyboard. */
+    if (!document.querySelector('.nav-arrows')) {
+      const nav = document.createElement('div');
+      nav.className = 'nav-arrows';
+      nav.innerHTML =
+        '<button type="button" class="nav-arrow nav-prev" title="上一页">‹</button>' +
+        '<button type="button" class="nav-arrow nav-next" title="下一页">›</button>';
+      nav.querySelector('.nav-prev').addEventListener('click', () => go(idx - 1));
+      nav.querySelector('.nav-next').addEventListener('click', () => go(idx + 1));
+      document.body.appendChild(nav);
+    }
 
     // hash deep-link
     function fromHash(){
