@@ -193,8 +193,13 @@ def _quote_blocks(slide: dict[str, Any]) -> list[dict[str, str]]:
     return blocks
 
 
-def _stat_blocks(slide: dict[str, Any]) -> list[dict[str, str]]:
+def _stat_blocks(slide: dict[str, Any]) -> list[dict[str, str]] | None:
+    """Return PKU section-text blocks for a stat slide, or None when the LLM
+    didn't supply a real numeric value. Callers must downgrade to bullet
+    blocks rather than fabricate a `—` stat."""
     st = L.get_stat(slide)
+    if not st:
+        return None
     blocks = [{
         "label": st["label"] or "关键数字",
         "text": f"**{st['value']}**" + (f"<br>{st['sub']}" if st.get("sub") else ""),
@@ -246,8 +251,11 @@ def _render_content(
 
     if layout == "multi-card":
         # Route based on what the LLM actually emitted.
-        if hint == "kpi-grid" or slide.get("kpis"):
-            base["cards"] = _kpi_cards(slide)
+        # kpi-grid requires real numeric KPIs; if not present, fall through
+        # to bullet-driven cards rather than fabricate numeric "values".
+        kpi_cards = _kpi_cards(slide) if (hint == "kpi-grid" or slide.get("kpis")) else []
+        if kpi_cards:
+            base["cards"] = kpi_cards
             base["cols"] = min(max(len(base["cards"]), 2), 4)
         elif hint in {"two-column"} or (slide.get("columns") and not slide.get("kpis")):
             base["cards"] = _theory_cards_from_columns(slide, 2 if hint == "two-column" else (3 if hint == "three-column" else len(slide.get("columns") or [])))
@@ -318,13 +326,18 @@ def _render_content(
         if hint == "big-quote" or slide.get("quote"):
             base["blocks"] = _quote_blocks(slide)
             base["mood"] = "quote"
-        elif hint == "stat-highlight" or slide.get("stat"):
-            base["blocks"] = _stat_blocks(slide)
-            base["mood"] = "stat"
         else:
-            base["blocks"] = _as_blocks_from_bullets(bullets) or [
-                {"label": "要点 01", "text": slide.get("title", "")}
-            ]
+            stat_blocks = (
+                _stat_blocks(slide) if (hint == "stat-highlight" or slide.get("stat")) else None
+            )
+            if stat_blocks:
+                base["blocks"] = stat_blocks
+                base["mood"] = "stat"
+            else:
+                # Downgrade: no real number, render bullets as blocks.
+                base["blocks"] = _as_blocks_from_bullets(bullets) or [
+                    {"label": "要点 01", "text": slide.get("title", "")}
+                ]
 
     return base
 

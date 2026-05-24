@@ -14,7 +14,18 @@ each renderer's job.
 from __future__ import annotations
 
 import html
-from typing import Any, Iterable
+import re
+from typing import Any
+
+
+_DIGIT_RE = re.compile(r"[0-9]")
+
+
+def has_real_number(value: Any) -> bool:
+    """True when the string contains at least one digit. Used to gate numeric
+    layouts (kpi-grid, stat-highlight) so the renderer never fabricates a
+    "value" out of prose when the LLM forgot to supply real data."""
+    return bool(_DIGIT_RE.search(str(value or "")))
 
 
 # ---------- text helpers ----------
@@ -151,62 +162,47 @@ def get_columns(slide: dict[str, Any], expected: int) -> list[dict[str, str]]:
 
 
 def get_kpis(slide: dict[str, Any], max_n: int = 4) -> list[dict[str, str]]:
+    """Return KPI entries the LLM actually supplied, dropping any whose value
+    has no digits. Never fabricates from bullet prose — if the model picks
+    `kpi-grid` without supplying ≥2 real numeric KPIs, `render_inner` will
+    downgrade the layout to `cards` instead of inventing numbers."""
     raw = slide.get("kpis")
-    if isinstance(raw, list) and raw:
-        items = []
-        for k in raw[:max_n]:
-            if not isinstance(k, dict):
-                continue
-            items.append({
-                "label": str(k.get("label") or ""),
-                "value": str(k.get("value") or ""),
-                "delta": str(k.get("delta") or ""),
-                "status": str(k.get("status") or ""),
-            })
-        if items:
-            return items
-    # Fallback: parse bullets — look for digits as the "value"
-    bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
+    if not isinstance(raw, list):
+        return []
     items: list[dict[str, str]] = []
-    import re
-    for b in bullets[:max_n]:
-        head, body = split_kv(b)
-        m = re.search(r"([+\-↑↓]?\s*[0-9][0-9.,]*\s*(?:%|pt|ms|s|x|×|倍|K|M|B)?)", body or b)
-        value = m.group(1).strip() if m else (body[:6] if body else "—")
+    for k in raw[:max_n]:
+        if not isinstance(k, dict):
+            continue
+        value = str(k.get("value") or "").strip()
+        if not has_real_number(value):
+            # Not a real KPI — refuse to render it as one. Keeping it would
+            # let the LLM dress up prose ("良好") as a metric.
+            continue
         items.append({
-            "label": head or (b[:10] if b else "指标"),
+            "label": str(k.get("label") or "").strip(),
             "value": value,
-            "delta": "",
-            "status": "",
+            "delta": str(k.get("delta") or "").strip(),
+            "status": str(k.get("status") or "").strip(),
         })
-    while len(items) < max(2, min(max_n, 3)):
-        items.append({"label": "—", "value": "—", "delta": "", "status": ""})
-    return items[:max_n]
+    return items
 
 
-def get_stat(slide: dict[str, Any]) -> dict[str, str]:
+def get_stat(slide: dict[str, Any]) -> dict[str, str] | None:
+    """Return the slide's hero stat only when the LLM supplied a value
+    containing a digit. Returns None otherwise — callers should downgrade
+    the layout rather than render a `—` placeholder."""
     raw = slide.get("stat")
-    if isinstance(raw, dict) and raw.get("value") is not None:
-        return {
-            "value": str(raw.get("value") or ""),
-            "label": str(raw.get("label") or slide.get("title") or ""),
-            "sub": str(raw.get("sub") or ""),
-            "delta": str(raw.get("delta") or ""),
-        }
-    # Fallback: pull a number out of the first bullet
-    bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-    import re
-    value = "—"
-    label = slide.get("title") or ""
-    sub = ""
-    if bullets:
-        head, body = split_kv(bullets[0])
-        m = re.search(r"([+\-↑↓]?\s*[0-9][0-9.,]*\s*(?:%|pt|ms|s|x|×|倍|K|M|B)?)", body or bullets[0])
-        if m:
-            value = m.group(1).strip()
-        label = head or label
-        sub = body if head else (bullets[1] if len(bullets) > 1 else "")
-    return {"value": value, "label": str(label or ""), "sub": str(sub or ""), "delta": ""}
+    if not isinstance(raw, dict):
+        return None
+    value = str(raw.get("value") or "").strip()
+    if not has_real_number(value):
+        return None
+    return {
+        "value": value,
+        "label": str(raw.get("label") or slide.get("title") or "").strip(),
+        "sub": str(raw.get("sub") or "").strip(),
+        "delta": str(raw.get("delta") or "").strip(),
+    }
 
 
 def get_quote(slide: dict[str, Any]) -> dict[str, str]:
@@ -401,6 +397,10 @@ def inner_kpi_grid(slide: dict[str, Any]) -> str:
 
 def inner_stat(slide: dict[str, Any]) -> str:
     st = get_stat(slide)
+    if not st:
+        # Should be unreachable — render_inner downgrades stat-highlight when
+        # `get_stat` returns None — but keep a safe path just in case.
+        return inner_cards(slide)
     delta = f'<div class="sg-delta">{esc(st["delta"])}</div>' if st.get("delta") else ""
     sub = f'<div class="sg-sub">{rich(st["sub"])}</div>' if st.get("sub") else ""
     return (
@@ -479,11 +479,22 @@ def inner_process_steps(slide: dict[str, Any]) -> str:
 
 
 def render_inner(layout: str, slide: dict[str, Any], *, accent_grad: bool = False) -> str:
-    """Dispatch a single content slide to its inner-HTML fragment."""
+    """Dispatch a single content slide to its inner-HTML fragment.
+
+    Numeric layouts are *downgraded* when the LLM picked the layout but did
+    not supply matching real data — better to render an honest `cards` slide
+    than to fabricate numbers to fill `kpi-grid` / `stat-highlight` slots.
+    """
     if layout == "kpi-grid":
-        return inner_kpi_grid(slide)
+        if len(get_kpis(slide)) >= 2:
+            return inner_kpi_grid(slide)
+        return inner_cards(slide, accent_grad=accent_grad)
     if layout == "stat-highlight":
-        return inner_stat(slide)
+        if get_stat(slide) is not None:
+            return inner_stat(slide)
+        # Downgrade: prefer bullets when the slide carries 3+ bullets,
+        # otherwise cards.
+        return inner_bullets(slide) if len(get_bullets(slide)) >= 3 else inner_cards(slide, accent_grad=accent_grad)
     if layout == "comparison":
         return inner_comparison(slide, pros_cons=False)
     if layout == "pros-cons":
@@ -505,6 +516,7 @@ def render_inner(layout: str, slide: dict[str, Any], *, accent_grad: bool = Fals
 
 __all__ = [
     "esc", "rich", "rich_grad", "split_kv", "deck_subtitle",
+    "has_real_number",
     "planned_slides", "chapter_titles",
     "get_columns", "get_kpis", "get_stat",
     "get_quote", "get_compare", "get_steps", "get_bullets",

@@ -36,15 +36,9 @@ def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> 
     subtitle = generic.get("subtitle") or "本周内容自动整理"
     inner = f"""
     {_cover_head()}
-    <p class="kicker">WEEKLY · auto report</p>
     <h1 class="h1 mt-s">{L.rich(title)}</h1>
     <p class="lede mt-m" style="max-width:880px">{L.rich(subtitle)}</p>
-    <div class="grid g3 mt-l">
-      <div class="kpi"><div class="label">sections</div><div class="value">{max(1, len(generic.get("slides", [])) - 2)}</div><div class="delta flat">automated</div></div>
-      <div class="kpi good"><div class="label">build</div><div class="value">OK</div><div class="delta up">↑ deck ready</div></div>
-      <div class="kpi warn"><div class="label">review</div><div class="value">pending</div><div class="delta flat">→ human-in-loop</div></div>
-    </div>
-    {_footer("cover · weekly", slide_no, total)}
+    {_footer("cover", slide_no, total)}
     """
     return _section(inner, active=active, title=str(title))
 
