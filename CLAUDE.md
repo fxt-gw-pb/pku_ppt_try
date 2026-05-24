@@ -119,26 +119,67 @@ The LLM produces a deliberately narrow shape — see `src/schema/__init__.py` an
     { "type": "cover | contents | section | content | closing",
       "title": "...",
       "bullets": ["..."],
-      "layout": "multi-card"?,
-      "section"?, "notes"?, "image_prompt"?, "chart_suggestion"? }
+      "layout": "cards"?,
+      "section"?, "notes"?, "image_prompt"?, "chart_suggestion"?,
+      // optional layout-specific structured fields (any may be absent):
+      "stat"?:    { "value", "label", "sub?", "delta?" },
+      "quote"?:   { "text", "author?" },
+      "compare"?: { "left": {"title", "points":[]}, "right": {"title", "points":[]} },
+      "kpis"?:    [ { "label", "value", "delta?", "status?: good|warn|bad" } ],
+      "steps"?:   [ { "when?", "title", "body?" } ],
+      "columns"?: [ { "title", "body", "kicker?" } ]
+    }
   ]
 }
 ```
 
+The schema validator (`validate_slide_json`) only enforces shape — when a structured field is absent, every renderer falls back to parsing `bullets` heuristically. `KNOWN_LAYOUTS` is the union of `KNOWN_PKU_LAYOUTS` (the 14 PKU runtime layouts) and `KNOWN_GENERIC_LAYOUTS` (the 11 html-ppt-facing names: `cards / bullets / two-column / three-column / kpi-grid / stat-highlight / comparison / pros-cons / big-quote / timeline / process-steps`).
+
 The PKU runtime (`assets/runtime.js`) needs much richer per-layout fields: `headline`, `images[]`, `items[]`, `cards[]`, `nodes[]`, `chapterIndex`, etc. — full grammar in `pku-red-defense-ppt/references/slides-json-schema.md`. Each html-ppt template has its own dedicated renderer that emits a complete `index.html` directly (no per-template slides.json schema).
+
+### LLM layout selection — anti-fabrication rules (in the system prompt)
+
+The DeepSeek prompt explicitly tells the model not to force a layout when the manuscript lacks the underlying material. Don't loosen these when editing the prompt:
+
+- **`stat-highlight`** and **`big-quote`** each: **at most 1 per deck, and must be omittable**. If the manuscript has no single load-bearing number / no quotable line, do not synthesize one.
+- **`kpi-grid`** requires ≥3 real quantitative metrics already present in the source.
+- **`comparison` / `pros-cons`** require both sides to have 2-4 distinct points from the source.
+- **`timeline`** requires actual time anchors (quarters, years, months); no fabricating `2024 Q3`-style markers.
+- **`process-steps`** requires steps with dependency order, not a flat bullet list.
+- Default fallbacks are `cards` and `bullets` — a deck that is 70% `cards` is fine.
+
+Renderers also accept the legacy PKU layout names (`multi-card`, `theory-cards`, `method`, `section-text`, `vs`, `swot`, `framework`) for backwards compatibility; `layouts._LAYOUT_ALIASES` normalizes them to the generic set.
 
 ### Dispatch & rendering
 
 `src/renderer/dispatch.py` maps a template slug to its render function. **All 15 html-ppt templates have dedicated renderers** under `src/renderer/<template>.py`; the `html_ppt_generic.py` fallback exists for safety but every registered template overrides it. PKU is handled separately by `src/renderer/__init__.compile_to_pku()` + the PKU runtime.
 
-`src/renderer/compile_to_pku()` bridges generic → PKU:
+#### Shared helpers — `src/renderer/layouts.py`
+
+Every html-ppt renderer imports `from . import layouts as L`. This module owns the boilerplate so each template file can focus on its own chrome (cover, contents, section dividers, brand-specific decorations):
+
+- **Text**: `L.esc(value)`, `L.rich(value)` (`**phrase**` → `<em>`, `<br>` survives, everything else escaped), `L.rich_grad(value)` (same but wraps emphasis in `<span class="gradient-text">` for gradient-driven templates), `L.split_kv("标题：正文")` → `(head, body)`.
+- **Planning**: `L.planned_slides(generic)` returns ordered `[(kind, slide), ...]` (always synthesizes a `cover` at index 0 and a `closing` at the end); `L.chapter_titles(generic)` collects every `type=section` title.
+- **Structured-field extractors**: `L.get_columns / get_kpis / get_stat / get_quote / get_compare / get_steps / get_bullets`. Each returns the LLM-provided structured field when present, otherwise builds a best-effort fallback from `bullets` so the layout still renders.
+- **Layout normalization**: `L.normalize_layout(layout, bullets_count)` collapses aliases (`multi-card → cards`, `theory-cards → cards`, `method → process-steps`, `section-text → bullets`, `vs/swot → comparison`, `framework → process-steps`, `image-analysis → cards`, `chart-analysis → kpi-grid`, `quote-card → big-quote`) and picks a sensible default when `layout` is missing.
+- **Inner-HTML fragments**: `L.render_inner(layout, slide)` dispatches to `inner_cards / inner_bullets / inner_columns / inner_kpi_grid / inner_stat / inner_comparison / inner_quote / inner_timeline / inner_process_steps`. Each returns the *body* HTML of one content slide using a small set of stable class names (`.content-cards`, `.content-bullets`, `.content-cols`, `.content-kpis`, `.content-stat`, `.content-vs[.pc]`, `.content-quote`, `.content-timeline`, `.content-steps`) plus shared primitives `.card`, `.grid g2|g3|g4`, `.pill`, `.gradient-text`.
+
+The renderers compose: their own brand chrome (kicker, headline, section number, decorative backdrops) + `L.render_inner(...)` + their own footer.
+
+#### Shared content-layout CSS — `templates/html-ppt/shared/assets/base.css`
+
+`base.css` now ships default rules for every `.content-*` class above so a new template gets all 11 layouts for free. Per-template `style.css` overrides the visual identity by retheming the CSS custom properties (`--accent`, `--accent-2`, `--accent-3`, `--surface`, `--surface-2`, `--text-1`, `--text-2`, `--text-3`, `--grad`, `--border`) — only override the `.content-*` class itself when the default tokens can't carry the look (e.g. dark templates needing different contrast on `.content-vs` borders). The shared `@media print` block (page-size, color-adjust, overflow reset) also lives here.
+
+#### `compile_to_pku()` — generic → PKU bridge
+
+`src/renderer/__init__.compile_to_pku()` is the PKU-only equivalent of the html-ppt renderers:
 
 - **Chapter detection**: walks slides; every `type=section` slide contributes a chapter title. If 3-6 found, uses those; else falls back to the 5 default PKU chapters.
-- **Layout pick** for `type=content`: honors `slide.layout` if it's one of `multi-card / theory-cards / method / timeline / section-text`; else heuristic — 2-4 bullets → `multi-card`, else `section-text`.
-- **Bullet → card** conversion: bullets shaped as `"title: body"` or `"标题：正文"` split into card title + body; otherwise auto-numbered.
+- **Layout resolution** for `type=content`: `_resolve_pku_layout(slide)` takes the LLM's `layout` hint, keeps it if it's already a PKU layout, otherwise translates via `_GENERIC_TO_PKU` (`cards → multi-card`, `bullets → section-text`, `kpi-grid → multi-card` rendered as value-led cards, `stat-highlight → section-text`, `comparison/pros-cons → vs`, `process-steps → method`, `big-quote → section-text`, `timeline → timeline`). No hint → bullet-count heuristic.
+- **Structured-field → PKU shape**: `_kpi_cards`, `_theory_cards_from_columns`, `_vs_from_compare`, `_method_from_steps`, `_timeline_from_steps`, `_quote_blocks`, `_stat_blocks` consume the same `L.get_*` extractors and emit PKU-runtime fields (`cards`, `methods`, `steps`, `leftItems`/`rightItems`, `nodes`, `blocks`).
+- **Bullet → card fallback**: bullets shaped as `"title: body"` / `"标题：正文"` split into card title + body; otherwise auto-numbered.
 - Always inserts a `cover` at start and `closing` at end if the LLM omitted them.
-
-Richer PKU layouts (image-analysis, chart-analysis, framework, vs, swot) need structured fields the bullets format can't carry — you'd need to extend the LLM contract first, then add a branch in `_render_content()`.
+- PKU layouts `image-analysis` / `chart-analysis` fall through to `section-text` because we have no real image assets to render — extend the LLM contract first, then add a real branch in `_render_content()`.
 
 ### Template registry
 
@@ -167,6 +208,8 @@ GET  /收款码/...                           ← static mount for the donation 
 ```
 
 The job runner is still a daemon thread inside the FastAPI process — no queue. Fine for the free-tier MVP; not for production load.
+
+Every materialized deck (both PKU and html-ppt) also gets a `data/slide.json` (singular) alongside its real assets — that's the raw generic LLM JSON dumped by `scripts/generate.py` for debugging / re-runs. Don't confuse it with PKU's `data/slides.json` (plural), which is the rich PKU-runtime format consumed by `runtime.js`. html-ppt decks only have `slide.json`; PKU decks have both.
 
 ## Frontend (two-view static app)
 
@@ -390,6 +433,7 @@ For PDF/print regressions, render one deck with headless Chrome and count pages:
 - `src/schema/__init__.py` — generic LLM output validator.
 - `src/renderer/__init__.py` — generic-to-PKU compiler (`compile_to_pku`).
 - `src/renderer/dispatch.py` — html-ppt slug → render function map.
+- `src/renderer/layouts.py` — shared helpers consumed by every html-ppt renderer and by `compile_to_pku`: `planned_slides`, `chapter_titles`, `normalize_layout`, `render_inner`, structured-field extractors.
 - `src/renderer/<template>.py` — 15 dedicated renderers (pitch_deck, weekly_report, hermes_cyber_terminal, etc.).
 - `src/renderer/html_ppt_generic.py` — generic fallback (kept for safety; not currently used).
 - `src/exporter/__init__.py` — copy template, write `data/slide.json`, zip deck.
@@ -404,12 +448,14 @@ For PDF/print regressions, render one deck with headless Chrome and count pages:
 
 ## Extending
 
+- **New generic layout (consumed by every html-ppt template)**: (a) add the layout name to `KNOWN_GENERIC_LAYOUTS` in `src/schema/__init__.py` and, if it needs a new structured field, extend `_check_structured_fields`; (b) describe the layout (+ pre-conditions, anti-fabrication rules) in the DeepSeek system prompt in `src/llm/deepseek.py`; (c) add a `get_<field>` extractor and an `inner_<layout>` fragment in `src/renderer/layouts.py`, then route it in `render_inner`; (d) add a default `.content-<layout>` rule in `templates/html-ppt/shared/assets/base.css` using only the shared CSS custom properties; (e) optionally extend `compile_to_pku()` so PKU benefits too.
 - **New PKU layout from LLM**: (a) extend the system prompt in `src/llm/deepseek.py` so the model emits the layout-specific fields; (b) add a branch in `_render_content()` in `src/renderer/__init__.py`; (c) confirm the layout name is in `KNOWN_PKU_LAYOUTS` of `src/schema/__init__.py`.
 - **New full-deck template**:
   1. Drop the asset bundle under `templates/html-ppt/<id>/` (`manifest.json` + scoped `style.css`).
-  2. Add `src/renderer/<id_slug>.py` with a `render_<slug>(generic)` function returning a complete `index.html`. Follow the CJK type hierarchy rule above (cover h1 56–74px CJK / 74–96px `:lang(en)`).
-  3. Register it in `src/renderer/dispatch.py` and `src/templates/registry.py`.
-  4. Run `python scripts/build_previews.py` to add a committed sample under `previews/<id>/`.
+  2. Add `src/renderer/<id_slug>.py` with a `render_<slug>(generic)` function returning a complete `index.html`. Use `L.planned_slides` / `L.normalize_layout` / `L.render_inner` from `src/renderer/layouts.py` for the content-page body so the template inherits all 11 generic layouts for free; only write bespoke HTML for the brand chrome (cover, contents, section divider, closing) and any layout you want to override.
+  3. Follow the CJK type hierarchy rule above (cover h1 56–74px CJK / 74–96px `:lang(en)`).
+  4. Register it in `src/renderer/dispatch.py` and `src/templates/registry.py`.
+  5. Run `python scripts/build_previews.py` to add a committed sample under `previews/<id>/`.
 - **Server-side PDF (instead of the current client-side print button)**: add Playwright; in `_run_job()` after the zip step, launch headless Chromium, navigate to the deck's `index.html`, `page.pdf(landscape=True, width="1280px", height="720px")`. Add a `pdf_url` field on done jobs.
 - **PPTX export**: harder — either re-implement each layout via `python-pptx`, or use LibreOffice headless to convert the HTML deck. Layout-specific work for either path.
 - **Object storage for outputs**: replace `OUTPUT_DIR` writes with `boto3` calls to S3/R2; return signed URLs in `download_url`. The `/decks` static mount becomes obsolete and the Render ephemeral-filesystem problem goes away.
