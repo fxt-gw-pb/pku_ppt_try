@@ -96,6 +96,7 @@ cp .env.example .env
 # 用编辑器打开 .env，填入：
 #   LLM_PROVIDER=deepseek
 #   DEEPSEEK_API_KEY=你的真实 DeepSeek API Key
+#   DEEPSEEK_MODEL=deepseek-v4-pro
 ```
 
 `.gitignore` 已排除 `.env`，不会被 commit。
@@ -329,7 +330,7 @@ uvicorn server.app:app --host 0.0.0.0 --port $PORT
 LLM_PROVIDER=deepseek
 DEEPSEEK_API_KEY=<真实 key>
 DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-chat
+DEEPSEEK_MODEL=deepseek-v4-pro
 MAX_INPUT_CHARS=30000
 ```
 

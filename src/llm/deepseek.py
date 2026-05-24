@@ -57,7 +57,7 @@ def generate(manuscript: str, options: dict[str, Any]) -> dict[str, Any]:
         )
 
     base_url = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
-    model = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+    model = os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-pro")
 
     # Lazy-import openai so `LLM_PROVIDER=mock` works without it installed.
     try:
@@ -77,6 +77,7 @@ def generate(manuscript: str, options: dict[str, Any]) -> dict[str, Any]:
         ],
         response_format={"type": "json_object"},
         temperature=0.4,
+        extra_body={"thinking": {"type": "disabled"}},
     )
 
     raw = (completion.choices[0].message.content or "").strip()
