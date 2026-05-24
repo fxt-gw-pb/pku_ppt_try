@@ -39,16 +39,10 @@ def _footer(current: int, total: int) -> str:
 
 def _cover(generic: dict[str, Any], current: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Generated with fxt ppt"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
-      <p class="kicker">Generated deck</p>
       <h1 class="h1">{_rich(title)}</h1>
       <p class="lede mt-m">{_rich(subtitle)}</p>
-      <div class="row wrap mt-l">
-        <span class="pill pill-accent">fxt ppt</span>
-        <span class="pill">模板生成</span>
-        <span class="pill">文稿整理</span>
-      </div>
       {_footer(current, total)}
     """
     return _section(inner, title=str(title), active=active)

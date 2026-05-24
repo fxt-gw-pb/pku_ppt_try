@@ -60,10 +60,9 @@ def _keyhint() -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "untitled"
-    subtitle = generic.get("subtitle") or "auto-generated minimal deck"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
     {_meta(slide_no, total, "cover")}
-    <div class="dk-eyebrow">fxt ppt · auto-generated</div>
     <h1 class="dk-h0">{_rich(title)}</h1>
     <span class="dk-line"></span>
     <p class="dk-lede">{_rich(subtitle)}</p>

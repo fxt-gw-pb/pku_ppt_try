@@ -53,11 +53,11 @@ def _footer(slide_no: int, total: int, label: str) -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Auto-generated launch deck"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
     <div class="hero-shot"></div>
     <div style="position:relative;z-index:2;max-width:760px">
-      <span class="brand">fxt ppt</span>
+      <span class="brand"></span>
       <p class="kicker mt-l">LAUNCH · 2026</p>
       <h1 class="h1 mt-s">{_rich(title)}</h1>
       <p class="lede mt-m">{_rich(subtitle)}</p>
@@ -82,7 +82,7 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
         )
     grid_cls = "grid g3" if len(cards) >= 3 else "grid g2"
     inner = f"""
-    <span class="brand">fxt ppt</span>
+    <span class="brand"></span>
     <p class="kicker mt-l">WHAT'S INSIDE</p>
     <h2 class="h2">分为 <span class="gradient-text">{len(cards)} 个功能</span></h2>
     <div class="{grid_cls} mt-l">{''.join(cards)}</div>
@@ -94,7 +94,7 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
 def _divider(title: str, points: list[str], chapter_no: int, slide_no: int, total: int) -> str:
     pills = "".join(f'<span class="pill pill-accent" style="margin-right:8px">{_esc(p)}</span>' for p in points[:4])
     inner = f"""
-    <span class="brand" style="color:rgba(255,255,255,.85)">fxt ppt</span>
+    <span class="brand" style="color:rgba(255,255,255,.85)"></span>
     <p class="kicker mt-l">CHAPTER · {chapter_no:02d}</p>
     <h1 class="h1 mt-s">{_rich(title)}</h1>
     <p class="lede mt-m">先建立结构，再展开重点。</p>
@@ -129,7 +129,7 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
     n = len(cells)
     grid_cls = "grid g3" if n in {3, 6} else "grid g2"
     inner = f"""
-    <span class="brand">fxt ppt</span>
+    <span class="brand"></span>
     <p class="kicker mt-l">{_esc(slide.get("section") or "feature")}</p>
     <h2 class="h2">{_rich(slide.get("title") or "核心特性")}</h2>
     <div class="{grid_cls} mt-l">{''.join(cells)}</div>
@@ -155,7 +155,7 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
             """
         )
     inner = f"""
-    <span class="brand">fxt ppt</span>
+    <span class="brand"></span>
     <p class="kicker mt-l">{_esc(slide.get("section") or "how it works")}</p>
     <h2 class="h2">{_rich(slide.get("title") or "工作流程")}</h2>
     <div class="mt-l" style="max-width:980px">{''.join(rows)}</div>
@@ -170,7 +170,7 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     inner = f"""
     <div class="hero-shot"></div>
     <div style="position:relative;z-index:2;max-width:780px">
-      <span class="brand" style="color:rgba(255,255,255,.85)">fxt ppt</span>
+      <span class="brand" style="color:rgba(255,255,255,.85)"></span>
       <p class="kicker mt-l">END · LAUNCH</p>
       <h1 class="h1 mt-s">{_rich(title)}</h1>
       <p class="lede mt-m">{_rich(message)}</p>
@@ -237,7 +237,7 @@ def render_product_launch(generic: dict[str, Any]) -> str:
             else:
                 body = L.render_inner(layout, slide)
                 inner = f"""
-    <span class="brand">fxt ppt</span>
+    <span class="brand"></span>
     <p class="kicker mt-l">{_esc(slide.get("section") or "feature")}</p>
     <h2 class="h2">{_rich(slide.get("title") or "")}</h2>
     {body}

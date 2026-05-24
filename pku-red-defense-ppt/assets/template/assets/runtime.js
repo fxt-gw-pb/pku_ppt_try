@@ -508,6 +508,7 @@
     NS.deck = deck;
     renderDeck(deck, stage);
     injectPdfButton();
+    injectEditPanel();
   }
 
   function injectPdfButton() {
@@ -551,6 +552,146 @@
         setTimeout(() => window.print(), 60);
       }
     });
+  }
+
+  /* ---------- field-edit panel ----------
+   * Same UX as the html-ppt runtime: a 360px sidebar with two textareas
+   * (verbatim find / replace) that mutates text nodes of the currently
+   * visible slide. Slides are light-DOM children of <deck-stage> projected
+   * through a <slot>, so a normal TreeWalker works. */
+  function activeSlideEl() {
+    const stage = document.querySelector("deck-stage");
+    if (!stage) return null;
+    return (
+      stage.querySelector('[data-deck-active]') ||
+      stage.querySelector('section.is-active') ||
+      stage.querySelector('section')
+    );
+  }
+  function replaceInTextNodes(root, needle, replacement) {
+    if (!root || !needle) return 0;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    const hits = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue && node.nodeValue.indexOf(needle) !== -1) hits.push(node);
+    }
+    let count = 0;
+    hits.forEach((n) => {
+      const before = n.nodeValue;
+      const after = before.split(needle).join(replacement);
+      if (after !== before) {
+        n.nodeValue = after;
+        count += before.split(needle).length - 1;
+      }
+    });
+    return count;
+  }
+  function injectEditPanel() {
+    if (document.querySelector(".edit-panel-toggle-btn")) return;
+
+    /* Inject CSS for both the toggle button and the panel */
+    const css = document.createElement("style");
+    css.textContent = [
+      '.edit-panel{position:fixed;top:0;right:0;width:360px;height:100vh;z-index:2147483601;',
+      ' background:#0f1115;color:#e6edf3;border-left:1px solid rgba(255,255,255,.08);',
+      ' display:none;flex-direction:column;padding:20px 18px;gap:12px;overflow-y:auto;',
+      ' font:14px/1.55 "Source Han Sans SC","Noto Sans SC",-apple-system,BlinkMacSystemFont,sans-serif;',
+      ' box-shadow:-12px 0 32px rgba(0,0,0,.35);box-sizing:border-box}',
+      'body.has-edit-panel .edit-panel{display:flex}',
+      '.edit-panel *{box-sizing:border-box}',
+      '.edit-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px}',
+      '.edit-panel-head h3{margin:0;font-size:15px;font-weight:700;letter-spacing:.04em}',
+      '.edit-panel-close{background:transparent;border:1px solid rgba(255,255,255,.18);color:#e6edf3;',
+      ' width:28px;height:28px;border-radius:8px;font-size:16px;cursor:pointer;line-height:1;padding:0}',
+      '.edit-panel-close:hover{background:rgba(255,255,255,.08)}',
+      '.edit-panel .hint{font-size:12px;color:#8b949e;line-height:1.6;margin:0}',
+      '.edit-panel .warn{font-size:12px;color:#f5a524;line-height:1.6;margin:0}',
+      '.edit-panel label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8b949e;font-weight:700}',
+      '.edit-panel textarea{width:100%;min-height:96px;resize:vertical;background:#161922;color:#e6edf3;',
+      ' border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 12px;',
+      ' font:13px/1.55 ui-monospace,"JetBrains Mono",SFMono-Regular,Menlo,monospace}',
+      '.edit-panel textarea:focus{outline:none;border-color:#9A0000;box-shadow:0 0 0 2px rgba(154,0,0,.25)}',
+      '.edit-panel .apply-btn{appearance:none;background:#9A0000;color:#fff;border:none;border-radius:8px;',
+      ' padding:10px 14px;font:600 13px/1 -apple-system,sans-serif;cursor:pointer;letter-spacing:.04em}',
+      '.edit-panel .apply-btn:hover{background:#b50000}',
+      '.edit-panel .status{font-size:12px;line-height:1.5;margin:0;min-height:18px}',
+      '.edit-panel .status.ok{color:#3fb950}',
+      '.edit-panel .status.err{color:#f85149}',
+      '.edit-panel-toggle-btn{position:fixed;right:24px;bottom:78px;z-index:2147483600;',
+      ' display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;',
+      ' background:#9A0000;color:#fff;border:1px solid rgba(255,255,255,.18);',
+      ' font:600 13px/1 "Source Han Sans SC","Noto Sans SC",-apple-system,sans-serif;',
+      ' letter-spacing:.04em;cursor:pointer;box-shadow:0 8px 24px rgba(154,0,0,.35);',
+      ' transition:transform .18s ease, background .18s ease}',
+      '.edit-panel-toggle-btn:hover{background:#b50000;transform:translateY(-1px)}',
+      'body.has-edit-panel deck-stage{transform-origin:top left;',
+      ' transform:scale(calc((100vw - 360px) / 100vw))}',
+      '@media print{.edit-panel,.edit-panel-toggle-btn{display:none!important}',
+      ' body.has-edit-panel deck-stage{transform:none!important}}'
+    ].join("\n");
+    document.head.appendChild(css);
+
+    /* Build the panel */
+    const panel = document.createElement("aside");
+    panel.className = "edit-panel";
+    panel.innerHTML = [
+      '<div class="edit-panel-head">',
+      '  <h3>字段修改</h3>',
+      '  <button type="button" class="edit-panel-close" title="关闭">×</button>',
+      '</div>',
+      '<p class="hint">只支持基于当前预览页字段的修改，不支持版式调整。修改即时生效，仅在当前浏览器内有效（刷新或重新生成会丢失）。</p>',
+      '<label for="pku-edit-find">要替换的字段（请从当前页面完整粘贴）</label>',
+      '<textarea id="pku-edit-find" spellcheck="false" placeholder="例如：基于注意力机制的医学影像分割研究"></textarea>',
+      '<label for="pku-edit-replace">替换为</label>',
+      '<textarea id="pku-edit-replace" spellcheck="false" placeholder="新内容"></textarea>',
+      '<p class="warn">⚠ 新字段字数与原字段差异过大可能导致排版超出当前版面，请尽量控制在相近长度。</p>',
+      '<button type="button" class="apply-btn">应用替换（仅作用于当前页）</button>',
+      '<p class="status" role="status"></p>'
+    ].join("");
+    document.body.appendChild(panel);
+
+    const findEl = panel.querySelector("#pku-edit-find");
+    const replEl = panel.querySelector("#pku-edit-replace");
+    const status = panel.querySelector(".status");
+    function setOpen(open) {
+      document.body.classList.toggle("has-edit-panel", !!open);
+    }
+    panel.querySelector(".edit-panel-close").addEventListener("click", () => setOpen(false));
+    panel.querySelector(".apply-btn").addEventListener("click", () => {
+      const needle = findEl.value;
+      const replacement = replEl.value;
+      if (!needle) {
+        status.className = "status err";
+        status.textContent = "请输入要替换的字段。";
+        return;
+      }
+      const slide = activeSlideEl();
+      if (!slide) {
+        status.className = "status err";
+        status.textContent = "未找到当前幻灯片。";
+        return;
+      }
+      const count = replaceInTextNodes(slide, needle, replacement);
+      if (count > 0) {
+        status.className = "status ok";
+        status.textContent = "✓ 已在当前页替换 " + count + " 处。";
+      } else {
+        status.className = "status err";
+        status.textContent = "✗ 当前页没有找到该字段。请检查是否完整粘贴自当前预览页（区分空格、标点）。";
+      }
+    });
+
+    /* Toggle button */
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "edit-panel-toggle-btn";
+    btn.title = "修改当前页字段（仅文本替换，不改版式）";
+    btn.innerHTML = '<span>✎</span><span>修改字段</span>';
+    btn.addEventListener("click", () => {
+      setOpen(!document.body.classList.contains("has-edit-panel"));
+    });
+    document.body.appendChild(btn);
   }
 
   NS.render = renderDeck;

@@ -55,12 +55,10 @@ def _footer(slide_no: int, total: int, label: str) -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "auto-generated presenter deck"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
-      <p class="kicker">fxt-ppt :: presenter mode</p>
       <h1 class="h1">{_rich(title)}</h1>
       <p class="lede">{_rich(subtitle)}</p>
-      <div class="speaker"><div class="av"></div><div><b>fxt ppt</b><span>auto-generated · presenter mode</span></div></div>
       {_footer(slide_no, total, "cover")}
     """
     return _section(inner, active=active, title=str(title), notes="按 P 进入演讲者视图。")
@@ -165,7 +163,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <p class="kicker">end · presenter</p>
       <h1 class="h1">{_rich(title)}</h1>
       <p class="lede">{_rich(message)}</p>
-      <div class="speaker mt-l"><div class="av"></div><div><b>fxt ppt</b><span>presenter-mode-reveal · auto-generated</span></div></div>
       {_footer(slide_no, total, "end")}
     """
     return _section(inner, title=str(title), notes=str(message))

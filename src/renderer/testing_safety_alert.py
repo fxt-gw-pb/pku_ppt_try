@@ -67,11 +67,10 @@ def _footer(left: str, slide_no: int, total: int) -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "incident report"
-    subtitle = generic.get("subtitle") or "auto-generated alert deck"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
     {_stripes()}
     {_chrome("safety · alert", "", slide_no, total)}
-    <div class="ts-kicker">fxt ppt · auto-generated</div>
     <h1 class="ts-h1">{_rich(title)}</h1>
     <p class="ts-sub">{_rich(subtitle)}</p>
     <div class="ts-alert-box" style="margin-top:28px">
@@ -199,10 +198,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div class="ts-kicker">end · resolved</div>
     <h1 class="ts-h1">{_rich(title)}</h1>
     <p class="ts-sub">{_rich(message)}</p>
-    <div class="ts-alert-box green" style="margin-top:24px">
-      <h3>credits</h3>
-      <p>fxt ppt · testing-safety-alert · auto-generated</p>
-    </div>
     {_footer("end · resolved", slide_no, total)}
     """
     return _section(inner, title=str(title))

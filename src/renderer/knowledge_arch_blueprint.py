@@ -55,10 +55,9 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Generated deck · blueprint edition"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
     {_grid_bg()}
-    <div class="kb-kicker">fxt ppt · auto-generated</div>
     <h1 class="kb-h1">{_rich(title)}</h1>
     <p class="kb-sub">{_rich(subtitle)}</p>
     <div style="margin-top:30px">
@@ -191,12 +190,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div class="kb-kicker">end · blueprint</div>
     <h1 class="kb-h1"><span class="rust">{_rich(title)}</span></h1>
     <p class="kb-sub">{_rich(message)}</p>
-    <div style="margin-top:28px">
-      <span class="kb-insight">
-        <span class="kk">CREDIT</span>
-        fxt ppt · knowledge-arch-blueprint · auto-generated
-      </span>
-    </div>
     {_footer("end · eof", slide_no, total)}
     """
     return _section(inner, title=str(title))

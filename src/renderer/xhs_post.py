@@ -54,9 +54,15 @@ def _page_dot(slide_no: int, total: int) -> str:
 
 
 def _bottom(left: str, right: str) -> str:
+    left_html = (
+        f'<div><span class="avatar"></span>'
+        f'<b style="color:var(--text-1);margin-left:8px">{_esc(left)}</b></div>'
+        if left
+        else '<div><span class="avatar"></span></div>'
+    )
     return (
         '<div class="bottom-bar">'
-        f'<div><span class="avatar">f</span> <b style="color:var(--text-1);margin-left:8px">{_esc(left)}</b></div>'
+        f'{left_html}'
         f'<div>{_esc(right)}</div>'
         '</div>'
     )
@@ -64,16 +70,14 @@ def _bottom(left: str, right: str) -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "把文稿整理成 3:4 图文轮播"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
     {_page_dot(slide_no, total)}
-    <div class="sticker pink" style="top:130px;left:48px;transform:rotate(-6deg)">📝 fxt ppt</div>
-    <div class="sticker yellow" style="top:150px;right:50px;transform:rotate(5deg)">自动生成</div>
     <div style="margin-top:220px">
       <h1 class="h1">{_rich(title)}</h1>
       <p class="lede" style="margin-top:24px">{_rich(subtitle)}</p>
     </div>
-    {_bottom("@fxt-ppt", "← 左滑 查看")}
+    {_bottom("","← 左滑 查看")}
     """
     return _section(inner, active=active, title=str(title))
 
@@ -95,7 +99,7 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
       <h2 class="h2">这份内容分为 <span class="cover-title">{len(items)} 段</span></h2>
       <div style="margin-top:30px">{''.join(items)}</div>
     </div>
-    {_bottom("@fxt-ppt", "contents")}
+    {_bottom("","contents")}
     """
     return _section(inner, title="目录")
 
@@ -111,7 +115,7 @@ def _divider(title: str, points: list[str], chapter_no: int, slide_no: int, tota
       <h1 class="h1 mt-s">{_rich(title)}</h1>
       <div class="tag-row">{chips}</div>
     </div>
-    {_bottom("@fxt-ppt", f"chapter {chapter_no:02d}")}
+    {_bottom("",f"chapter {chapter_no:02d}")}
     """
     return _section(inner, title=title)
 
@@ -138,7 +142,7 @@ def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <h2 class="h2">{_rich(slide.get("title") or "核心要点")}</h2>
       <div style="margin-top:24px">{''.join(items)}</div>
     </div>
-    {_bottom("@fxt-ppt", "content")}
+    {_bottom("","content")}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
 
@@ -170,7 +174,7 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <h2 class="h2">{_rich(slide.get("title") or "过程拆解")}</h2>
       <div style="margin-top:26px">{''.join(rows)}</div>
     </div>
-    {_bottom("@fxt-ppt", "steps")}
+    {_bottom("","steps")}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))
 
@@ -184,13 +188,8 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div style="margin-top:30px;text-align:center">
       <h2 class="h2">{_rich(title)}</h2>
       <p class="lede" style="margin-top:20px">{_rich(message)}</p>
-      <div class="tag-row" style="justify-content:center;margin-top:30px">
-        <span class="ht">#fxtppt</span>
-        <span class="ht">#自动生成</span>
-        <span class="ht">#xhs-post</span>
-      </div>
     </div>
-    {_bottom("@fxt-ppt", "end ♡")}
+    {_bottom("","end ♡")}
     """
     return _section(inner, title=str(title))
 
@@ -256,7 +255,7 @@ def render_xhs_post(generic: dict[str, Any]) -> str:
       <h2 class="h2">{_rich(slide.get("title") or "")}</h2>
       {body}
     </div>
-    {_bottom("@fxt-ppt", f"content · {layout}")}
+    {_bottom("",f"content · {layout}")}
     """
                 sections.append(_section(inner, title=str(slide.get("title") or "")))
 

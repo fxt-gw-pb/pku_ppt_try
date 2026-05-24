@@ -26,13 +26,9 @@ def _footer(left: str, slide_no: int, total: int) -> str:
     return f'<div class="deck-footer"><span>{L.esc(left)}</span><span>{slide_no:02d} / {total:02d}</span></div>'
 
 
-def _cover_head() -> str:
-    return (
-        '<div class="cover-head">'
-        '<div class="logo">fxt ppt</div>'
-        '<div class="week-chip">auto · weekly</div>'
-        '</div>'
-    )
+def _cover_head(label: str = "") -> str:
+    chip = f'<div class="week-chip">{L.esc(label)}</div>' if label else ""
+    return f'<div class="cover-head"><div class="logo"></div>{chip}</div>'
 
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
@@ -59,7 +55,7 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
         tag = SHIP_TAGS[i % len(SHIP_TAGS)]
         rows.append(
             f'<div class="ship-item"><span class="tag {tag}">PART {i + 1:02d}</span>'
-            f'<div><b>{L.rich(t)}</b></div><span class="owner">@fxt-ppt</span></div>'
+            f'<div><b>{L.rich(t)}</b></div></div>'
         )
     inner = f"""
     {_cover_head()}
@@ -112,11 +108,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <p class="kicker">end · report</p>
     <h1 class="h1 mt-s">{L.rich(title)}</h1>
     <p class="lede mt-m">{L.rich(message)}</p>
-    <div class="grid g3 mt-l">
-      <div class="kpi good"><div class="label">deck</div><div class="value">READY</div><div class="delta up">automation OK</div></div>
-      <div class="kpi"><div class="label">brand</div><div class="value">fxt ppt</div><div class="delta flat">weekly-report</div></div>
-      <div class="kpi warn"><div class="label">credit</div><div class="value">AUTO</div><div class="delta flat">human-in-loop</div></div>
-    </div>
     {_footer("end", slide_no, total)}
     """
     return _section(inner, title=str(title))

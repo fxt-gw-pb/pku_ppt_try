@@ -61,21 +61,11 @@ def _terminal(bar: str, body: str) -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Generated deck · tech sharing edition"
-    code_body = (
-        '<span class="cmt"># run the auto-deck</span>\n'
-        '<span class="kw">$</span> fxt-ppt run \\\n'
-        '    --template <span class="str">"tech-sharing"</span> \\\n'
-        '    --input <span class="str">"manuscript.md"</span>\n'
-        '<span class="cmt"># deck materialized in &lt;1s</span>'
-    )
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
-      <p class="kicker">fxt-ppt :: auto-generated</p>
       <h1 class="h1">{_rich(title)}</h1>
       <p class="lede mt-m">{_rich(subtitle)}</p>
-      <div class="mt-l" style="max-width:760px">{_terminal('~/fxt-ppt $ ./run', code_body)}</div>
-      <div class="speaker"><div class="av"></div><div><b>fxt ppt</b><span>template :: tech-sharing</span></div></div>
-      {_footer("boot · cover", slide_no, total)}
+      {_footer("cover", slide_no, total)}
     """
     return _section(inner, active=active, title=str(title))
 
@@ -162,7 +152,7 @@ def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
     inner = f"""
       <p class="kicker">./pipeline</p>
       <h2 class="h2">{_rich(slide.get("title") or "过程拆解")}</h2>
-      <div class="mt-l" style="max-width:980px">{_terminal('~/fxt-ppt $ ./pipeline.sh', code_inner)}</div>
+      <div class="mt-l" style="max-width:980px">{_terminal('$ ./pipeline.sh', code_inner)}</div>
       {_footer("content · pipeline", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "过程"))
@@ -175,11 +165,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <p class="kicker">exit 0</p>
       <h1 class="h1">{_rich(title)}</h1>
       <p class="lede mt-m">{_rich(message)}</p>
-      <div class="mt-l">
-        <span class="tag">fxt ppt</span>
-        <span class="tag">tech-sharing</span>
-        <span class="tag">auto-generated</span>
-      </div>
       {_footer("end · eof", slide_no, total)}
     """
     return _section(inner, title=str(title))

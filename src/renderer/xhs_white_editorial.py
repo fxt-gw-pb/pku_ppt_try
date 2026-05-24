@@ -61,16 +61,12 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "把文稿整理成一份白底杂志风内容 deck"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
-    {_top(slide_no, total, "内容生成 · 白底杂志风")}
-    <div class="xw-kicker">基于文稿自动生成</div>
+    {_top(slide_no, total, "")}
     <h1 class="xw-title">{_rich(title)}</h1>
     <p class="xw-sub">{_rich(subtitle)}</p>
-    <div class="xw-hero">
-      <div class="xw-quote">先把复杂内容讲清楚，<br>再用 <span class="xw-focus">重点块</span> 抓住读者注意力。</div>
-    </div>
-    {_footer(slide_no, total, "Cover · xhs-white-editorial")}
+    {_footer(slide_no, total, "Cover")}
     """
     return _section(inner, active=active, title=str(title))
 
@@ -172,11 +168,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div style="margin-top:100px">
       <div class="xw-big-stat xw-grad">{_rich(title)}<small> · thanks</small></div>
       <p class="xw-sub" style="font-size:28px;margin-top:36px">{_rich(message)}</p>
-      <div style="margin-top:40px">
-        <span class="xw-pill">fxt ppt</span>
-        <span class="xw-pill">xhs-white-editorial</span>
-        <span class="xw-pill">generated deck</span>
-      </div>
     </div>
     {_footer(slide_no, total, "End")}
     """

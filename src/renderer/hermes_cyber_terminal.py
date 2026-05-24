@@ -72,21 +72,15 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Generated deck · cyber terminal edition"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
     {_chrome_overlay()}
-    {_chrome_bar("fxt-ppt run --template hermes-cyber-terminal", "session 01")}
+    {_chrome_bar("./run", "session 01")}
     <div style="margin-top:60px">
-      <div class="hc-tag">build · auto</div>
       <h1 class="hc-h1">{_rich(title)}<span class="hc-cursor"></span></h1>
       <p class="hc-lede">{_rich(subtitle)}</p>
-      <div style="margin-top:22px">
-        <span class="hc-tag">fxt ppt</span>
-        <span class="hc-tag amber">template</span>
-        <span class="hc-tag">classic mode</span>
-      </div>
     </div>
-    {_footer("boot · cover", slide_no, total)}
+    {_footer("cover", slide_no, total)}
     """
     return _section(inner, active=active, title=str(title))
 
@@ -213,8 +207,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <div class="hc-big">{_rich(title)}</div>
       <p class="hc-lede" style="margin-top:18px">{_rich(message)}</p>
       <div style="margin-top:24px">
-        <span class="hc-tag">fxt ppt</span>
-        <span class="hc-tag amber">hermes-cyber-terminal</span>
         <span class="hc-tag">eof<span class="hc-cursor"></span></span>
       </div>
     </div>

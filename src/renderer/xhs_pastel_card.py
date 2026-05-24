@@ -70,15 +70,14 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "把文稿整理成一份柔和的内容 deck"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
     {_blobs("b1", "b2", "b3")}
-    {_top("A soft manifesto", "", slide_no, total)}
-    <div class="xp-kicker">基于文稿生成</div>
+    {_top("", "", slide_no, total)}
     <h1 class="xp-h1">{_rich(title)}</h1>
     <div class="xp-divider"></div>
     <p class="xp-sub">{_rich(subtitle)}</p>
-    {_footer("by fxt ppt · pastel edition", slide_no, total)}
+    {_footer("", slide_no, total)}
     """
     return _section(inner, active=active, title=str(title))
 
@@ -214,11 +213,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <h1 class="xp-h1" style="font-size:140px">{_rich(title)}</h1>
       <div class="xp-divider"></div>
       <p class="xp-sub" style="font-size:26px">{_rich(message)}</p>
-      <div style="margin-top:30px">
-        <span class="xp-chip">fxt ppt</span>
-        <span class="xp-chip mint">xhs-pastel-card</span>
-        <span class="xp-chip rose">generated</span>
-      </div>
     </div>
     {_footer("end", slide_no, total)}
     """

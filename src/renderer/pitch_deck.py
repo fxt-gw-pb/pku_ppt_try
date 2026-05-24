@@ -23,8 +23,9 @@ from . import layouts as L
 
 # ---------- shared chrome ----------
 
-def _brand() -> str:
-    return '<div><span class="brand-dot"></span><span class="brand">fxt ppt</span></div>'
+def _brand(label: str = "") -> str:
+    text = f'<span class="brand">{L.esc(label)}</span>' if label else ""
+    return f'<div><span class="brand-dot"></span>{text}</div>'
 
 
 def _section(inner: str, *, active: bool = False, title: str = "") -> str:
@@ -41,22 +42,17 @@ def _footer(slide_no: int, total: int, tag: str) -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Auto-generated pitch · 路演版本"
+    subtitle = generic.get("subtitle") or ""
+    section_count = max(1, len(generic.get("slides", [])) - 2)
     inner = f"""
     <div class="cover-bg"></div><div class="cover-blob"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:38px">
       {_brand()}
-      <span class="num-tag">PITCH · 2026</span>
+      <span class="num-tag">{section_count:02d} SECTIONS</span>
     </div>
-    <p class="kicker">FXT PPT · AUTO PITCH</p>
     <h1 class="h1 mt-s">{L.rich_grad(title)}</h1>
     <p class="lede mt-m" style="max-width:900px">{L.rich_grad(subtitle)}</p>
-    <div class="grid g3 mt-l" style="max-width:1080px">
-      <div class="metric"><div class="n">1</div><div class="l">deck idea</div></div>
-      <div class="metric"><div class="n">{max(1, len(generic.get("slides", [])) - 2)}</div><div class="l">sections</div></div>
-      <div class="metric"><div class="n">∞</div><div class="l">iterations</div></div>
-    </div>
-    {_footer(slide_no, total, "cover · pitch")}
+    {_footer(slide_no, total, "cover")}
     """
     return _section(inner, active=active, title=str(title))
 
@@ -106,11 +102,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <p class="kicker" style="color:#fff">THE ASK</p>
       <h2 class="h2 mt-s">{L.rich(title)}</h2>
       <p class="dim mt-m" style="font-size:18px">{L.rich(message)}</p>
-      <div class="mt-l">
-        <span class="pill" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4)">fxt ppt</span>
-        <span class="pill" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4)">pitch-deck</span>
-        <span class="pill" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4)">auto-generated</span>
-      </div>
     </div>
     {_footer(slide_no, total, "end · ask")}
     """

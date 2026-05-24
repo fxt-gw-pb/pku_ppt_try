@@ -55,6 +55,19 @@ def rich_grad(value: Any) -> str:
     return "".join(out)
 
 
+def deck_subtitle(generic: Any, fallback: str = "") -> str:
+    """Return a content-derived eyebrow/sub-label for in-deck chrome.
+
+    Uses the manuscript's subtitle when meaningful; otherwise falls back to the
+    caller-provided string. Renderers use this to avoid leaking brand or
+    template-id strings ("fxt ppt", "weekly-report") into the slides.
+    """
+    sub = ""
+    if isinstance(generic, dict):
+        sub = (generic.get("subtitle") or "").strip()
+    return sub or fallback
+
+
 def split_kv(bullet: str) -> tuple[str, str]:
     """Split ``"标题：正文"`` / ``"title: body"`` on either : or ：
     Returns (head, body); head is empty when no separator is present.
@@ -491,7 +504,7 @@ def render_inner(layout: str, slide: dict[str, Any], *, accent_grad: bool = Fals
 
 
 __all__ = [
-    "esc", "rich", "rich_grad", "split_kv",
+    "esc", "rich", "rich_grad", "split_kv", "deck_subtitle",
     "planned_slides", "chapter_titles",
     "get_columns", "get_kpis", "get_stat",
     "get_quote", "get_compare", "get_steps", "get_bullets",

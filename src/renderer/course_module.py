@@ -62,24 +62,19 @@ def _sidebar(chapters: list[str], current_idx: int, done_until: int) -> str:
         items.append(f'<li class="{cls}">{_rich(t)}</li>')
     return f"""
     <aside class="sidebar">
-      <div class="brand">fxt ppt</div>
       <h5>Course outline</h5>
       <ul class="obj-list">{''.join(items)}</ul>
-      <h5 style="margin-top:32px">Module</h5>
-      <span class="pill-academic">auto-generated</span>
     </aside>
     """
 
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Auto-generated course module"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
-      <p class="kicker">FXT PPT · COURSE MODULE</p>
       <h1 class="h1 mt-s">{_rich(title)}</h1>
       <p class="lede mt-m" style="max-width:900px">{_rich(subtitle)}</p>
-      <div class="callout mt-l"><b>Learning goal</b><br>把原文当作一节课，先掌握结构，再展开重点。</div>
-      {_footer(slide_no, total, "module · cover")}
+      {_footer(slide_no, total, "cover")}
     """
     return _section(inner, active=active, title=str(title), full=True)
 

@@ -93,16 +93,14 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Generated deck · knowledge graph edition"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
     {_ambient("gd-orb-1", "gd-orb-2", "gd-orb-3")}
     {_graph_svg()}
     {_snum(slide_no, total)}
     <div style="margin-top:auto">
-      <p class="gd-eyebrow">fxt ppt · auto-generated deck</p>
       <h1 class="gd-h1" style="font-size:84px"><span class="gd-rainbow">{_rich(title)}</span></h1>
       <p class="gd-lede" style="margin-top:18px">{_rich(subtitle)}</p>
-      <p class="gd-eyebrow" style="margin-top:24px">↑ 背景是装饰性的知识图谱节点</p>
     </div>
     """
     return _section(inner, active=active, title=str(title))
@@ -220,11 +218,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
       <p class="gd-eyebrow">End of deck</p>
       <h1 class="gd-h1" style="font-size:120px"><span class="gd-rainbow">{_rich(title)}</span></h1>
       <p class="gd-lede" style="margin-top:18px">{_rich(message)}</p>
-      <div style="margin-top:22px">
-        <span class="gd-tag">fxt ppt</span>
-        <span class="gd-tag">graphify-dark-graph</span>
-        <span class="gd-tag">auto-generated</span>
-      </div>
     </div>
     """
     return _section(inner, title=str(title))

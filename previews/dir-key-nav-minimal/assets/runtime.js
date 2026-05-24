@@ -166,6 +166,91 @@
       setTimeout(() => { window.print(); }, 60);
     }
 
+    /* ===== Field-edit panel (verbatim find/replace on current slide) =====
+     * The panel injects two textareas (search + replace). On 应用替换 we walk
+     * text nodes of the CURRENTLY ACTIVE slide and swap the first match.
+     * No API calls; styling untouched (caller warned about length mismatch). */
+    let editPanelEl = null;
+    function buildEditPanel() {
+      if (editPanelEl) return editPanelEl;
+      const panel = document.createElement('aside');
+      panel.className = 'edit-panel';
+      panel.innerHTML = [
+        '<div class="edit-panel-head">',
+        '  <h3>字段修改</h3>',
+        '  <button type="button" class="edit-panel-close" title="关闭">×</button>',
+        '</div>',
+        '<p class="hint">只支持基于当前预览页字段的修改，不支持版式调整。修改即时生效，仅在当前浏览器内有效（刷新或重新生成会丢失）。</p>',
+        '<label for="edit-find">要替换的字段（请从当前页面完整粘贴）</label>',
+        '<textarea id="edit-find" spellcheck="false" placeholder="例如：基于注意力机制的医学影像分割研究"></textarea>',
+        '<label for="edit-replace">替换为</label>',
+        '<textarea id="edit-replace" spellcheck="false" placeholder="新内容"></textarea>',
+        '<p class="warn">⚠ 新字段字数与原字段差异过大可能导致排版超出当前版面，请尽量控制在相近长度。</p>',
+        '<button type="button" class="apply-btn">应用替换（仅作用于当前页）</button>',
+        '<p class="status" role="status"></p>'
+      ].join('');
+      document.body.appendChild(panel);
+      const find = panel.querySelector('#edit-find');
+      const repl = panel.querySelector('#edit-replace');
+      const status = panel.querySelector('.status');
+      panel.querySelector('.edit-panel-close').addEventListener('click', () => toggleEditPanel(false));
+      panel.querySelector('.apply-btn').addEventListener('click', () => {
+        const needle = find.value;
+        const replacement = repl.value;
+        if (!needle) {
+          status.className = 'status err';
+          status.textContent = '请输入要替换的字段。';
+          return;
+        }
+        const target = slides[idx] || document.querySelector('.slide.is-active') || slides[0];
+        const count = replaceInTextNodes(target, needle, replacement);
+        if (count > 0) {
+          status.className = 'status ok';
+          status.textContent = '✓ 已在当前页替换 ' + count + ' 处。';
+        } else {
+          status.className = 'status err';
+          status.textContent = '✗ 当前页没有找到该字段。请检查是否完整粘贴自当前预览页（区分空格、标点）。';
+        }
+      });
+      editPanelEl = panel;
+      return panel;
+    }
+    function toggleEditPanel(force) {
+      buildEditPanel();
+      const isOpen = force !== undefined ? force : !document.body.classList.contains('has-edit-panel');
+      document.body.classList.toggle('has-edit-panel', isOpen);
+    }
+    function replaceInTextNodes(root, needle, replacement) {
+      if (!root || !needle) return 0;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+      const hits = [];
+      let node;
+      while ((node = walker.nextNode())) {
+        if (node.nodeValue && node.nodeValue.indexOf(needle) !== -1) hits.push(node);
+      }
+      let count = 0;
+      hits.forEach((n) => {
+        const before = n.nodeValue;
+        const after = before.split(needle).join(replacement);
+        if (after !== before) {
+          n.nodeValue = after;
+          // Count occurrences in this node
+          count += before.split(needle).length - 1;
+        }
+      });
+      return count;
+    }
+
+    if (!document.querySelector('.edit-panel-toggle-btn')) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'edit-panel-toggle-btn';
+      btn.title = '修改当前页字段（仅文本替换，不改版式）';
+      btn.innerHTML = '<span>✎</span><span>修改字段</span>';
+      btn.addEventListener('click', () => toggleEditPanel());
+      document.body.appendChild(btn);
+    }
+
     /* ===== notes overlay (N key) ===== */
     let notes = document.querySelector('.notes-overlay');
     if (!notes) {

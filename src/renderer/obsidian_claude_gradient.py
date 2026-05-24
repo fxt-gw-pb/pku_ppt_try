@@ -57,17 +57,12 @@ def _section(inner: str, *, active: bool = False, title: str = "") -> str:
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
-    subtitle = generic.get("subtitle") or "Generated deck · obsidian gradient edition"
+    subtitle = generic.get("subtitle") or ""
     inner = f"""
     {_backdrop()}
     {_snum(slide_no, total)}
-    <div class="oc-tag">fxt ppt · auto-deck</div>
     <h1 class="oc-h1"><span class="oc-g">{_rich(title)}</span></h1>
     <p class="oc-sub">{_rich(subtitle)}</p>
-    <div style="margin-top:22px">
-      <span class="oc-pill">classic mode</span>
-      <span class="oc-pill">auto-generated</span>
-    </div>
     """
     return _section(inner, active=active, title=str(title))
 
@@ -174,11 +169,6 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     <div class="oc-tag">end</div>
     <h1 class="oc-h1"><span class="oc-g">{_rich(title)}</span></h1>
     <p class="oc-sub">{_rich(message)}</p>
-    <div style="margin-top:22px">
-      <span class="oc-pill">fxt ppt</span>
-      <span class="oc-pill">obsidian-claude-gradient</span>
-      <span class="oc-pill">auto-generated</span>
-    </div>
     """
     return _section(inner, title=str(title))
 
