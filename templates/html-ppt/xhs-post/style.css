@@ -1,4 +1,27 @@
 /* xhs-post — 小红书 3:4 九宫格 */
+
+/* PDF export override — this template is 3:4 portrait (810×1080), not the
+ * default 16:9 landscape. The shared base.css @media print block sets
+ * @page size:1280px 720px and forces .slide to 1280×720; we override both
+ * here. Loaded after base.css so the cascade wins for same specificity;
+ * !important guards against the shared rules' !important. */
+@media print {
+  @page { size: 810px 1080px; margin: 0; }
+  html, body {
+    width: 810px !important;
+    background: var(--bg) !important;
+  }
+  body.tpl-xhs-post .deck,
+  .deck {
+    width: 810px !important;
+  }
+  body.tpl-xhs-post .slide,
+  .slide {
+    width: 810px !important;
+    height: 1080px !important;
+  }
+}
+
 .tpl-xhs-post{
   --bg:#fef7f3;--bg-soft:#fff1ea;--surface:#ffffff;--surface-2:#fff5ef;
   --border:rgba(90,40,30,.12);--border-strong:rgba(90,40,30,.24);

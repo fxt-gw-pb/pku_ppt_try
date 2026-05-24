@@ -578,9 +578,11 @@
   function saveStoredEdits(arr) {
     try { localStorage.setItem(EDITS_KEY, JSON.stringify(arr)); } catch (e) {}
   }
-  function appendStoredEdit(find, replace) {
+  function appendStoredEdit(find, replace, slideIndex) {
     const arr = loadStoredEdits();
-    arr.push({ find: find, replace: replace, ts: Date.now() });
+    const entry = { find: find, replace: replace, ts: Date.now() };
+    if (typeof slideIndex === "number") entry.slideIndex = slideIndex;
+    arr.push(entry);
     saveStoredEdits(arr);
   }
   function popStoredEdit() {
@@ -592,6 +594,11 @@
   function clearStoredEdits() {
     try { localStorage.removeItem(EDITS_KEY); } catch (e) {}
   }
+  function deckSections() {
+    const stage = document.querySelector("deck-stage");
+    if (!stage) return [];
+    return Array.from(stage.querySelectorAll(":scope > section"));
+  }
   function activeSlideEl() {
     const stage = document.querySelector("deck-stage");
     if (!stage) return null;
@@ -600,6 +607,13 @@
       stage.querySelector('section.is-active') ||
       stage.querySelector('section')
     );
+  }
+  function activeSlideIndex() {
+    const sections = deckSections();
+    if (!sections.length) return -1;
+    const active = activeSlideEl();
+    const i = active ? sections.indexOf(active) : -1;
+    return i >= 0 ? i : 0;
   }
   function replaceInTextNodes(root, needle, replacement) {
     const result = { count: 0, snapshots: [] };
@@ -626,31 +640,43 @@
     if (!saved.length) return;
     const stage = document.querySelector("deck-stage");
     if (!stage) return;
+    const sections = deckSections();
     saved.forEach((op) => {
-      if (op && op.find != null && op.replace != null) {
-        replaceInTextNodes(stage, op.find, op.replace);
-      }
+      if (!op || op.find == null || op.replace == null) return;
+      const target =
+        typeof op.slideIndex === "number" && sections[op.slideIndex]
+          ? sections[op.slideIndex]
+          : stage; /* legacy ops without slideIndex fall back to whole deck */
+      replaceInTextNodes(target, op.find, op.replace);
     });
   }
-  /* Recursively walk a value (parsed JSON) applying find/replace ops to
-   * every string. Used to rewrite data/slides.json on re-export. */
-  function applyEditsToJson(value, ops) {
-    if (typeof value === "string") {
-      let out = value;
-      for (const op of ops) {
-        if (op && op.find != null && op.replace != null && op.find !== "") {
-          out = out.split(op.find).join(op.replace);
-        }
-      }
-      return out;
-    }
-    if (Array.isArray(value)) return value.map((v) => applyEditsToJson(v, ops));
+  /* Recursively map every string under `value` with one find/replace op. */
+  function mapStrings(value, needle, repl) {
+    if (typeof value === "string") return value.split(needle).join(repl);
+    if (Array.isArray(value)) return value.map((v) => mapStrings(v, needle, repl));
     if (value && typeof value === "object") {
       const out = {};
-      for (const k of Object.keys(value)) out[k] = applyEditsToJson(value[k], ops);
+      for (const k of Object.keys(value)) out[k] = mapStrings(value[k], needle, repl);
       return out;
     }
     return value;
+  }
+  /* Rewrite a parsed slides.json with all persisted edit ops. Per-op:
+   * if slideIndex present, apply only inside that slide's object; else
+   * apply across the whole deck (legacy ops). */
+  function applyEditsToDeckJson(deckObj, ops) {
+    if (!deckObj || !ops || !ops.length) return deckObj;
+    const slides = Array.isArray(deckObj.slides) ? deckObj.slides : null;
+    let out = deckObj;
+    ops.forEach((op) => {
+      if (!op || op.find == null || op.replace == null || op.find === "") return;
+      if (typeof op.slideIndex === "number" && slides && slides[op.slideIndex] != null) {
+        slides[op.slideIndex] = mapStrings(slides[op.slideIndex], op.find, op.replace);
+      } else {
+        out = mapStrings(out, op.find, op.replace);
+      }
+    });
+    return out;
   }
   function deriveDeckZipUrl() {
     if (location.protocol === "file:") return null;
@@ -661,13 +687,19 @@
   }
   function loadJSZip() {
     if (window.JSZip) return Promise.resolve(window.JSZip);
-    return new Promise((resolve, reject) => {
-      const s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
-      s.onload = () => window.JSZip ? resolve(window.JSZip) : reject(new Error("JSZip 未加载成功"));
-      s.onerror = () => reject(new Error("JSZip 加载失败，请检查网络"));
-      document.head.appendChild(s);
-    });
+    function inject(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = src;
+        s.onload = () => window.JSZip ? resolve(window.JSZip) : reject(new Error("JSZip 未加载成功"));
+        s.onerror = () => reject(new Error("JSZip 加载失败：" + src));
+        document.head.appendChild(s);
+      });
+    }
+    /* Vendor-first; CDN only as fallback. */
+    return inject("assets/jszip.min.js").catch(() =>
+      inject("https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js")
+    );
   }
   function serializeDeckForExport() {
     const clone = document.documentElement.cloneNode(true);
@@ -706,7 +738,7 @@
       const raw = await zip.files[slidesPath].async("string");
       try {
         const parsed = JSON.parse(raw);
-        const rewritten = applyEditsToJson(parsed, ops);
+        const rewritten = applyEditsToDeckJson(parsed, ops);
         zip.file(slidesPath, JSON.stringify(rewritten, null, 2));
       } catch (e) {
         console.warn("[PKU] failed to rewrite slides.json:", e);
@@ -831,7 +863,7 @@
       const result = replaceInTextNodes(slide, needle, replacement);
       if (result.count > 0) {
         lastEdit = result.snapshots;
-        appendStoredEdit(needle, replacement);
+        appendStoredEdit(needle, replacement, activeSlideIndex());
         undoBtn.disabled = false;
         status.className = "status ok";
         status.textContent = "✓ 已在当前页替换 " + result.count + " 处（已保存，刷新仍生效）。";

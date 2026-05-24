@@ -183,9 +183,11 @@
     function saveStoredEdits(arr) {
       try { localStorage.setItem(EDITS_KEY, JSON.stringify(arr)); } catch (e) {}
     }
-    function appendStoredEdit(find, replace) {
+    function appendStoredEdit(find, replace, slideIndex) {
       const arr = loadStoredEdits();
-      arr.push({ find: find, replace: replace, ts: Date.now() });
+      const entry = { find: find, replace: replace, ts: Date.now() };
+      if (typeof slideIndex === 'number') entry.slideIndex = slideIndex;
+      arr.push(entry);
       saveStoredEdits(arr);
     }
     function popStoredEdit() {
@@ -218,14 +220,20 @@
       return result;
     }
 
-    /* Replay any saved edits against the whole deck (not just current slide). */
+    /* Replay any saved edits. Each op was applied to a specific slide
+     * (slideIndex); replay re-targets that same slide so a "replace X→Y"
+     * on slide 3 doesn't bleed into an unrelated slide 7 that also
+     * happened to contain X. */
     (function replaySavedEdits() {
       const saved = loadStoredEdits();
       if (!saved.length) return;
       saved.forEach((op) => {
-        if (op && op.find != null && op.replace != null) {
-          replaceInTextNodes(deck, op.find, op.replace);
-        }
+        if (!op || op.find == null || op.replace == null) return;
+        const target =
+          typeof op.slideIndex === 'number' && slides[op.slideIndex]
+            ? slides[op.slideIndex]
+            : deck; /* legacy ops without slideIndex fall back to whole deck */
+        replaceInTextNodes(target, op.find, op.replace);
       });
     })();
 
@@ -270,11 +278,12 @@
           status.textContent = '请输入要替换的字段。';
           return;
         }
-        const target = slides[idx] || document.querySelector('.slide.is-active') || slides[0];
+        const targetIdx = slides[idx] ? idx : 0;
+        const target = slides[targetIdx] || document.querySelector('.slide.is-active') || slides[0];
         const result = replaceInTextNodes(target, needle, replacement);
         if (result.count > 0) {
           lastEdit = { snapshots: result.snapshots, find: needle, replace: replacement };
-          appendStoredEdit(needle, replacement);
+          appendStoredEdit(needle, replacement, targetIdx);
           undoBtn.disabled = false;
           status.className = 'status ok';
           status.textContent = '✓ 已在当前页替换 ' + result.count + ' 处（已保存，刷新仍生效）。';
@@ -347,15 +356,23 @@
     }
     function loadJSZip() {
       if (window.JSZip) return Promise.resolve(window.JSZip);
-      return new Promise(function (resolve, reject) {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
-        s.onload = function () {
-          if (window.JSZip) resolve(window.JSZip);
-          else reject(new Error('JSZip 未加载成功'));
-        };
-        s.onerror = function () { reject(new Error('JSZip 加载失败，请检查网络')); };
-        document.head.appendChild(s);
+      function inject(src) {
+        return new Promise(function (resolve, reject) {
+          const s = document.createElement('script');
+          s.src = src;
+          s.onload = function () {
+            if (window.JSZip) resolve(window.JSZip);
+            else reject(new Error('JSZip 未加载成功'));
+          };
+          s.onerror = function () { reject(new Error('JSZip 加载失败：' + src)); };
+          document.head.appendChild(s);
+        });
+      }
+      /* Vendor-first: every materialized deck ships assets/jszip.min.js
+       * so this works offline and inside firewalled networks. The CDN is
+       * only a fallback for hand-rolled decks that omit the asset. */
+      return inject('assets/jszip.min.js').catch(function () {
+        return inject('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js');
       });
     }
     function serializeDeckForExport() {

@@ -168,6 +168,19 @@ GET  /收款码/...                           ← static mount for the donation 
 
 The job runner is still a daemon thread inside the FastAPI process — no queue. Fine for the free-tier MVP; not for production load.
 
+### Job phase / progress fields
+
+While a job is `running`, `_run_job` writes:
+
+- `phase`: `"llm"` → `"render"` → `"zip"` → `"done"`
+- `progress`: `5` → `60` → `90` → `100` (informational only; frontend ignores the number)
+
+`web/app.js` reads `phase` and shows a one-line spinner + label (`AI 正在生成大纲...` / `正在渲染幻灯片...` / `正在打包网页...`). Don't surface `progress` as a numeric bar — the LLM phase dominates wall time and the bar would visually freeze.
+
+### Post-LLM layout diversification
+
+`src/llm/__init__.generate_slide_json` calls `src.renderer.diversify.diversify_layouts(raw)` after schema validation. It breaks runs of 3+ consecutive content slides with the same `layout` by picking a content-fit alternative for the offending slide — never invents structured data (`kpis`/`stat`/`quote`/etc.) to justify a flashier layout.
+
 ## Frontend (two-view static app)
 
 The public UI exposes exactly two views. Do not re-add a third.
@@ -185,7 +198,7 @@ UI copy that is canonical (keep both root `index.html` and `web/index.html` in s
 - Donation note, on both views, with a clickable `.donation-trigger` opening a shared QR modal backed by `收款码/537a8a731804791d569387f56522fa2a.jpg`:
   > 该网页暂时免费使用，生成 PPT 需要一定的 API tokens 花费，该费用由作者承担，请勿滥用，如果感到有用，也欢迎 打赏给作者 <=1 元的奖赏~
 - Generate view warning:
-  > PPT 生成需要约 30s，生成过程中切勿刷新页面，刷新页面也会丢失您的既往文件生成记录。
+  > PPT 生成约需 30s–2min，生成过程中切勿刷新页面，刷新页面也会丢失您的既往文件生成记录。
 - Export wording in the public UI: `网页包和 PDF` (not `HTML/PPTX`, except when explicitly explaining that PPTX is unsupported).
 - Generated-job action buttons are high contrast: **`进入预览页`** red filled, **`下载网页包`** light filled with red text/border.
 
@@ -195,6 +208,10 @@ UI copy that is canonical (keep both root `index.html` and `web/index.html` in s
 - **`web/index.html`** — local uvicorn serves it at `/` via `app.mount("/", StaticFiles(directory="web"))`. References sibling `style.css` and `app.js`.
 
 Keep them in sync when editing the UI, adjusting paths as needed.
+
+### Cold-start warmup
+
+`web/app.js` fires `/api/health` whenever the user enters `#generate` (self-throttled to once per 60s) so Render's cold-start latency is hidden behind the user's paste/read time. Keep this unless you've solved the underlying free-tier sleep behavior.
 
 ## Per-deck "导出 PDF" button
 
@@ -212,6 +229,26 @@ The shared print stack:
 - Chrome (`.progress-bar`, `.notes-overlay`, `.overview`, `.pdf-export-btn`) is hidden in print
 
 Verified in headless Chrome (`--print-to-pdf`): both `pitch-deck` and `pku-red` produce 14-page PDFs at 960×540 PDF points (= 1280×720 CSS px at 96/72 DPR), with all backgrounds intact.
+
+### Per-template print overrides
+
+`xhs-post` is a 3:4 portrait template (810×1080). Its `style.css` ends with an `@media print` block re-setting `@page size: 810px 1080px` and overriding `.slide` size — loaded after the shared `base.css`, so the cascade wins. Follow the same pattern for any future non-16:9 template; don't put per-template print rules into the shared base.
+
+## In-deck field-edit panel + re-export
+
+Every generated deck and preview carries an `✎ 修改字段` toggle that opens a 360px sidebar with verbatim find/replace, undo, clear-all, and `⇩ 下载修改后的网页包`. Implementation lives in both runtimes (`templates/html-ppt/shared/assets/runtime.js` and `pku-red-defense-ppt/assets/template/assets/runtime.js`); keep them feature-parity. After changing either, run `python scripts/build_previews.py`.
+
+Persistence:
+
+- Each replace is appended to `localStorage["fxt-ppt-deck-edits:" + location.pathname]` as `{find, replace, slideIndex, ts}`.
+- On init, every saved op is replayed **only against the slide at its recorded `slideIndex`** — no cross-slide bleed. Ops missing `slideIndex` (legacy) fall back to whole-deck replay.
+- Undo pops the most recent op from storage.
+
+Re-export:
+
+- Enabled only on `/decks/<id>/index.html` (where `/decks/<id>.zip` is derivable).
+- Loads JSZip from vendored `assets/jszip.min.js` first, CDN as fallback. The vendored copy ships with every deck via the exporter; don't go CDN-first.
+- Rewrites the zip's `index.html` with the current DOM (stripped of `.edit-panel`, `.pdf-export-btn`, `.nav-arrows`, etc.). For PKU decks, also rewrites `data/slides.json` per-slide so edits survive a fresh open (PKU re-renders from JSON every load).
 
 ## Typography rule (CJK-first)
 
@@ -338,6 +375,7 @@ cmp -s deck-stage.js pku-red-defense-ppt/assets/template/deck-stage.js
 cmp -s assets/runtime.js pku-red-defense-ppt/assets/template/assets/runtime.js
 cmp -s assets/base.css pku-red-defense-ppt/assets/template/assets/base.css
 cmp -s assets/theme-pku-red.css pku-red-defense-ppt/assets/template/assets/theme-pku-red.css
+cmp -s assets/jszip.min.js pku-red-defense-ppt/assets/template/assets/jszip.min.js
 cmp -s data/slides.json pku-red-defense-ppt/assets/template/data/slides.json
 ```
 
@@ -396,9 +434,12 @@ For PDF/print regressions, render one deck with headless Chrome and count pages:
 - `src/templates/registry.py` — template registry used by API, CLI, and frontend.
 - `scripts/generate.py` — single-deck CLI entrypoint.
 - `scripts/build_previews.py` — rebuild all per-template `previews/<id>/` sample decks.
-- `templates/html-ppt/shared/assets/base.css` — shared deck CSS (incl. `@media print` rules driving PDF export).
-- `templates/html-ppt/shared/assets/runtime.js` — keyboard runtime, presenter mode, **导出 PDF** floating button injection.
-- `pku-red-defense-ppt/assets/template/assets/runtime.js` — PKU runtime, also injects 导出 PDF button (mirrored to root `assets/runtime.js`).
+- `templates/html-ppt/shared/assets/base.css` — shared deck CSS (incl. `@media print` rules driving PDF export, default content-layout styles, edit-panel + nav-arrows styles).
+- `templates/html-ppt/shared/assets/runtime.js` — keyboard runtime, presenter mode, **导出 PDF** floating button injection, **field-edit panel** (localStorage-persisted per-slide edits + JSZip-based re-export).
+- `templates/html-ppt/shared/assets/jszip.min.js` — vendored JSZip (3.10.1); ships with every html-ppt deck so re-export works offline. CDN is fallback only.
+- `pku-red-defense-ppt/assets/template/assets/runtime.js` — PKU runtime, also injects 导出 PDF and the edit panel (mirrored to root `assets/runtime.js`).
+- `pku-red-defense-ppt/assets/template/assets/jszip.min.js` — vendored JSZip for PKU decks (mirrored to root `assets/jszip.min.js`).
+- `src/renderer/diversify.py` — post-LLM pass that breaks 3+ same-layout runs with content-fit alternatives (called from `src/llm/__init__.generate_slide_json`).
 - `pku-red-defense-ppt/scripts/validate_slides.py` — validator for PKU runtime JSON.
 - `pku-red-defense-ppt/scripts/create_deck.py` — standalone skill materializer.
 

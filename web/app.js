@@ -365,31 +365,20 @@ function statusLabel(status) {
   }[status] || status;
 }
 
-const PHASES = [
-  { key: "llm",    label: "AI 生成大纲",  hint: "约 25s，请耐心等候" },
-  { key: "render", label: "渲染幻灯片",   hint: "排版与布局" },
-  { key: "zip",    label: "打包网页",     hint: "生成下载包" },
-];
+const PHASES = {
+  llm:    "AI 正在生成大纲...",
+  render: "正在渲染幻灯片...",
+  zip:    "正在打包网页...",
+};
 
 function renderProgress(job) {
-  // Pre-3-stage backends may not emit phase. Default to a generic
-  // "running" state so old job JSON still renders something sensible.
-  const phase = job.phase || (job.status === "running" ? "llm" : null);
-  if (!phase || job.status === "done" || job.status === "failed") return "";
-  const activeIdx = Math.max(0, PHASES.findIndex((p) => p.key === phase));
-  const pct = typeof job.progress === "number" ? job.progress : 0;
-  const segments = PHASES.map((p, i) => {
-    const state = i < activeIdx ? "done" : i === activeIdx ? "active" : "pending";
-    return `<div class="prog-seg ${state}"><span></span></div>`;
-  }).join("");
-  const stage = PHASES[activeIdx] || PHASES[0];
+  if (job.status !== "running" && job.status !== "pending") return "";
+  const phase = job.phase || "llm";
+  const label = PHASES[phase] || "处理中...";
   return `
-    <div class="job-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}">
-      <div class="prog-track">${segments}</div>
-      <div class="prog-meta">
-        <span class="prog-label">${escapeHtml(stage.label)}</span>
-        <span class="prog-hint">${escapeHtml(stage.hint)}</span>
-      </div>
+    <div class="job-progress" role="status">
+      <span class="prog-spin" aria-hidden="true"></span>
+      <span class="prog-label">${escapeHtml(label)}</span>
     </div>`;
 }
 
