@@ -10,6 +10,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 ACCENT_COLORS = ["blue", "green", "orange", "purple", "red"]
 
 
@@ -217,10 +219,21 @@ def render_presenter_mode_reveal(generic: dict[str, Any]) -> str:
             sections.append(_closing(slide, idx, total))
         else:
             bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(bullets))
+            if layout == "cards":
+                sections.append(_cards(slide, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, idx, total))
             else:
-                sections.append(_cards(slide, idx, total))
+                body = L.render_inner(layout, slide)
+                notes = slide.get("notes") or slide.get("speaker_notes") or ""
+                inner = f"""
+      <p class="kicker">{_esc(slide.get("section") or "content")}</p>
+      <h2 class="h2">{_rich(slide.get("title") or "")}</h2>
+      {body}
+      {_footer(idx, total, f"content · {layout}")}
+    """
+                sections.append(_section(inner, title=str(slide.get("title") or ""), notes=str(notes)))
 
     title = _esc(generic.get("title") or "演讲者模式 Reveal")
     return f"""<!DOCTYPE html>

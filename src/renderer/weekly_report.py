@@ -1,53 +1,29 @@
 """Render generic slide_json into the weekly-report deck.
 
 Visual language: clean business report — blue/teal/amber accents on light
-surface cards, KPI tiles with left status stripes, ship-item rows with
-feat/fix/exp/infra tags, next-row task list.
+surface cards, KPI tiles with status stripes, ship-item rows. Dispatches new
+generic layouts (kpi-grid / stat-highlight / comparison / pros-cons /
+big-quote / timeline / process-steps / two/three-column / bullets) via
+`src/renderer/layouts.py`.
 """
 from __future__ import annotations
 
-import html
 from typing import Any
+
+from . import layouts as L
 
 KPI_STATUS = ["good", "warn", "bad", ""]
 SHIP_TAGS = ["feat", "fix", "exp", "infra"]
 
 
-def _esc(value: Any) -> str:
-    return html.escape(str(value or ""), quote=True)
-
-
-def _rich(value: Any) -> str:
-    text = _esc(value)
-    text = text.replace("&lt;br&gt;", "<br>").replace("&lt;br/&gt;", "<br>")
-    parts = text.split("**")
-    out: list[str] = []
-    for i, part in enumerate(parts):
-        if i % 2 == 1:
-            out.append(f'<span class="gradient-text">{part}</span>')
-        else:
-            out.append(part)
-    return "".join(out)
-
-
-def _split_kv(bullet: str) -> tuple[str, str]:
-    for sep in ("：", ":"):
-        if sep in bullet:
-            head, _, tail = bullet.partition(sep)
-            head, tail = head.strip(), tail.strip()
-            if head and tail:
-                return head, tail
-    return "", bullet.strip()
-
-
 def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     cls = "slide is-active" if active else "slide"
-    data_title = f' data-title="{_esc(title)}"' if title else ""
+    data_title = f' data-title="{L.esc(title)}"' if title else ""
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
 def _footer(left: str, slide_no: int, total: int) -> str:
-    return f'<div class="deck-footer"><span>{_esc(left)}</span><span>{slide_no:02d} / {total:02d}</span></div>'
+    return f'<div class="deck-footer"><span>{L.esc(left)}</span><span>{slide_no:02d} / {total:02d}</span></div>'
 
 
 def _cover_head() -> str:
@@ -65,8 +41,8 @@ def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> 
     inner = f"""
     {_cover_head()}
     <p class="kicker">WEEKLY · auto report</p>
-    <h1 class="h1 mt-s">{_rich(title)}</h1>
-    <p class="lede mt-m" style="max-width:880px">{_rich(subtitle)}</p>
+    <h1 class="h1 mt-s">{L.rich(title)}</h1>
+    <p class="lede mt-m" style="max-width:880px">{L.rich(subtitle)}</p>
     <div class="grid g3 mt-l">
       <div class="kpi"><div class="label">sections</div><div class="value">{max(1, len(generic.get("slides", [])) - 2)}</div><div class="delta flat">automated</div></div>
       <div class="kpi good"><div class="label">build</div><div class="value">OK</div><div class="delta up">↑ deck ready</div></div>
@@ -82,13 +58,8 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
     for i, t in enumerate(chapters[:8]):
         tag = SHIP_TAGS[i % len(SHIP_TAGS)]
         rows.append(
-            f"""
-      <div class="ship-item">
-        <span class="tag {tag}">PART {i + 1:02d}</span>
-        <div><b>{_rich(t)}</b></div>
-        <span class="owner">@fxt-ppt</span>
-      </div>
-            """
+            f'<div class="ship-item"><span class="tag {tag}">PART {i + 1:02d}</span>'
+            f'<div><b>{L.rich(t)}</b></div><span class="owner">@fxt-ppt</span></div>'
         )
     inner = f"""
     {_cover_head()}
@@ -106,17 +77,13 @@ def _divider(title: str, points: list[str], chapter_no: int, slide_no: int, tota
         status = KPI_STATUS[i % len(KPI_STATUS)]
         cls = f"kpi {status}".strip()
         kpis.append(
-            f"""
-      <div class="{cls}">
-        <div class="label">point {i + 1:02d}</div>
-        <div class="value" style="font-size:22px;line-height:1.25">{_rich(p)}</div>
-      </div>
-            """
+            f'<div class="{cls}"><div class="label">point {i + 1:02d}</div>'
+            f'<div class="value" style="font-size:22px;line-height:1.25">{L.rich(p)}</div></div>'
         )
     inner = f"""
     {_cover_head()}
     <p class="kicker">part · {chapter_no:02d}</p>
-    <h1 class="h1 mt-s">{_rich(title)}</h1>
+    <h1 class="h1 mt-s">{L.rich(title)}</h1>
     <p class="lede mt-m">先建立结构，再展开重点。</p>
     <div class="grid g3 mt-l">{''.join(kpis)}</div>
     {_footer(f"section · chapter_{chapter_no:02d}", slide_no, total)}
@@ -124,63 +91,17 @@ def _divider(title: str, points: list[str], chapter_no: int, slide_no: int, tota
     return _section(inner, title=title)
 
 
-def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
-    bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-    rows = []
-    for i, bullet in enumerate(bullets[:6]):
-        head, body = _split_kv(bullet)
-        tag = SHIP_TAGS[i % len(SHIP_TAGS)]
-        rows.append(
-            f"""
-      <div class="ship-item">
-        <span class="tag {tag}">{_rich(head or f"item {i + 1:02d}")}</span>
-        <div><b>{_rich(body or bullet)}</b></div>
-        <span class="owner">{i + 1:02d}/{len(bullets):02d}</span>
-      </div>
-            """
-        )
-    if not rows:
-        rows.append(f'<div class="ship-item"><span class="tag feat">item</span><div><b>{_rich(slide.get("title", ""))}</b></div></div>')
-    n_items = max(len(bullets), 1)
-    kpi_strip = f"""
-    <div class="grid g3 mt-m" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
-      <div class="kpi good"><div class="label">items shipped</div><div class="value">{n_items:02d}</div><span class="delta up">▲ this week</span></div>
-      <div class="kpi"><div class="label">slide</div><div class="value">{slide_no:02d}<span style="font-size:24px;color:var(--text-3)"> / {total:02d}</span></div><span class="delta flat">on track</span></div>
-      <div class="kpi warn"><div class="label">section</div><div class="value" style="font-size:24px;line-height:1.2">{_esc((slide.get("section") or "core")[:14])}</div><span class="delta up">in scope</span></div>
-    </div>
-    """
+def _content(slide: dict[str, Any], slide_no: int, total: int) -> str:
+    layout = L.normalize_layout(slide.get("layout"), len(L.get_bullets(slide)))
+    body = L.render_inner(layout, slide)
     inner = f"""
     {_cover_head()}
-    <p class="kicker">{_esc(slide.get("section") or "content")}</p>
-    <h2 class="h2">{_rich(slide.get("title") or "本周内容")}</h2>
-    {kpi_strip}
-    <div class="mt-l">{''.join(rows)}</div>
-    {_footer("content · cards", slide_no, total)}
+    <p class="kicker">{L.esc(slide.get("section") or "content")}</p>
+    <h2 class="h2">{L.rich(slide.get("title") or "本周内容")}</h2>
+    {body}
+    {_footer(f"content · {layout}", slide_no, total)}
     """
     return _section(inner, title=str(slide.get("title") or "内容"))
-
-
-def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
-    bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-    rows = []
-    for i, bullet in enumerate(bullets[:8]):
-        head, body = _split_kv(bullet)
-        rows.append(
-            f"""
-      <div class="next-row">
-        <div class="owner">step {i + 1:02d}</div>
-        <div class="task"><b>{_rich(head or f"步骤 {i + 1}")}</b><span>{_rich(body if head else bullet)}</span></div>
-      </div>
-            """
-        )
-    inner = f"""
-    {_cover_head()}
-    <p class="kicker">{_esc(slide.get("section") or "next week")}</p>
-    <h2 class="h2">{_rich(slide.get("title") or "下一步计划")}</h2>
-    <div class="mt-l">{''.join(rows)}</div>
-    {_footer("content · pipeline", slide_no, total)}
-    """
-    return _section(inner, title=str(slide.get("title") or "过程"))
 
 
 def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
@@ -189,8 +110,8 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     inner = f"""
     {_cover_head()}
     <p class="kicker">end · report</p>
-    <h1 class="h1 mt-s">{_rich(title)}</h1>
-    <p class="lede mt-m">{_rich(message)}</p>
+    <h1 class="h1 mt-s">{L.rich(title)}</h1>
+    <p class="lede mt-m">{L.rich(message)}</p>
     <div class="grid g3 mt-l">
       <div class="kpi good"><div class="label">deck</div><div class="value">READY</div><div class="delta up">automation OK</div></div>
       <div class="kpi"><div class="label">brand</div><div class="value">fxt ppt</div><div class="delta flat">weekly-report</div></div>
@@ -201,39 +122,12 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     return _section(inner, title=str(title))
 
 
-def _planned_slides(generic: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
-    slides = [s for s in (generic.get("slides") or []) if isinstance(s, dict)]
-    planned: list[tuple[str, dict[str, Any]]] = [("cover", {})]
-    chapters = [
-        (s.get("title") or s.get("section") or "").strip()
-        for s in slides
-        if s.get("type") == "section"
-    ]
-    if chapters:
-        planned.append(("contents", {}))
-    closing: dict[str, Any] | None = None
-    for slide in slides:
-        stype = slide.get("type")
-        if stype in {"cover", "contents"}:
-            continue
-        if stype == "closing":
-            closing = slide
-            continue
-        planned.append((stype, slide))
-    planned.append(("closing", closing or {}))
-    return planned
-
-
 def render_weekly_report(generic: dict[str, Any]) -> str:
-    planned = _planned_slides(generic)
+    planned = L.planned_slides(generic)
     total = len(planned)
+    chapters = L.chapter_titles(generic)
     sections: list[str] = []
     chapter_no = 0
-    chapters = [
-        (s.get("title") or s.get("section") or "").strip()
-        for s in generic.get("slides", [])
-        if isinstance(s, dict) and s.get("type") == "section"
-    ]
     for idx, (kind, slide) in enumerate(planned, start=1):
         active = idx == 1
         if kind == "cover":
@@ -243,18 +137,14 @@ def render_weekly_report(generic: dict[str, Any]) -> str:
         elif kind == "section":
             chapter_no += 1
             title = slide.get("title") or f"Part {chapter_no}"
-            points = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
+            points = L.get_bullets(slide)
             sections.append(_divider(title, points, chapter_no, idx, total))
         elif kind == "closing":
             sections.append(_closing(slide, idx, total))
         else:
-            bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
-                sections.append(_steps(slide, idx, total))
-            else:
-                sections.append(_cards(slide, idx, total))
+            sections.append(_content(slide, idx, total))
 
-    title = _esc(generic.get("title") or "Weekly Report 周报")
+    title = L.esc(generic.get("title") or "Weekly Report 周报")
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>

@@ -8,6 +8,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 TAG_COLORS = ["", "amber", "red", "", "amber"]
 
 
@@ -269,10 +271,25 @@ def render_hermes_cyber_terminal(generic: dict[str, Any]) -> str:
             sections.append(_closing(slide, idx, total))
         else:
             bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(bullets))
+            if layout == "cards":
+                sections.append(_cards(slide, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, idx, total))
             else:
-                sections.append(_cards(slide, idx, total))
+                body = L.render_inner(layout, slide)
+                bar_left = f"cat {(slide.get('section') or 'content').lower().replace(' ', '_')}.md"
+                inner = f"""
+    {_chrome_overlay()}
+    {_chrome_bar(bar_left, slide.get("section") or "content")}
+    <div style="margin-top:20px">
+      <h3 class="hc-h3">> {_rich(slide.get("title") or "")}</h3>
+      <h2 class="hc-h2">{_rich(slide.get("title") or "")}</h2>
+      {body}
+    </div>
+    {_footer(f"content · {layout}", idx, total)}
+    """
+                sections.append(_section(inner, title=str(slide.get("title") or "")))
 
     title = _esc(generic.get("title") or "暗终端 Cyber")
     return f"""<!DOCTYPE html>

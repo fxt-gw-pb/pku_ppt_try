@@ -9,6 +9,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 THEMES = ["t-indigo", "t-cream", "t-crimson", "t-emerald", "t-slate", "t-violet", "t-white", "t-charcoal"]
 
 
@@ -203,10 +205,23 @@ def render_dir_key_nav_minimal(generic: dict[str, Any]) -> str:
             content_no += 1
             theme = THEMES[(chapter_no + content_no) % len(THEMES)]
             bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(bullets))
+            if layout == "cards":
+                sections.append(_cards(slide, theme, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, theme, idx, total))
             else:
-                sections.append(_cards(slide, theme, idx, total))
+                body = L.render_inner(layout, slide)
+                eyebrow = slide.get("section") or "idea"
+                inner = f"""
+    {_meta(idx, total, str(eyebrow).lower())}
+    <div class="dk-eyebrow">{_esc(eyebrow)}</div>
+    <h2 class="dk-h2">{_rich(slide.get("title") or "")}</h2>
+    <span class="dk-line"></span>
+    {body}
+    {_keyhint()}
+    """
+                sections.append(_section(inner, theme, title=str(slide.get("title") or "")))
 
     title = _esc(generic.get("title") or "方向键 8 色极简")
     return f"""<!DOCTYPE html>

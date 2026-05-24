@@ -10,6 +10,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 
 def _esc(value: Any) -> str:
     return html.escape(str(value or ""), quote=True)
@@ -231,10 +233,20 @@ def render_tech_sharing(generic: dict[str, Any]) -> str:
             sections.append(_closing(slide, idx, total))
         else:
             bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(bullets))
+            if layout == "cards":
+                sections.append(_cards(slide, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, idx, total))
             else:
-                sections.append(_cards(slide, idx, total))
+                body = L.render_inner(layout, slide)
+                inner = f"""
+      <p class="kicker">{_esc(slide.get("section") or "content")}</p>
+      <h2 class="h2">{_rich(slide.get("title") or "")}</h2>
+      {body}
+      {_footer(f"content · {layout}", idx, total)}
+    """
+                sections.append(_section(inner, title=str(slide.get("title") or "")))
 
     title = _esc(generic.get("title") or "Tech Sharing 技术分享")
     return f"""<!DOCTYPE html>

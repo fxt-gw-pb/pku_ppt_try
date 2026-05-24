@@ -9,6 +9,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 ALERT_TONES = ["", "amber", "green"]  # default red
 BOX_TONES = ["", "amber", "green"]
 
@@ -254,10 +256,23 @@ def render_testing_safety_alert(generic: dict[str, Any]) -> str:
             sections.append(_closing(slide, idx, total))
         else:
             bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(bullets))
+            if layout == "cards":
+                sections.append(_cards(slide, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, idx, total))
             else:
-                sections.append(_cards(slide, idx, total))
+                body = L.render_inner(layout, slide)
+                tone = ALERT_TONES[idx % len(ALERT_TONES)]
+                inner = f"""
+    {_stripes()}
+    {_chrome(slide.get("section") or "finding", tone, idx, total)}
+    <div class="ts-kicker">{_esc(layout)}</div>
+    <h2 class="ts-h2">{_rich(slide.get("title") or "")}</h2>
+    {body}
+    {_footer(f"content · {layout}", idx, total)}
+    """
+                sections.append(_section(inner, title=str(slide.get("title") or "")))
 
     title = _esc(generic.get("title") or "红琥珀警示")
     return f"""<!DOCTYPE html>

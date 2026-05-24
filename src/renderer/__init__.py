@@ -3,27 +3,24 @@ that the HTML template's `runtime.js` renderer can consume.
 
 The contract between LLM output and PPT skill is intentionally narrow:
   - LLM produces semantic content (cover / contents / section / content / closing)
-    with bullets and an optional `layout` hint.
+    with bullets, optional `layout`, and optional structured fields
+    (stat / quote / compare / kpis / steps / columns).
   - This compiler decides the concrete PKU layout per slide, assigns
     `chapterIndex` consistently, and fills in PKU-shaped fields
-    (`headline`, `cards`, `blocks`, `points`, ...).
+    (`headline`, `cards`, `blocks`, `nodes`, `leftItems`, `methods`, ...).
 
-When the LLM provides a known `layout` hint, the compiler honors it for the
-subset of layouts that can be reasonably produced from a bullets-only input:
-  - "multi-card"     → bullets become cards (1 per bullet)
-  - "section-text"   → bullets become labeled paragraph blocks
-  - "theory-cards"   → same shape as multi-card with a red-headed card style
-  - "method"         → bullets become method cards
-  - "timeline"       → bullets become time steps (best-effort labels)
-
-For richer layouts (image-analysis, chart-analysis, framework, vs, swot, ...)
-the LLM would need to provide structured fields the bullets format doesn't
-carry, so the compiler currently falls back to multi-card / section-text.
+PKU `runtime.js` ships 14 layouts (cover, contents, section-divider,
+image-analysis, chart-analysis, timeline, theory-cards, multi-card, framework,
+vs, swot, method, section-text, closing). We route the LLM's generic-layout
+names to the closest PKU layout and feed it the structured data when present,
+otherwise we fall back to bullets-only heuristics.
 """
 from __future__ import annotations
 
 import copy
 from typing import Any
+
+from . import layouts as L
 
 DEFAULT_CHAPTERS = [
     {"title": "背景和意义", "subtitle": "Background & Significance"},
@@ -41,75 +38,194 @@ DEFAULT_META = {
     "logo": "assets/media/pku-logo.png",
 }
 
-CARDLIKE_LAYOUTS = {"multi-card", "theory-cards", "method"}
-BLOCKLIKE_LAYOUTS = {"section-text"}
-STEPLIKE_LAYOUTS = {"timeline"}
+# Map the generic LLM-facing layout name to the concrete PKU layout we'll emit.
+# When the LLM gives a name that's already a PKU layout we keep it as-is.
+_GENERIC_TO_PKU = {
+    "cards": "multi-card",
+    "bullets": "section-text",
+    "two-column": "multi-card",
+    "three-column": "multi-card",
+    "kpi-grid": "multi-card",       # rendered as value-led cards
+    "stat-highlight": "section-text",  # value as first block with big formatting hint
+    "comparison": "vs",
+    "pros-cons": "vs",
+    "big-quote": "section-text",    # single quote block, serif/italic via class
+    "timeline": "timeline",
+    "process-steps": "method",
+    "quote-card": "section-text",
+}
 
 
-def _split_kv(bullet: str) -> tuple[str, str]:
-    """Split a 'title: body' bullet on either : or ：; otherwise return ('', body)."""
-    for sep in ("：", ":"):
-        if sep in bullet:
-            head, _, tail = bullet.partition(sep)
-            head, tail = head.strip(), tail.strip()
-            if head and tail:
-                return head, tail
-    return "", bullet.strip()
+# ---------- bullet-driven card builders (legacy) ----------
 
-
-def _as_cards(bullets: list[str]) -> list[dict[str, str]]:
-    cards: list[dict[str, str]] = []
+def _as_cards_from_bullets(bullets: list[str]) -> list[dict[str, str]]:
+    out: list[dict[str, str]] = []
     for i, b in enumerate(bullets):
-        head, body = _split_kv(b)
-        cards.append({
+        head, body = L.split_kv(b)
+        out.append({
             "title": head or f"要点 {i + 1}",
             "body": body or b,
             "tag": f"{i + 1:02d}",
         })
-    return cards
+    return out
 
 
-def _as_method_cards(bullets: list[str]) -> list[dict[str, str]]:
-    methods: list[dict[str, str]] = []
+def _as_method_cards_from_bullets(bullets: list[str]) -> list[dict[str, str]]:
+    out: list[dict[str, str]] = []
     for i, b in enumerate(bullets):
-        head, body = _split_kv(b)
-        methods.append({
+        head, body = L.split_kv(b)
+        out.append({
             "title": head or f"方法 {i + 1}",
             "en": f"METHOD {chr(64 + i + 1)}",
             "body": body or b,
         })
-    return methods
+    return out
 
 
-def _as_blocks(bullets: list[str]) -> list[dict[str, str]]:
-    blocks: list[dict[str, str]] = []
+def _as_blocks_from_bullets(bullets: list[str]) -> list[dict[str, str]]:
+    out: list[dict[str, str]] = []
     for i, b in enumerate(bullets):
-        head, body = _split_kv(b)
-        blocks.append({
+        head, body = L.split_kv(b)
+        out.append({
             "label": head or f"要点 {i + 1:02d}",
             "text": body or b,
         })
-    return blocks
+    return out
 
 
-def _as_steps(bullets: list[str]) -> list[dict[str, str]]:
-    steps: list[dict[str, str]] = []
+def _as_steps_from_bullets(bullets: list[str]) -> list[dict[str, str]]:
+    out: list[dict[str, str]] = []
     for i, b in enumerate(bullets):
-        head, body = _split_kv(b)
-        steps.append({
+        head, body = L.split_kv(b)
+        out.append({
             "label": f"S{i + 1}",
             "title": head or f"阶段 {i + 1}",
             "body": body or b,
         })
-    return steps
+    return out
 
 
-def _pick_layout(layout_hint: str | None, n_bullets: int) -> str:
-    """Decide the concrete PKU layout for a content slide."""
-    if layout_hint in CARDLIKE_LAYOUTS | BLOCKLIKE_LAYOUTS | STEPLIKE_LAYOUTS:
-        return layout_hint
-    # Heuristic by bullet count.
-    if 2 <= n_bullets <= 4:
+# ---------- structured-field → PKU shape ----------
+
+def _kpi_cards(slide: dict[str, Any]) -> list[dict[str, str]]:
+    """Convert KPI list to PKU multi-card cards with value-led body."""
+    kpis = L.get_kpis(slide, max_n=4)
+    out = []
+    for i, k in enumerate(kpis):
+        # Lead the body with the value (**bold** triggers PKU red emphasis in rich text).
+        body_parts = [f"**{k['value']}**"]
+        if k.get("delta"):
+            body_parts.append(k["delta"])
+        body = "<br>".join(body_parts)
+        out.append({
+            "title": k["label"] or f"指标 {i + 1}",
+            "body": body,
+            "tag": f"{i + 1:02d}",
+        })
+    return out
+
+
+def _theory_cards_from_columns(slide: dict[str, Any], n: int) -> list[dict[str, str]]:
+    """Convert columns to PKU theory-cards style cards."""
+    cols = L.get_columns(slide, n)
+    out = []
+    for i, c in enumerate(cols):
+        out.append({
+            "title": c["title"] or f"维度 {i + 1}",
+            "body": c["body"],
+            "tag": f"{i + 1:02d}",
+        })
+    return out
+
+
+def _vs_from_compare(slide: dict[str, Any], pros_cons: bool) -> dict[str, Any]:
+    cmp = L.get_compare(slide)
+    left, right = cmp["left"], cmp["right"]
+    left_items = [{"body": p} for p in left["points"][:6]]
+    right_items = [{"body": p} for p in right["points"][:6]]
+    if pros_cons:
+        left_kicker, right_kicker = "PROS · 优势", "CONS · 局限"
+    else:
+        left_kicker, right_kicker = "BEFORE · 现状", "AFTER · 改进"
+    return {
+        "leftKicker": left_kicker,
+        "leftTitle": left["title"] or ("我们的优势" if pros_cons else "现状"),
+        "leftItems": left_items,
+        "rightKicker": right_kicker,
+        "rightTitle": right["title"] or ("仍存局限" if pros_cons else "改进后"),
+        "rightItems": right_items,
+    }
+
+
+def _method_from_steps(slide: dict[str, Any]) -> list[dict[str, str]]:
+    steps = L.get_steps(slide, max_n=4)
+    out = []
+    for i, s in enumerate(steps):
+        out.append({
+            "title": s["title"] or f"方法 {i + 1}",
+            "en": s.get("when") or f"METHOD {chr(64 + i + 1)}",
+            "body": s.get("body") or "",
+        })
+    return out
+
+
+def _timeline_from_steps(slide: dict[str, Any]) -> list[dict[str, str]]:
+    steps = L.get_steps(slide, max_n=6)
+    out = []
+    for i, s in enumerate(steps):
+        label = s.get("when") or f"S{i + 1}"
+        out.append({
+            "label": label,
+            "title": s["title"] or f"阶段 {i + 1}",
+            "body": s.get("body") or "",
+        })
+    return out
+
+
+def _quote_blocks(slide: dict[str, Any]) -> list[dict[str, str]]:
+    q = L.get_quote(slide)
+    blocks = [{
+        "label": "引述",
+        "text": f"**{q['text']}**",
+    }]
+    if q.get("author"):
+        blocks.append({"label": "出处", "text": q["author"]})
+    return blocks
+
+
+def _stat_blocks(slide: dict[str, Any]) -> list[dict[str, str]]:
+    st = L.get_stat(slide)
+    blocks = [{
+        "label": st["label"] or "关键数字",
+        "text": f"**{st['value']}**" + (f"<br>{st['sub']}" if st.get("sub") else ""),
+    }]
+    if st.get("delta"):
+        blocks.append({"label": "对比基线", "text": st["delta"]})
+    # Also pull the rest of bullets in case the LLM gave extra context.
+    for b in L.get_bullets(slide)[1:4]:
+        head, body = L.split_kv(b)
+        blocks.append({"label": head or "—", "text": body or b})
+    return blocks
+
+
+# ---------- per-slide compiler ----------
+
+def _resolve_pku_layout(slide: dict[str, Any]) -> str:
+    """Pick the concrete PKU layout for a content slide."""
+    hint = slide.get("layout")
+    if hint:
+        # If it's already a PKU layout name, use it directly.
+        if hint in {
+            "multi-card", "theory-cards", "method", "timeline", "section-text",
+            "vs", "swot", "framework", "image-analysis", "chart-analysis",
+        }:
+            return hint
+        # Else translate the generic name.
+        if hint in _GENERIC_TO_PKU:
+            return _GENERIC_TO_PKU[hint]
+    # No hint → bullet-count heuristic.
+    n = len(L.get_bullets(slide))
+    if 2 <= n <= 4:
         return "multi-card"
     return "section-text"
 
@@ -117,8 +233,9 @@ def _pick_layout(layout_hint: str | None, n_bullets: int) -> str:
 def _render_content(
     slide: dict[str, Any], chapter_idx: int, section_title: str
 ) -> dict[str, Any]:
-    bullets: list[str] = list(slide.get("bullets") or [])
-    layout = _pick_layout(slide.get("layout"), len(bullets))
+    bullets = L.get_bullets(slide)
+    layout = _resolve_pku_layout(slide)
+    hint = slide.get("layout") or ""
     base: dict[str, Any] = {
         "layout": layout,
         "chapterIndex": chapter_idx,
@@ -126,29 +243,89 @@ def _render_content(
         "sectionTitleEn": "",
         "headline": slide.get("title", ""),
     }
+
     if layout == "multi-card":
-        base["cols"] = min(max(len(bullets), 2), 4)
-        base["cards"] = _as_cards(bullets) or [
-            {"title": slide.get("title", "要点"), "body": ""}
-        ]
+        # Route based on what the LLM actually emitted.
+        if hint == "kpi-grid" or slide.get("kpis"):
+            base["cards"] = _kpi_cards(slide)
+            base["cols"] = min(max(len(base["cards"]), 2), 4)
+        elif hint in {"two-column"} or (slide.get("columns") and not slide.get("kpis")):
+            base["cards"] = _theory_cards_from_columns(slide, 2 if hint == "two-column" else (3 if hint == "three-column" else len(slide.get("columns") or [])))
+            base["cols"] = 2 if hint == "two-column" else min(max(len(base["cards"]), 2), 4)
+        elif hint == "three-column":
+            base["cards"] = _theory_cards_from_columns(slide, 3)
+            base["cols"] = 3
+        else:
+            base["cards"] = _as_cards_from_bullets(bullets) or [
+                {"title": slide.get("title", "要点"), "body": ""}
+            ]
+            base["cols"] = min(max(len(bullets), 2), 4)
+
     elif layout == "theory-cards":
         base["cards"] = [
             {"title": c["title"], "label": c["tag"], "body": c["body"]}
-            for c in _as_cards(bullets)
+            for c in _as_cards_from_bullets(bullets)
         ] or [{"title": slide.get("title", "要点"), "body": ""}]
+
     elif layout == "method":
-        base["cols"] = min(max(len(bullets), 2), 4)
-        base["methods"] = _as_method_cards(bullets) or [
-            {"title": slide.get("title", "方法"), "en": "METHOD", "body": ""}
-        ]
+        if slide.get("steps"):
+            base["methods"] = _method_from_steps(slide)
+        else:
+            base["methods"] = _as_method_cards_from_bullets(bullets)
+        if not base["methods"]:
+            base["methods"] = [{"title": slide.get("title", "方法"), "en": "METHOD", "body": ""}]
+        base["cols"] = min(max(len(base["methods"]), 2), 4)
+
     elif layout == "timeline":
-        base["steps"] = _as_steps(bullets) or [
-            {"label": "S1", "title": slide.get("title", "阶段"), "body": ""}
+        if slide.get("steps"):
+            base["steps"] = _timeline_from_steps(slide)
+        else:
+            base["steps"] = _as_steps_from_bullets(bullets)
+        if not base["steps"]:
+            base["steps"] = [{"label": "S1", "title": slide.get("title", "阶段"), "body": ""}]
+
+    elif layout == "vs":
+        base.update(_vs_from_compare(slide, pros_cons=(hint == "pros-cons")))
+
+    elif layout == "swot":
+        cmp = L.get_compare(slide)
+        base["strengths"] = cmp["left"]["points"][:4] or []
+        base["weaknesses"] = cmp["right"]["points"][:4] or []
+        base["opportunities"] = []
+        base["threats"] = []
+
+    elif layout == "framework":
+        steps = L.get_steps(slide, max_n=5)
+        if not steps:
+            steps = [
+                {"title": h or b, "body": body, "when": ""}
+                for b in bullets
+                for h, body in [L.split_kv(b)]
+            ]
+        base["nodes"] = [
+            {"title": s["title"], "body": s.get("body") or "", "primary": (i == 0)}
+            for i, s in enumerate(steps)
         ]
-    else:  # section-text fallback
-        base["blocks"] = _as_blocks(bullets) or [
-            {"label": "要点 01", "text": slide.get("title", "")}
-        ]
+
+    elif layout in {"image-analysis", "chart-analysis"}:
+        # PKU's image-analysis / chart-analysis layouts expect images/headline +
+        # paragraph body. Without real image assets we fall through to a
+        # section-text shape so the deck still renders.
+        base["layout"] = "section-text"
+        layout = "section-text"
+
+    if layout == "section-text":
+        if hint == "big-quote" or slide.get("quote"):
+            base["blocks"] = _quote_blocks(slide)
+            base["mood"] = "quote"
+        elif hint == "stat-highlight" or slide.get("stat"):
+            base["blocks"] = _stat_blocks(slide)
+            base["mood"] = "stat"
+        else:
+            base["blocks"] = _as_blocks_from_bullets(bullets) or [
+                {"label": "要点 01", "text": slide.get("title", "")}
+            ]
+
     return base
 
 
@@ -221,8 +398,6 @@ def compile_to_pku(
             })
             has_closing = True
         elif t == "content":
-            # If the LLM tagged this content with a section name, prefer that
-            # over the most-recent section-divider context.
             sect = (s.get("section") or current_section_title or "").strip()
             if sect and sect in title_to_idx:
                 current_chapter = title_to_idx[sect]
@@ -231,8 +406,6 @@ def compile_to_pku(
                 _render_content(s, current_chapter, current_section_title)
             )
 
-    # Always ensure cover at the front and closing at the back so the deck
-    # opens and ends correctly even if the LLM forgot them.
     if not has_cover:
         pku_slides.insert(0, {"layout": "cover"})
     if not has_closing:

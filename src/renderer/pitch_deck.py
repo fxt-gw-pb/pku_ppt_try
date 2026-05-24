@@ -1,41 +1,27 @@
 """Render generic slide_json into the pitch-deck deck.
 
 Visual language: classic YC/VC pitch — white background with soft blue-purple
-gradient washes, mega numbers, metric strips, traction bar charts, ask box
-with bold gradient backdrop, large section-num backdrops on dividers.
+gradient washes, mega numbers, KPI cards with colored stripes, VS panels,
+serif pull quotes, gradient-dot timelines, numbered step cards.
+
+Content-page layouts honored:
+- cards / bullets (default fallbacks)
+- two-column / three-column
+- kpi-grid
+- stat-highlight
+- comparison / pros-cons (rendered through VS panel with different accents)
+- big-quote
+- timeline
+- process-steps
 """
 from __future__ import annotations
 
-import html
 from typing import Any
 
-
-def _esc(value: Any) -> str:
-    return html.escape(str(value or ""), quote=True)
+from . import layouts as L
 
 
-def _rich(value: Any) -> str:
-    text = _esc(value)
-    text = text.replace("&lt;br&gt;", "<br>").replace("&lt;br/&gt;", "<br>")
-    parts = text.split("**")
-    out: list[str] = []
-    for i, part in enumerate(parts):
-        if i % 2 == 1:
-            out.append(f'<span class="gradient-text">{part}</span>')
-        else:
-            out.append(part)
-    return "".join(out)
-
-
-def _split_kv(bullet: str) -> tuple[str, str]:
-    for sep in ("：", ":"):
-        if sep in bullet:
-            head, _, tail = bullet.partition(sep)
-            head, tail = head.strip(), tail.strip()
-            if head and tail:
-                return head, tail
-    return "", bullet.strip()
-
+# ---------- shared chrome ----------
 
 def _brand() -> str:
     return '<div><span class="brand-dot"></span><span class="brand">fxt ppt</span></div>'
@@ -43,13 +29,15 @@ def _brand() -> str:
 
 def _section(inner: str, *, active: bool = False, title: str = "") -> str:
     cls = "slide is-active" if active else "slide"
-    data_title = f' data-title="{_esc(title)}"' if title else ""
+    data_title = f' data-title="{L.esc(title)}"' if title else ""
     return f'<section class="{cls}"{data_title}>{inner}</section>'
 
 
 def _footer(slide_no: int, total: int, tag: str) -> str:
-    return f'<div class="deck-footer"><span>{_esc(tag)}</span><span>{slide_no:02d} / {total:02d}</span></div>'
+    return f'<div class="deck-footer"><span>{L.esc(tag)}</span><span>{slide_no:02d} / {total:02d}</span></div>'
 
+
+# ---------- cover / contents / divider / closing ----------
 
 def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> str:
     title = generic.get("title") or "未命名内容"
@@ -61,8 +49,8 @@ def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> 
       <span class="num-tag">PITCH · 2026</span>
     </div>
     <p class="kicker">FXT PPT · AUTO PITCH</p>
-    <h1 class="h1 mt-s">{_rich(title)}</h1>
-    <p class="lede mt-m" style="max-width:900px">{_rich(subtitle)}</p>
+    <h1 class="h1 mt-s">{L.rich_grad(title)}</h1>
+    <p class="lede mt-m" style="max-width:900px">{L.rich_grad(subtitle)}</p>
     <div class="grid g3 mt-l" style="max-width:1080px">
       <div class="metric"><div class="n">1</div><div class="l">deck idea</div></div>
       <div class="metric"><div class="n">{max(1, len(generic.get("slides", [])) - 2)}</div><div class="l">sections</div></div>
@@ -76,14 +64,11 @@ def _cover(generic: dict[str, Any], slide_no: int, total: int, active: bool) -> 
 def _contents(chapters: list[str], slide_no: int, total: int) -> str:
     cards = []
     for i, t in enumerate(chapters[:6]):
-        cards.append(
-            f"""
+        cards.append(f"""
       <div class="card" style="padding:26px 28px">
         <span class="num-tag">PART {i + 1:02d}</span>
-        <h4 style="margin:10px 0 6px;font-size:22px;font-weight:800">{_rich(t)}</h4>
-      </div>
-            """
-        )
+        <h4 style="margin:10px 0 6px;font-size:22px;font-weight:800">{L.rich_grad(t)}</h4>
+      </div>""")
     grid_cls = "grid g3" if len(cards) >= 3 else "grid g2"
     inner = f"""
     {_brand()}
@@ -96,95 +81,20 @@ def _contents(chapters: list[str], slide_no: int, total: int) -> str:
 
 
 def _divider(title: str, points: list[str], chapter_no: int, slide_no: int, total: int) -> str:
-    pills = "".join(f'<span class="pill pill-accent" style="margin-right:8px">{_esc(p)}</span>' for p in points[:4])
+    pills = "".join(
+        f'<span class="pill pill-accent" style="margin-right:8px">{L.esc(p)}</span>'
+        for p in points[:4]
+    )
     inner = f"""
     <div class="section-num">{chapter_no:02d}</div>
     {_brand()}
     <p class="kicker mt-l">PART · {chapter_no:02d}</p>
-    <h1 class="h1 mt-s">{_rich(title)}</h1>
+    <h1 class="h1 mt-s">{L.rich_grad(title)}</h1>
     <p class="lede mt-m" style="max-width:900px">先建立结构，再展开重点。</p>
     <div class="mt-l">{pills}</div>
     {_footer(slide_no, total, f"section · {chapter_no:02d}")}
     """
     return _section(inner, title=title)
-
-
-def _cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
-    bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-    cells = []
-    for i, bullet in enumerate(bullets[:6]):
-        head, body = _split_kv(bullet)
-        body_html = (
-            f'<p class="dim" style="font-size:15px;line-height:1.55">{_rich(body)}</p>'
-            if (head and body)
-            else ""
-        )
-        cells.append(
-            f"""
-      <div class="card" style="padding:28px 32px">
-        <span class="num-tag">{i + 1:02d}</span>
-        <h4 style="margin:10px 0 8px;font-size:22px;font-weight:800">{_rich(head or bullet)}</h4>
-        {body_html}
-      </div>
-            """
-        )
-    if not cells:
-        cells.append(f'<div class="card"><h4>{_rich(slide.get("title", ""))}</h4></div>')
-    n = len(cells)
-    grid_cls = "grid g3" if n in {3, 6} else "grid g2"
-    metric_strip = f"""
-    <div class="grid g3 mt-m" style="max-width:520px">
-      <div class="metric"><div class="n" style="font-size:54px">{n:02d}</div><div class="l">key points</div></div>
-      <div class="metric"><div class="n" style="font-size:54px">{slide_no:02d}</div><div class="l">slide</div></div>
-      <div class="metric"><div class="n" style="font-size:54px">{total:02d}</div><div class="l">total</div></div>
-    </div>
-    """
-    inner = f"""
-    {_brand()}
-    <div class="section-num">{slide_no:02d}</div>
-    <p class="kicker mt-l">{_esc(slide.get("section") or "content")}</p>
-    <h2 class="h2">{_rich(slide.get("title") or "核心要点")}</h2>
-    {metric_strip}
-    <div class="{grid_cls} mt-l">{''.join(cells)}</div>
-    {_footer(slide_no, total, "content · cards")}
-    """
-    return _section(inner, title=str(slide.get("title") or "内容"))
-
-
-def _steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
-    bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)][:6]
-    n = max(len(bullets), 1)
-    bars: list[str] = []
-    for i, bullet in enumerate(bullets):
-        head, _body = _split_kv(bullet)
-        pct = 25 + int(70 * (i / max(n - 1, 1)))
-        label = _esc(head or f"step {i + 1}")
-        bars.append(
-            f'<div class="bar" style="height:{pct}%"><em>{label}</em><span>{i + 1:02d}</span></div>'
-        )
-    rows = []
-    for i, bullet in enumerate(bullets):
-        head, body = _split_kv(bullet)
-        rows.append(
-            f"""
-      <div class="card" style="padding:18px 22px;margin-top:10px">
-        <span class="num-tag">{i + 1:02d}</span>
-        <h4 style="margin:6px 0 4px;font-size:18px">{_rich(head or f"步骤 {i + 1}")}</h4>
-        <p class="dim" style="font-size:13px;line-height:1.55">{_rich(body if head else bullet)}</p>
-      </div>
-            """
-        )
-    inner = f"""
-    {_brand()}
-    <p class="kicker mt-l">{_esc(slide.get("section") or "traction")}</p>
-    <h2 class="h2">{_rich(slide.get("title") or "增长路径")}</h2>
-    <div class="card mt-l" style="padding:36px 40px">
-      <div class="traction-bar">{''.join(bars)}</div>
-    </div>
-    <div class="grid g3 mt-l">{''.join(rows)}</div>
-    {_footer(slide_no, total, "content · traction")}
-    """
-    return _section(inner, title=str(slide.get("title") or "过程"))
 
 
 def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
@@ -194,8 +104,8 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     {_brand()}
     <div class="ask-box mt-l">
       <p class="kicker" style="color:#fff">THE ASK</p>
-      <h2 class="h2 mt-s">{_rich(title)}</h2>
-      <p class="dim mt-m" style="font-size:18px">{_rich(message)}</p>
+      <h2 class="h2 mt-s">{L.rich(title)}</h2>
+      <p class="dim mt-m" style="font-size:18px">{L.rich(message)}</p>
       <div class="mt-l">
         <span class="pill" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4)">fxt ppt</span>
         <span class="pill" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4)">pitch-deck</span>
@@ -207,60 +117,258 @@ def _closing(slide: dict[str, Any], slide_no: int, total: int) -> str:
     return _section(inner, title=str(title))
 
 
-def _planned_slides(generic: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
-    slides = [s for s in (generic.get("slides") or []) if isinstance(s, dict)]
-    planned: list[tuple[str, dict[str, Any]]] = [("cover", {})]
-    chapters = [
-        (s.get("title") or s.get("section") or "").strip()
-        for s in slides
-        if s.get("type") == "section"
-    ]
-    if chapters:
-        planned.append(("contents", {}))
-    closing: dict[str, Any] | None = None
-    for slide in slides:
-        stype = slide.get("type")
-        if stype in {"cover", "contents"}:
-            continue
-        if stype == "closing":
-            closing = slide
-            continue
-        planned.append((stype, slide))
-    planned.append(("closing", closing or {}))
-    return planned
+# ---------- shared content-page header ----------
 
+def _content_header(slide: dict[str, Any], slide_no: int) -> str:
+    return f"""
+    {_brand()}
+    <div class="section-num">{slide_no:02d}</div>
+    <p class="kicker mt-l">{L.esc(slide.get("section") or "content")}</p>
+    <h2 class="h2">{L.rich_grad(slide.get("title") or "")}</h2>
+    """
+
+
+# ---------- content layouts ----------
+
+def _layout_cards(slide: dict[str, Any], slide_no: int, total: int) -> str:
+    bullets = L.get_bullets(slide)
+    cells = []
+    for i, bullet in enumerate(bullets[:6]):
+        head, body = L.split_kv(bullet)
+        body_html = (
+            f'<p class="dim" style="font-size:15px;line-height:1.55">{L.rich(body)}</p>'
+            if (head and body) else ""
+        )
+        cells.append(f"""
+      <div class="card" style="padding:28px 32px">
+        <span class="num-tag">{i + 1:02d}</span>
+        <h4 style="margin:10px 0 8px;font-size:22px;font-weight:800">{L.rich_grad(head or bullet)}</h4>
+        {body_html}
+      </div>""")
+    if not cells:
+        cells.append(f'<div class="card"><h4>{L.rich(slide.get("title", ""))}</h4></div>')
+    grid_cls = "grid g3" if len(cells) in {3, 6} else "grid g2"
+    inner = f"""
+    {_content_header(slide, slide_no)}
+    <div class="{grid_cls} mt-l">{''.join(cells)}</div>
+    {_footer(slide_no, total, "content · cards")}
+    """
+    return _section(inner, title=str(slide.get("title") or "内容"))
+
+
+def _layout_bullets(slide: dict[str, Any], slide_no: int, total: int) -> str:
+    bullets = L.get_bullets(slide)
+    rows = []
+    for i, b in enumerate(bullets[:7]):
+        rows.append(
+            f'<div class="row"><div class="ord">{i + 1:02d}</div>'
+            f'<div class="txt">{L.rich_grad(b)}</div></div>'
+        )
+    inner = f"""
+    {_content_header(slide, slide_no)}
+    <div class="bullets-list">{''.join(rows)}</div>
+    {_footer(slide_no, total, "content · bullets")}
+    """
+    return _section(inner, title=str(slide.get("title") or "要点"))
+
+
+def _layout_columns(slide: dict[str, Any], slide_no: int, total: int, n: int) -> str:
+    cols = L.get_columns(slide, n)
+    blocks = []
+    for c in cols:
+        kicker = f'<p class="ckicker">{L.esc(c["kicker"])}</p>' if c.get("kicker") else ""
+        blocks.append(f"""
+      <div class="col">
+        {kicker}
+        <h4>{L.rich_grad(c["title"])}</h4>
+        <p>{L.rich(c["body"])}</p>
+      </div>""")
+    inner = f"""
+    {_content_header(slide, slide_no)}
+    <div class="col-wrap" style="--n:{n}">{''.join(blocks)}</div>
+    {_footer(slide_no, total, f"content · {n}-col")}
+    """
+    return _section(inner, title=str(slide.get("title") or ""))
+
+
+def _layout_kpi_grid(slide: dict[str, Any], slide_no: int, total: int) -> str:
+    kpis = L.get_kpis(slide, max_n=4)
+    cells = []
+    for k in kpis:
+        cls = f"kpi-card {k['status']}".strip()
+        delta = f'<div class="delta">{L.esc(k["delta"])}</div>' if k.get("delta") else ""
+        cells.append(f"""
+      <div class="{cls}">
+        <div class="lbl">{L.esc(k["label"])}</div>
+        <div class="val">{L.esc(k["value"])}</div>
+        {delta}
+      </div>""")
+    grid_cls = "grid g4" if len(kpis) == 4 else "grid g3" if len(kpis) == 3 else "grid g2"
+    inner = f"""
+    {_content_header(slide, slide_no)}
+    <div class="{grid_cls} mt-l">{''.join(cells)}</div>
+    {_footer(slide_no, total, "content · KPI")}
+    """
+    return _section(inner, title=str(slide.get("title") or "指标"))
+
+
+def _layout_stat(slide: dict[str, Any], slide_no: int, total: int) -> str:
+    stat = L.get_stat(slide)
+    delta = f'<div class="delta">{L.esc(stat["delta"])}</div>' if stat.get("delta") else ""
+    sub = f'<div class="sub">{L.rich(stat["sub"])}</div>' if stat.get("sub") else ""
+    inner = f"""
+    {_brand()}
+    <p class="kicker mt-l">{L.esc(slide.get("section") or "impact")}</p>
+    <div class="stat-stage">
+      <div class="num">{L.esc(stat["value"])}</div>
+      <div class="lbl">{L.rich(stat["label"] or slide.get("title") or "")}</div>
+      {sub}
+      {delta}
+    </div>
+    {_footer(slide_no, total, "content · stat")}
+    """
+    return _section(inner, title=str(slide.get("title") or "数字"))
+
+
+def _layout_comparison(slide: dict[str, Any], slide_no: int, total: int, *, pros_cons: bool = False) -> str:
+    cmp = L.get_compare(slide)
+    left, right = cmp["left"], cmp["right"]
+    left_lis = "".join(f"<li>{L.rich(p)}</li>" for p in left["points"][:6])
+    right_lis = "".join(f"<li>{L.rich(p)}</li>" for p in right["points"][:6])
+    if pros_cons:
+        left_kicker = '<span class="kicker-tag">PROS</span>'
+        right_kicker = '<span class="kicker-tag">CONS</span>'
+        wrap_cls = "vs-wrap pc"
+        mid = "✓ / ✗"
+    else:
+        left_kicker = '<span class="kicker-tag">BEFORE</span>'
+        right_kicker = '<span class="kicker-tag">AFTER</span>'
+        wrap_cls = "vs-wrap"
+        mid = "→"
+    inner = f"""
+    {_content_header(slide, slide_no)}
+    <div class="{wrap_cls}">
+      <div class="card side left">
+        <h3>{left_kicker}{L.rich(left["title"])}</h3>
+        <ul>{left_lis}</ul>
+      </div>
+      <div class="mid">{mid}</div>
+      <div class="card side right">
+        <h3>{right_kicker}{L.rich(right["title"])}</h3>
+        <ul>{right_lis}</ul>
+      </div>
+    </div>
+    {_footer(slide_no, total, "content · " + ("pros-cons" if pros_cons else "compare"))}
+    """
+    return _section(inner, title=str(slide.get("title") or "对比"))
+
+
+def _layout_quote(slide: dict[str, Any], slide_no: int, total: int) -> str:
+    q = L.get_quote(slide)
+    author = f'<div class="author">— {L.esc(q["author"])}</div>' if q.get("author") else ""
+    inner = f"""
+    {_brand()}
+    <p class="kicker mt-l">{L.esc(slide.get("section") or "quote")}</p>
+    <div class="quote-stage">
+      <div class="qmark">"</div>
+      <blockquote>{L.rich_grad(q["text"])}</blockquote>
+      {author}
+    </div>
+    {_footer(slide_no, total, "content · quote")}
+    """
+    return _section(inner, title=str(slide.get("title") or "Quote"))
+
+
+def _layout_timeline(slide: dict[str, Any], slide_no: int, total: int) -> str:
+    steps = L.get_steps(slide, max_n=6)
+    n = max(len(steps), 3)
+    items = []
+    for s in steps:
+        items.append(f"""
+      <div class="tl-item">
+        <div class="when">{L.esc(s["when"] or s["title"][:14])}</div>
+        <div class="dot"></div>
+        <h4>{L.rich(s["title"])}</h4>
+        <p>{L.rich(s["body"])}</p>
+      </div>""")
+    inner = f"""
+    {_content_header(slide, slide_no)}
+    <div class="tl-wrap"><div class="tl-row" style="--n:{n}">{''.join(items)}</div></div>
+    {_footer(slide_no, total, "content · timeline")}
+    """
+    return _section(inner, title=str(slide.get("title") or "时间线"))
+
+
+def _layout_process_steps(slide: dict[str, Any], slide_no: int, total: int) -> str:
+    steps = L.get_steps(slide, max_n=4)
+    n = max(len(steps), 2)
+    items = []
+    for i, s in enumerate(steps):
+        items.append(f"""
+      <div class="step" data-n="{i + 1:02d}">
+        <div class="num">STEP {i + 1:02d}</div>
+        <h4>{L.rich(s["title"])}</h4>
+        <p>{L.rich(s["body"])}</p>
+      </div>""")
+    inner = f"""
+    {_content_header(slide, slide_no)}
+    <div class="steps-wrap" style="--n:{n}">{''.join(items)}</div>
+    {_footer(slide_no, total, "content · process")}
+    """
+    return _section(inner, title=str(slide.get("title") or "流程"))
+
+
+# ---------- main entry ----------
 
 def render_pitch_deck(generic: dict[str, Any]) -> str:
-    planned = _planned_slides(generic)
+    planned = L.planned_slides(generic)
     total = len(planned)
+    chapters = L.chapter_titles(generic)
     sections: list[str] = []
     chapter_no = 0
-    chapters = [
-        (s.get("title") or s.get("section") or "").strip()
-        for s in generic.get("slides", [])
-        if isinstance(s, dict) and s.get("type") == "section"
-    ]
     for idx, (kind, slide) in enumerate(planned, start=1):
         active = idx == 1
         if kind == "cover":
             sections.append(_cover(generic, idx, total, active))
-        elif kind == "contents":
+            continue
+        if kind == "contents":
             sections.append(_contents(chapters, idx, total))
-        elif kind == "section":
+            continue
+        if kind == "section":
             chapter_no += 1
             title = slide.get("title") or f"Part {chapter_no}"
-            points = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
+            points = L.get_bullets(slide)
             sections.append(_divider(title, points, chapter_no, idx, total))
-        elif kind == "closing":
+            continue
+        if kind == "closing":
             sections.append(_closing(slide, idx, total))
+            continue
+        # content
+        layout = L.normalize_layout(slide.get("layout"), len(L.get_bullets(slide)))
+        if layout == "kpi-grid":
+            sections.append(_layout_kpi_grid(slide, idx, total))
+        elif layout == "stat-highlight":
+            sections.append(_layout_stat(slide, idx, total))
+        elif layout == "comparison":
+            sections.append(_layout_comparison(slide, idx, total, pros_cons=False))
+        elif layout == "pros-cons":
+            sections.append(_layout_comparison(slide, idx, total, pros_cons=True))
+        elif layout == "big-quote":
+            sections.append(_layout_quote(slide, idx, total))
+        elif layout == "timeline":
+            sections.append(_layout_timeline(slide, idx, total))
+        elif layout == "process-steps":
+            sections.append(_layout_process_steps(slide, idx, total))
+        elif layout == "two-column":
+            sections.append(_layout_columns(slide, idx, total, 2))
+        elif layout == "three-column":
+            sections.append(_layout_columns(slide, idx, total, 3))
+        elif layout == "bullets":
+            sections.append(_layout_bullets(slide, idx, total))
         else:
-            bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
-                sections.append(_steps(slide, idx, total))
-            else:
-                sections.append(_cards(slide, idx, total))
+            sections.append(_layout_cards(slide, idx, total))
 
-    title = _esc(generic.get("title") or "Pitch Deck 路演")
+    title = L.esc(generic.get("title") or "Pitch Deck 路演")
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>

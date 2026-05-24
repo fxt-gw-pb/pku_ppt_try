@@ -9,6 +9,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 
 def _esc(value: Any) -> str:
     return html.escape(str(value or ""), quote=True)
@@ -248,10 +250,22 @@ def render_knowledge_arch_blueprint(generic: dict[str, Any]) -> str:
             sections.append(_closing(slide, idx, total))
         else:
             bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(bullets))
+            if layout == "cards":
+                sections.append(_cards(slide, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, idx, total))
             else:
-                sections.append(_cards(slide, idx, total))
+                body = L.render_inner(layout, slide)
+                inner = f"""
+    {_grid_bg()}
+    <div class="kb-kicker">{_esc(slide.get("section") or "content")}</div>
+    <h2 class="kb-h1" style="font-size:48px">{_rich(slide.get("title") or "")}</h2>
+    <div class="kb-section-label">{_esc(layout)}</div>
+    {body}
+    {_footer(f"content · {layout}", idx, total)}
+    """
+                sections.append(_section(inner, title=str(slide.get("title") or "")))
 
     title = _esc(generic.get("title") or "奶油蓝图架构")
     return f"""<!DOCTYPE html>

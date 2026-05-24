@@ -12,15 +12,15 @@
       "subtitle": ""
     },
     {
-      "title": "国内外研究现状",
+      "title": "研究现状与问题",
       "subtitle": ""
     },
     {
-      "title": "研究思路与内容",
+      "title": "研究思路与方法",
       "subtitle": ""
     },
     {
-      "title": "研究方法",
+      "title": "实验与结果",
       "subtitle": ""
     },
     {
@@ -49,87 +49,116 @@
       "chapterIndex": 0,
       "sectionTitle": "背景与意义",
       "sectionTitleEn": "",
-      "headline": "选题背景",
-      "cols": 3,
+      "headline": "选题的三个驱动力",
       "cards": [
         {
-          "title": "外部环境的驱动",
-          "body": "行业趋势、政策导向或社会需求持续上升",
+          "title": "外部环境",
+          "body": "行业趋势、政策导向与社会需求持续上升，为研究提供时代背景。",
           "tag": "01"
         },
         {
-          "title": "现有方案的局限",
-          "body": "在关键指标上仍存在明显瓶颈",
+          "title": "现有方案",
+          "body": "在关键指标上仍存在明显瓶颈，无法支撑下一阶段任务。",
           "tag": "02"
         },
         {
-          "title": "新方向的可能性",
-          "body": "新工具与新数据为突破提供契机",
+          "title": "新的可能",
+          "body": "新工具与新数据为方法论突破提供契机，窗口期短暂但清晰。",
           "tag": "03"
         }
-      ]
+      ],
+      "cols": 3
     },
     {
-      "layout": "multi-card",
+      "layout": "section-text",
       "chapterIndex": 0,
       "sectionTitle": "背景与意义",
       "sectionTitleEn": "",
-      "headline": "研究意义",
-      "cols": 3,
-      "cards": [
+      "headline": "用一句话说清研究意义",
+      "blocks": [
         {
-          "title": "理论价值",
-          "body": "完善已有理论框架",
-          "tag": "01"
+          "label": "引述",
+          "text": "**如果一项研究只能压缩成一句话，那它一定是把复杂问题拆成了可以独立验证的最小单元。**"
         },
         {
-          "title": "方法价值",
-          "body": "提出可推广工作流",
-          "tag": "02"
-        },
-        {
-          "title": "应用价值",
-          "body": "支撑具体应用场景",
-          "tag": "03"
+          "label": "出处",
+          "text": "—— 研究方法学 笔记"
         }
-      ]
+      ],
+      "mood": "quote"
     },
     {
       "layout": "section-divider",
       "chapterIndex": 1,
       "points": [
-        "主要流派",
-        "技术演进",
-        "现有缺口"
+        "主流路径",
+        "代表工作",
+        "共性缺口"
       ]
     },
     {
-      "layout": "multi-card",
+      "layout": "vs",
       "chapterIndex": 1,
-      "sectionTitle": "国内外研究现状",
+      "sectionTitle": "研究现状与问题",
       "sectionTitleEn": "",
-      "headline": "主流路径与共性短板",
-      "cols": 4,
-      "cards": [
+      "headline": "现状 vs 我们的切入点",
+      "leftKicker": "BEFORE · 现状",
+      "leftTitle": "现有主流方法",
+      "leftItems": [
         {
-          "title": "路径 A",
-          "body": "原创理论领先，工程化偏弱",
-          "tag": "01"
+          "body": "依赖大规模标注数据，单任务训练成本高"
         },
         {
-          "title": "路径 B",
-          "body": "工程化激进，原创度有限",
-          "tag": "02"
+          "body": "对长尾分布缺乏稳健性，跨域时显著退化"
         },
         {
-          "title": "路径 C",
-          "body": "新兴方法，潜力可期",
-          "tag": "03"
+          "body": "可解释性弱，难以为决策环节提供依据"
+        }
+      ],
+      "rightKicker": "AFTER · 改进",
+      "rightTitle": "本研究切入点",
+      "rightItems": [
+        {
+          "body": "利用结构先验降低标注需求，单样本可学"
         },
         {
-          "title": "共性",
-          "body": "跨场景泛化能力不足",
-          "tag": "04"
+          "body": "通过多视图对齐显式建模长尾，跨域稳定"
+        },
+        {
+          "body": "对每一步推理给出可追溯的中间表征"
+        }
+      ]
+    },
+    {
+      "layout": "vs",
+      "chapterIndex": 1,
+      "sectionTitle": "研究现状与问题",
+      "sectionTitleEn": "",
+      "headline": "诚实的取舍",
+      "leftKicker": "PROS · 优势",
+      "leftTitle": "我们方法的优势",
+      "leftItems": [
+        {
+          "body": "训练样本需求降低 60% 以上"
+        },
+        {
+          "body": "在 5 个跨域数据集上保持精度衰减 < 5%"
+        },
+        {
+          "body": "中间表征可被领域专家直接审阅"
+        }
+      ],
+      "rightKicker": "CONS · 局限",
+      "rightTitle": "我们方法的局限",
+      "rightItems": [
+        {
+          "body": "对结构先验的质量比较敏感"
+        },
+        {
+          "body": "在极小样本（<10）时仍不稳定"
+        },
+        {
+          "body": "推理速度尚未做端侧优化"
         }
       ]
     },
@@ -137,38 +166,72 @@
       "layout": "section-divider",
       "chapterIndex": 2,
       "points": [
-        "核心问题",
         "总体框架",
-        "创新点定位"
+        "关键创新",
+        "实现路径"
       ]
     },
     {
-      "layout": "multi-card",
+      "layout": "method",
       "chapterIndex": 2,
-      "sectionTitle": "研究思路与内容",
+      "sectionTitle": "研究思路与方法",
       "sectionTitleEn": "",
-      "headline": "总体框架",
-      "cols": 4,
-      "cards": [
+      "headline": "四步研究流程",
+      "methods": [
         {
           "title": "问题界定",
-          "body": "明确研究对象与边界",
-          "tag": "01"
+          "en": "METHOD A",
+          "body": "锁定研究对象、边界条件与可测量的目标指标。"
         },
         {
           "title": "理论建模",
-          "body": "在已有理论上提出新假设",
-          "tag": "02"
+          "en": "METHOD B",
+          "body": "在已有理论上提出结构假设，引入新约束。"
         },
         {
           "title": "数据采集",
-          "body": "梳理来源与采集方案",
-          "tag": "03"
+          "en": "METHOD C",
+          "body": "梳理多源数据，建立标注与质控流程。"
         },
         {
-          "title": "分析验证",
-          "body": "实证检验并量化结论",
-          "tag": "04"
+          "title": "实证验证",
+          "en": "METHOD D",
+          "body": "通过消融与跨域测试逐项检验，量化贡献。"
+        }
+      ],
+      "cols": 4
+    },
+    {
+      "layout": "timeline",
+      "chapterIndex": 2,
+      "sectionTitle": "研究思路与方法",
+      "sectionTitleEn": "",
+      "headline": "研究演进时间线",
+      "steps": [
+        {
+          "label": "2024 Q3",
+          "title": "立项调研",
+          "body": "完成 80+ 文献综述与 5 次专家访谈。"
+        },
+        {
+          "label": "2024 Q4",
+          "title": "原型实现",
+          "body": "搭建首版端到端 pipeline，跑通 baseline。"
+        },
+        {
+          "label": "2025 Q1",
+          "title": "数据扩充",
+          "body": "新增 12k 标注样本，建立质控规范。"
+        },
+        {
+          "label": "2025 Q2",
+          "title": "方法迭代",
+          "body": "引入结构先验与对齐损失，关键指标突破。"
+        },
+        {
+          "label": "2025 Q3",
+          "title": "外部评测",
+          "body": "在 3 个公开榜单与 2 个真实场景验证。"
         }
       ]
     },
@@ -176,48 +239,116 @@
       "layout": "section-divider",
       "chapterIndex": 3,
       "points": [
-        "方法体系",
-        "技术路线",
-        "实验设计"
+        "核心指标",
+        "对比实验",
+        "案例分析"
       ]
     },
     {
       "layout": "multi-card",
       "chapterIndex": 3,
-      "sectionTitle": "研究方法",
+      "sectionTitle": "实验与结果",
       "sectionTitleEn": "",
-      "headline": "四类互补方法",
-      "cols": 4,
+      "headline": "关键指标全面提升",
       "cards": [
         {
-          "title": "文献调研",
-          "body": "定位空白",
+          "title": "Top-1 准确率",
+          "body": "**92.4%**<br>↑ 6.1pt vs SOTA",
           "tag": "01"
         },
         {
-          "title": "消融实验",
-          "body": "定位贡献",
+          "title": "跨域均值",
+          "body": "**88.7%**<br>↑ 9.3pt",
           "tag": "02"
         },
         {
-          "title": "多中心评测",
-          "body": "验证泛化",
+          "title": "训练耗时",
+          "body": "**−38%**<br>8×A100 集群",
           "tag": "03"
         },
         {
-          "title": "复杂度分析",
-          "body": "支撑工程可行性",
+          "title": "推理延迟",
+          "body": "**12ms**<br>→ 持平 baseline",
           "tag": "04"
         }
-      ]
+      ],
+      "cols": 4
+    },
+    {
+      "layout": "section-text",
+      "chapterIndex": 3,
+      "sectionTitle": "实验与结果",
+      "sectionTitleEn": "",
+      "headline": "一个数字说明问题",
+      "blocks": [
+        {
+          "label": "训练耗时下降",
+          "text": "**38%**<br>在 8×A100 集群上，全样本训练时间从 41h 缩短到 25h。"
+        },
+        {
+          "label": "对比基线",
+          "text": "↓ vs strongest baseline"
+        }
+      ],
+      "mood": "stat"
+    },
+    {
+      "layout": "multi-card",
+      "chapterIndex": 3,
+      "sectionTitle": "实验与结果",
+      "sectionTitleEn": "",
+      "headline": "概念 vs 实现",
+      "cards": [
+        {
+          "title": "概念层",
+          "body": "结构先验把领域知识显式注入到训练目标，让模型在小样本下也能稳定收敛。",
+          "tag": "01"
+        },
+        {
+          "title": "实现层",
+          "body": "通过一组可微图算子构造对齐损失，并以课程学习方式逐步加权。",
+          "tag": "02"
+        }
+      ],
+      "cols": 2
+    },
+    {
+      "layout": "multi-card",
+      "chapterIndex": 3,
+      "sectionTitle": "实验与结果",
+      "sectionTitleEn": "",
+      "headline": "贡献清单（卡片回顾）",
+      "cards": [
+        {
+          "title": "结构先验",
+          "body": "把领域知识转成可微约束，降低标注需求",
+          "tag": "01"
+        },
+        {
+          "title": "对齐损失",
+          "body": "在多视图特征上建模长尾，提升稳定性",
+          "tag": "02"
+        },
+        {
+          "title": "可追溯表征",
+          "body": "中间层支持专家直接审阅与干预",
+          "tag": "03"
+        },
+        {
+          "title": "工程优化",
+          "body": "训练耗时 −38%，端到端 pipeline 已开源",
+          "tag": "04"
+        }
+      ],
+      "cols": 4
     },
     {
       "layout": "section-divider",
       "chapterIndex": 4,
       "points": [
         "主要结论",
-        "创新点",
-        "不足与展望"
+        "不足",
+        "下一步"
       ]
     },
     {
@@ -225,23 +356,23 @@
       "chapterIndex": 4,
       "sectionTitle": "结论与展望",
       "sectionTitleEn": "",
-      "headline": "主要结论",
+      "headline": "结论与下一步",
       "blocks": [
         {
           "label": "要点 01",
-          "text": "建立了关键变量与目标指标的定量关联"
+          "text": "建立了关键变量与目标指标的定量关联，效果在 5 个数据集上验证"
         },
         {
           "label": "要点 02",
-          "text": "证实新机制 A 与 B 的协同效应"
+          "text": "证实结构先验与对齐损失的协同效应，跨域稳定性显著提升"
         },
         {
           "label": "要点 03",
-          "text": "在真实场景下完成多轮验证"
+          "text": "工程实现完成规模化扩展，已在两个真实业务场景落地"
         },
         {
-          "label": "要点 04",
-          "text": "工程实现完成规模化扩展"
+          "label": "下一步",
+          "text": "极小样本场景的稳定性、端侧推理优化、跨语言迁移"
         }
       ]
     },

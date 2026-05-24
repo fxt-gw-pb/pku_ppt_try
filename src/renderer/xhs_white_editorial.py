@@ -4,6 +4,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 SOFT_CLASSES = ["soft-pink", "soft-blue", "soft-green", "soft-orange", "soft-purple"]
 
 
@@ -230,11 +232,20 @@ def render_xhs_white_editorial(generic: dict[str, Any]) -> str:
         elif kind == "closing":
             sections.append(_closing(slide, idx, total))
         else:
-            bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(L.get_bullets(slide)))
+            if layout == "cards":
+                sections.append(_cards(slide, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, idx, total))
             else:
-                sections.append(_cards(slide, idx, total))
+                body = L.render_inner(layout, slide)
+                inner = f"""
+    {_top(idx, total, slide.get("section") or slide.get("title") or "")}
+    <h2 class="xw-title-md">{_rich(slide.get("title") or "")}</h2>
+    {body}
+    {_footer(idx, total, f"Content · {layout}")}
+    """
+                sections.append(_section(inner, title=str(slide.get("title") or "")))
 
     title = _esc(generic.get("title") or "小红书白底杂志风")
     return f"""<!DOCTYPE html>

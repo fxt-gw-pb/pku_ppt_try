@@ -9,6 +9,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 GLASS_TINTS = ["", "gd-glass-warm", "gd-glass-blue", "gd-glass-green", ""]
 ACCENT_SPANS = ["gd-accent", "gd-green", "gd-blue", "gd-accent"]
 
@@ -276,10 +278,21 @@ def render_graphify_dark_graph(generic: dict[str, Any]) -> str:
             sections.append(_closing(slide, idx, total))
         else:
             bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(bullets))
+            if layout == "cards":
+                sections.append(_cards(slide, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, idx, total))
             else:
-                sections.append(_cards(slide, idx, total))
+                body = L.render_inner(layout, slide)
+                inner = f"""
+    {_ambient("gd-orb-2", "gd-orb-3")}
+    {_snum(idx, total)}
+    <p class="gd-eyebrow">{_esc(slide.get("section") or "content")}</p>
+    <h2 class="gd-h2">{_rich(slide.get("title") or "")}</h2>
+    {body}
+    """
+                sections.append(_section(inner, title=str(slide.get("title") or "")))
 
     title = _esc(generic.get("title") or "暗底知识图谱")
     return f"""<!DOCTYPE html>

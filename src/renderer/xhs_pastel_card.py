@@ -9,6 +9,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 PASTELS = ["peach", "mint", "sky", "lilac", "lemon", "rose"]
 CHIP_COLORS = ["", "mint", "sky", "lilac", "rose"]  # empty == default peach dot
 
@@ -270,11 +272,23 @@ def render_xhs_pastel_card(generic: dict[str, Any]) -> str:
         elif kind == "closing":
             sections.append(_closing(slide, idx, total))
         else:
-            bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(L.get_bullets(slide)))
+            if layout == "cards":
+                sections.append(_cards(slide, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, idx, total))
             else:
-                sections.append(_cards(slide, idx, total))
+                body = L.render_inner(layout, slide)
+                chip_text = _esc(slide.get("section") or slide.get("title") or "Highlights")
+                inner = f"""
+    {_blobs("b1")}
+    {_top(chip_text, "rose", idx, total)}
+    <h2 class="xp-h2">{_rich(slide.get("title") or "")}</h2>
+    <div class="xp-divider"></div>
+    {body}
+    {_footer(f"content · {layout}", idx, total)}
+    """
+                sections.append(_section(inner, title=str(slide.get("title") or "")))
 
     title = _esc(generic.get("title") or "小红书柔和马卡龙")
     return f"""<!DOCTYPE html>

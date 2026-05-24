@@ -9,6 +9,8 @@ from __future__ import annotations
 import html
 from typing import Any
 
+from . import layouts as L
+
 STICKER_COLORS = ["pink", "yellow", "blue", "green"]
 ACCENTS = ["var(--accent)", "var(--accent-2)", "var(--accent-3)"]
 ACCENT_TEXT = ["#fff", "#fff", "var(--text-1)"]
@@ -240,11 +242,23 @@ def render_xhs_post(generic: dict[str, Any]) -> str:
         elif kind == "closing":
             sections.append(_closing(slide, idx, total))
         else:
-            bullets = [b for b in (slide.get("bullets") or []) if isinstance(b, str)]
-            if slide.get("layout") == "timeline" or len(bullets) >= 5:
+            layout = L.normalize_layout(slide.get("layout"), len(L.get_bullets(slide)))
+            if layout == "cards":
+                sections.append(_cards(slide, idx, total))
+            elif layout == "bullets":
                 sections.append(_steps(slide, idx, total))
             else:
-                sections.append(_cards(slide, idx, total))
+                body = L.render_inner(layout, slide)
+                inner = f"""
+    {_page_dot(idx, total)}
+    <div class="sticker pink" style="top:130px;left:46px;transform:rotate(-4deg)">{_esc(slide.get("section") or "")}</div>
+    <div style="margin-top:160px">
+      <h2 class="h2">{_rich(slide.get("title") or "")}</h2>
+      {body}
+    </div>
+    {_bottom("@fxt-ppt", f"content · {layout}")}
+    """
+                sections.append(_section(inner, title=str(slide.get("title") or "")))
 
     title = _esc(generic.get("title") or "小红书 3:4 图文")
     return f"""<!DOCTYPE html>
