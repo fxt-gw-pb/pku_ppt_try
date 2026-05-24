@@ -570,23 +570,24 @@
     );
   }
   function replaceInTextNodes(root, needle, replacement) {
-    if (!root || !needle) return 0;
+    const result = { count: 0, snapshots: [] };
+    if (!root || !needle) return result;
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
     const hits = [];
     let node;
     while ((node = walker.nextNode())) {
       if (node.nodeValue && node.nodeValue.indexOf(needle) !== -1) hits.push(node);
     }
-    let count = 0;
     hits.forEach((n) => {
       const before = n.nodeValue;
       const after = before.split(needle).join(replacement);
       if (after !== before) {
+        result.snapshots.push({ node: n, before: before });
         n.nodeValue = after;
-        count += before.split(needle).length - 1;
+        result.count += before.split(needle).length - 1;
       }
     });
-    return count;
+    return result;
   }
   function injectEditPanel() {
     if (document.querySelector(".edit-panel-toggle-btn")) return;
@@ -613,9 +614,14 @@
       ' border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 12px;',
       ' font:13px/1.55 ui-monospace,"JetBrains Mono",SFMono-Regular,Menlo,monospace}',
       '.edit-panel textarea:focus{outline:none;border-color:#9A0000;box-shadow:0 0 0 2px rgba(154,0,0,.25)}',
-      '.edit-panel .apply-btn{appearance:none;background:#9A0000;color:#fff;border:none;border-radius:8px;',
+      '.edit-panel .apply-row{display:flex;flex-direction:column;gap:8px}',
+      '.edit-panel .apply-btn,.edit-panel .undo-btn{appearance:none;border-radius:8px;',
       ' padding:10px 14px;font:600 13px/1 -apple-system,sans-serif;cursor:pointer;letter-spacing:.04em}',
+      '.edit-panel .apply-btn{background:#9A0000;color:#fff;border:none}',
       '.edit-panel .apply-btn:hover{background:#b50000}',
+      '.edit-panel .undo-btn{background:transparent;color:#e6edf3;border:1px solid rgba(255,255,255,.22)}',
+      '.edit-panel .undo-btn:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4)}',
+      '.edit-panel .apply-btn:disabled,.edit-panel .undo-btn:disabled{opacity:.4;cursor:not-allowed}',
       '.edit-panel .status{font-size:12px;line-height:1.5;margin:0;min-height:18px}',
       '.edit-panel .status.ok{color:#3fb950}',
       '.edit-panel .status.err{color:#f85149}',
@@ -647,7 +653,10 @@
       '<label for="pku-edit-replace">替换为</label>',
       '<textarea id="pku-edit-replace" spellcheck="false" placeholder="新内容"></textarea>',
       '<p class="warn">⚠ 新字段字数与原字段差异过大可能导致排版超出当前版面，请尽量控制在相近长度。</p>',
-      '<button type="button" class="apply-btn">应用替换（仅作用于当前页）</button>',
+      '<div class="apply-row">',
+      '  <button type="button" class="apply-btn">应用替换（仅作用于当前页）</button>',
+      '  <button type="button" class="undo-btn" disabled title="撤回上次修改">↶ 撤回上次修改</button>',
+      '</div>',
       '<p class="status" role="status"></p>'
     ].join("");
     document.body.appendChild(panel);
@@ -655,6 +664,8 @@
     const findEl = panel.querySelector("#pku-edit-find");
     const replEl = panel.querySelector("#pku-edit-replace");
     const status = panel.querySelector(".status");
+    const undoBtn = panel.querySelector(".undo-btn");
+    let lastEdit = null; /* [{ node, before }] — restored on undo */
     function setOpen(open) {
       document.body.classList.toggle("has-edit-panel", !!open);
     }
@@ -673,14 +684,32 @@
         status.textContent = "未找到当前幻灯片。";
         return;
       }
-      const count = replaceInTextNodes(slide, needle, replacement);
-      if (count > 0) {
+      const result = replaceInTextNodes(slide, needle, replacement);
+      if (result.count > 0) {
+        lastEdit = result.snapshots;
+        undoBtn.disabled = false;
         status.className = "status ok";
-        status.textContent = "✓ 已在当前页替换 " + count + " 处。";
+        status.textContent = "✓ 已在当前页替换 " + result.count + " 处。";
       } else {
         status.className = "status err";
         status.textContent = "✗ 当前页没有找到该字段。请检查是否完整粘贴自当前预览页（区分空格、标点）。";
       }
+    });
+    undoBtn.addEventListener("click", () => {
+      if (!lastEdit || !lastEdit.length) return;
+      let restored = 0;
+      lastEdit.forEach((s) => {
+        if (s.node && s.node.parentNode) {
+          s.node.nodeValue = s.before;
+          restored++;
+        }
+      });
+      lastEdit = null;
+      undoBtn.disabled = true;
+      status.className = restored ? "status ok" : "status err";
+      status.textContent = restored
+        ? "↶ 已撤回上一次修改（" + restored + " 处文本恢复）。"
+        : "✗ 上次修改的节点已失效，无法撤回。";
     });
 
     /* Toggle button */
