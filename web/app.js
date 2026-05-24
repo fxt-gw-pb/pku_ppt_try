@@ -175,11 +175,28 @@ function normalizeTemplates(remoteTemplates) {
   return [...byId.values()];
 }
 
+let lastWarmupAt = 0;
+async function warmupBackend() {
+  // Fire-and-forget ping to wake the Render free-tier dyno. Self-throttled:
+  // skip if we've had a successful ping in the last 60s. Errors swallowed —
+  // the real generate call (with its own error surface) is the only thing
+  // the user needs to see fail.
+  if (Date.now() - lastWarmupAt < 60_000) return;
+  try {
+    const r = await fetch(`${API_BASE}/api/health`);
+    if (r.ok) lastWarmupAt = Date.now();
+  } catch (_) {
+    // Cold-start timeouts are expected on the first hit; let the user
+    // discover the issue (if any) when they submit.
+  }
+}
+
 async function loadHealth() {
   try {
     const response = await fetch(`${API_BASE}/api/health`);
     if (!response.ok) throw new Error(`${response.status}`);
     const health = await response.json();
+    lastWarmupAt = Date.now();
     MAX_CHARS = health.max_input_chars || MAX_CHARS;
     selectedTemplateId = health.default_template_id || selectedTemplateId;
     templates = normalizeTemplates(health.templates);
@@ -207,6 +224,8 @@ function route() {
   document.querySelectorAll("[data-nav]").forEach((link) => {
     link.classList.toggle("active", link.dataset.nav === target);
   });
+  // Hide the cold-start latency behind the user's paste/read time.
+  if (target === "generate") warmupBackend();
 }
 
 function renderTemplates() {
@@ -346,6 +365,34 @@ function statusLabel(status) {
   }[status] || status;
 }
 
+const PHASES = [
+  { key: "llm",    label: "AI 生成大纲",  hint: "约 25s，请耐心等候" },
+  { key: "render", label: "渲染幻灯片",   hint: "排版与布局" },
+  { key: "zip",    label: "打包网页",     hint: "生成下载包" },
+];
+
+function renderProgress(job) {
+  // Pre-3-stage backends may not emit phase. Default to a generic
+  // "running" state so old job JSON still renders something sensible.
+  const phase = job.phase || (job.status === "running" ? "llm" : null);
+  if (!phase || job.status === "done" || job.status === "failed") return "";
+  const activeIdx = Math.max(0, PHASES.findIndex((p) => p.key === phase));
+  const pct = typeof job.progress === "number" ? job.progress : 0;
+  const segments = PHASES.map((p, i) => {
+    const state = i < activeIdx ? "done" : i === activeIdx ? "active" : "pending";
+    return `<div class="prog-seg ${state}"><span></span></div>`;
+  }).join("");
+  const stage = PHASES[activeIdx] || PHASES[0];
+  return `
+    <div class="job-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}">
+      <div class="prog-track">${segments}</div>
+      <div class="prog-meta">
+        <span class="prog-label">${escapeHtml(stage.label)}</span>
+        <span class="prog-hint">${escapeHtml(stage.hint)}</span>
+      </div>
+    </div>`;
+}
+
 function addJobCard(job) {
   emptyEl.hidden = true;
   let item = document.getElementById(`job-${job.job_id}`);
@@ -383,6 +430,7 @@ function renderJobCard(item, job) {
       <span class="job-status ${escapeHtml(job.status)}">${escapeHtml(statusLabel(job.status))}</span>
     </div>
     <div class="job-meta">${created}${slideInfo}${templateInfo}</div>
+    ${renderProgress(job)}
     ${actions}
     ${errorBlock}
   `;

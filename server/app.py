@@ -116,6 +116,11 @@ def _run_job(job_id: str, manuscript: str, template_id: str) -> None:
         job["started_at"] = _now()
         job["template_id"] = template.template_id
         job["template_name"] = template.name
+        # Phase + coarse percentage so the frontend can render a three-stage
+        # bar. The LLM call dominates wall time (~25s of ~30s), so its
+        # percentage covers a wide range and the bar visually pauses there.
+        job["phase"] = "llm"
+        job["progress"] = 5
         _save_job(job)
 
         generic = generate_slide_json(manuscript, {})
@@ -124,6 +129,10 @@ def _run_job(job_id: str, manuscript: str, template_id: str) -> None:
             raise RuntimeError(
                 "slide_json validation failed: " + "; ".join(errors)
             )
+        job["phase"] = "render"
+        job["progress"] = 60
+        _save_job(job)
+
         deck_out = OUTPUT_DIR / job_id
         if template.engine == "pku-json":
             pku = compile_to_pku(generic)
@@ -151,10 +160,16 @@ def _run_job(job_id: str, manuscript: str, template_id: str) -> None:
             json.dumps(generic, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
+        job["phase"] = "zip"
+        job["progress"] = 90
+        _save_job(job)
+
         zip_path = OUTPUT_DIR / f"{job_id}.zip"
         zip_deck(deck_out, zip_path)
 
         job["status"] = "done"
+        job["phase"] = "done"
+        job["progress"] = 100
         job["finished_at"] = _now()
         # Point clients directly at the static mount. Render's edge layer has
         # an interaction with FileResponse + cross-origin requests that returns

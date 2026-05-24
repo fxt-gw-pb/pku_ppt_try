@@ -168,80 +168,34 @@
 
     /* ===== Field-edit panel (verbatim find/replace on current slide) =====
      * The panel injects two textareas (search + replace). On 应用替换 we walk
-     * text nodes of the CURRENTLY ACTIVE slide and swap the first match.
-     * No API calls; styling untouched (caller warned about length mismatch). */
-    let editPanelEl = null;
-    function buildEditPanel() {
-      if (editPanelEl) return editPanelEl;
-      const panel = document.createElement('aside');
-      panel.className = 'edit-panel';
-      panel.innerHTML = [
-        '<div class="edit-panel-head">',
-        '  <h3>字段修改</h3>',
-        '  <button type="button" class="edit-panel-close" title="关闭">×</button>',
-        '</div>',
-        '<p class="hint">只支持基于当前预览页字段的修改，不支持版式调整。修改即时生效，仅在当前浏览器内有效（刷新或重新生成会丢失）。</p>',
-        '<label for="edit-find">要替换的字段（请从当前页面完整粘贴）</label>',
-        '<textarea id="edit-find" spellcheck="false" placeholder="例如：基于注意力机制的医学影像分割研究"></textarea>',
-        '<label for="edit-replace">替换为</label>',
-        '<textarea id="edit-replace" spellcheck="false" placeholder="新内容"></textarea>',
-        '<p class="warn">⚠ 新字段字数与原字段差异过大可能导致排版超出当前版面，请尽量控制在相近长度。</p>',
-        '<div class="apply-row">',
-        '  <button type="button" class="apply-btn">应用替换（仅作用于当前页）</button>',
-        '  <button type="button" class="undo-btn" disabled title="撤回上次修改">↶ 撤回上次修改</button>',
-        '</div>',
-        '<p class="status" role="status"></p>'
-      ].join('');
-      document.body.appendChild(panel);
-      const find = panel.querySelector('#edit-find');
-      const repl = panel.querySelector('#edit-replace');
-      const status = panel.querySelector('.status');
-      const undoBtn = panel.querySelector('.undo-btn');
-      let lastEdit = null; /* [{ node, before }] — restored on undo */
-      panel.querySelector('.edit-panel-close').addEventListener('click', () => toggleEditPanel(false));
-      panel.querySelector('.apply-btn').addEventListener('click', () => {
-        const needle = find.value;
-        const replacement = repl.value;
-        if (!needle) {
-          status.className = 'status err';
-          status.textContent = '请输入要替换的字段。';
-          return;
-        }
-        const target = slides[idx] || document.querySelector('.slide.is-active') || slides[0];
-        const result = replaceInTextNodes(target, needle, replacement);
-        if (result.count > 0) {
-          lastEdit = result.snapshots;
-          undoBtn.disabled = false;
-          status.className = 'status ok';
-          status.textContent = '✓ 已在当前页替换 ' + result.count + ' 处。';
-        } else {
-          status.className = 'status err';
-          status.textContent = '✗ 当前页没有找到该字段。请检查是否完整粘贴自当前预览页（区分空格、标点）。';
-        }
-      });
-      undoBtn.addEventListener('click', () => {
-        if (!lastEdit || !lastEdit.length) return;
-        let restored = 0;
-        lastEdit.forEach((s) => {
-          if (s.node && s.node.parentNode) {
-            s.node.nodeValue = s.before;
-            restored++;
-          }
-        });
-        lastEdit = null;
-        undoBtn.disabled = true;
-        status.className = restored ? 'status ok' : 'status err';
-        status.textContent = restored
-          ? '↶ 已撤回上一次修改（' + restored + ' 处文本恢复）。'
-          : '✗ 上次修改的节点已失效，无法撤回。';
-      });
-      editPanelEl = panel;
-      return panel;
+     * text nodes of the CURRENTLY ACTIVE slide and swap the match. Edits are
+     * persisted to localStorage keyed by pathname so a reload restores them.
+     * 下载修改后的网页包 re-zips the deck client-side with the edited DOM. */
+    const EDITS_KEY = 'fxt-ppt-deck-edits:' + location.pathname;
+    function loadStoredEdits() {
+      try {
+        const raw = localStorage.getItem(EDITS_KEY);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) { return []; }
     }
-    function toggleEditPanel(force) {
-      buildEditPanel();
-      const isOpen = force !== undefined ? force : !document.body.classList.contains('has-edit-panel');
-      document.body.classList.toggle('has-edit-panel', isOpen);
+    function saveStoredEdits(arr) {
+      try { localStorage.setItem(EDITS_KEY, JSON.stringify(arr)); } catch (e) {}
+    }
+    function appendStoredEdit(find, replace) {
+      const arr = loadStoredEdits();
+      arr.push({ find: find, replace: replace, ts: Date.now() });
+      saveStoredEdits(arr);
+    }
+    function popStoredEdit() {
+      const arr = loadStoredEdits();
+      const last = arr.pop();
+      saveStoredEdits(arr);
+      return last;
+    }
+    function clearStoredEdits() {
+      try { localStorage.removeItem(EDITS_KEY); } catch (e) {}
     }
     function replaceInTextNodes(root, needle, replacement) {
       const result = { count: 0, snapshots: [] };
@@ -262,6 +216,191 @@
         }
       });
       return result;
+    }
+
+    /* Replay any saved edits against the whole deck (not just current slide). */
+    (function replaySavedEdits() {
+      const saved = loadStoredEdits();
+      if (!saved.length) return;
+      saved.forEach((op) => {
+        if (op && op.find != null && op.replace != null) {
+          replaceInTextNodes(deck, op.find, op.replace);
+        }
+      });
+    })();
+
+    let editPanelEl = null;
+    function buildEditPanel() {
+      if (editPanelEl) return editPanelEl;
+      const panel = document.createElement('aside');
+      panel.className = 'edit-panel';
+      panel.innerHTML = [
+        '<div class="edit-panel-head">',
+        '  <h3>字段修改</h3>',
+        '  <button type="button" class="edit-panel-close" title="关闭">×</button>',
+        '</div>',
+        '<p class="hint">只支持基于当前预览页字段的修改，不支持版式调整。修改保存在本浏览器，刷新仍生效；重新生成会丢失。</p>',
+        '<label for="edit-find">要替换的字段（请从当前页面完整粘贴）</label>',
+        '<textarea id="edit-find" spellcheck="false" placeholder="例如：基于注意力机制的医学影像分割研究"></textarea>',
+        '<label for="edit-replace">替换为</label>',
+        '<textarea id="edit-replace" spellcheck="false" placeholder="新内容"></textarea>',
+        '<p class="warn">⚠ 新字段字数与原字段差异过大可能导致排版超出当前版面，请尽量控制在相近长度。</p>',
+        '<div class="apply-row">',
+        '  <button type="button" class="apply-btn">应用替换（仅作用于当前页）</button>',
+        '  <button type="button" class="undo-btn" disabled title="撤回上次修改">↶ 撤回上次修改</button>',
+        '  <button type="button" class="export-btn" title="下载已编辑后的网页包">⇩ 下载修改后的网页包</button>',
+        '  <button type="button" class="clear-btn" title="清空本浏览器内已保存的全部修改">清空所有已保存修改</button>',
+        '</div>',
+        '<p class="status" role="status"></p>'
+      ].join('');
+      document.body.appendChild(panel);
+      const find = panel.querySelector('#edit-find');
+      const repl = panel.querySelector('#edit-replace');
+      const status = panel.querySelector('.status');
+      const undoBtn = panel.querySelector('.undo-btn');
+      const exportBtn = panel.querySelector('.export-btn');
+      const clearBtn = panel.querySelector('.clear-btn');
+      let lastEdit = null; /* [{ node, before }] — restored on undo */
+      panel.querySelector('.edit-panel-close').addEventListener('click', () => toggleEditPanel(false));
+      panel.querySelector('.apply-btn').addEventListener('click', () => {
+        const needle = find.value;
+        const replacement = repl.value;
+        if (!needle) {
+          status.className = 'status err';
+          status.textContent = '请输入要替换的字段。';
+          return;
+        }
+        const target = slides[idx] || document.querySelector('.slide.is-active') || slides[0];
+        const result = replaceInTextNodes(target, needle, replacement);
+        if (result.count > 0) {
+          lastEdit = { snapshots: result.snapshots, find: needle, replace: replacement };
+          appendStoredEdit(needle, replacement);
+          undoBtn.disabled = false;
+          status.className = 'status ok';
+          status.textContent = '✓ 已在当前页替换 ' + result.count + ' 处（已保存，刷新仍生效）。';
+        } else {
+          status.className = 'status err';
+          status.textContent = '✗ 当前页没有找到该字段。请检查是否完整粘贴自当前预览页（区分空格、标点）。';
+        }
+      });
+      undoBtn.addEventListener('click', () => {
+        if (!lastEdit || !lastEdit.snapshots || !lastEdit.snapshots.length) return;
+        let restored = 0;
+        lastEdit.snapshots.forEach((s) => {
+          if (s.node && s.node.parentNode) {
+            s.node.nodeValue = s.before;
+            restored++;
+          }
+        });
+        popStoredEdit();
+        lastEdit = null;
+        undoBtn.disabled = true;
+        status.className = restored ? 'status ok' : 'status err';
+        status.textContent = restored
+          ? '↶ 已撤回上一次修改（' + restored + ' 处文本恢复）。'
+          : '✗ 上次修改的节点已失效，无法撤回。';
+      });
+      clearBtn.addEventListener('click', () => {
+        if (!loadStoredEdits().length) {
+          status.className = 'status';
+          status.textContent = '没有需要清空的已保存修改。';
+          return;
+        }
+        if (!confirm('清空本浏览器中已保存的所有修改？页面会重新加载。')) return;
+        clearStoredEdits();
+        location.reload();
+      });
+      exportBtn.addEventListener('click', async () => {
+        status.className = 'status';
+        status.textContent = '正在打包修改后的网页包...';
+        exportBtn.disabled = true;
+        try {
+          await downloadEditedZip();
+          status.className = 'status ok';
+          status.textContent = '✓ 已开始下载修改后的网页包。';
+        } catch (e) {
+          status.className = 'status err';
+          status.textContent = '✗ 导出失败：' + (e && e.message ? e.message : e);
+        } finally {
+          exportBtn.disabled = false;
+        }
+      });
+      editPanelEl = panel;
+      return panel;
+    }
+    function toggleEditPanel(force) {
+      buildEditPanel();
+      const isOpen = force !== undefined ? force : !document.body.classList.contains('has-edit-panel');
+      document.body.classList.toggle('has-edit-panel', isOpen);
+    }
+
+    /* ===== Re-export helpers =====
+     * Derive the original zip URL from pathname. Only generated decks at
+     * /decks/{id}/index.html have a sibling /decks/{id}.zip; previews and
+     * local file:// don't. */
+    function deriveDeckZipUrl() {
+      if (location.protocol === 'file:') return null;
+      const m = /^(.*)\/index\.html$/i.exec(location.pathname);
+      const base = m ? m[1] : location.pathname.replace(/\/$/, '');
+      if (!/\/decks\/[^/]+$/.test(base)) return null;
+      return location.origin + base + '.zip';
+    }
+    function loadJSZip() {
+      if (window.JSZip) return Promise.resolve(window.JSZip);
+      return new Promise(function (resolve, reject) {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+        s.onload = function () {
+          if (window.JSZip) resolve(window.JSZip);
+          else reject(new Error('JSZip 未加载成功'));
+        };
+        s.onerror = function () { reject(new Error('JSZip 加载失败，请检查网络')); };
+        document.head.appendChild(s);
+      });
+    }
+    function serializeDeckForExport() {
+      /* Clone the doc, drop runtime-injected chrome so the export looks
+       * identical to a fresh render. The runtime re-injects everything on
+       * the next page load anyway. */
+      const clone = document.documentElement.cloneNode(true);
+      clone.removeAttribute('data-printing');
+      const dropSelectors = [
+        '.edit-panel', '.edit-panel-toggle-btn',
+        '.pdf-export-btn',
+        '.nav-arrows',
+        '.progress-bar',
+        '.notes-overlay', '.overview'
+      ];
+      dropSelectors.forEach(function (sel) {
+        clone.querySelectorAll(sel).forEach(function (el) { el.remove(); });
+      });
+      return '<!doctype html>\n<html' + (clone.getAttribute('lang') ? ' lang="' + clone.getAttribute('lang') + '"' : '') + '>\n' + clone.innerHTML + '\n</html>';
+    }
+    async function downloadEditedZip() {
+      const zipUrl = deriveDeckZipUrl();
+      if (!zipUrl) {
+        throw new Error('当前页不是可下载的生成结果（仅生成结果页支持二次导出）');
+      }
+      const JSZip = await loadJSZip();
+      const resp = await fetch(zipUrl);
+      if (!resp.ok) throw new Error('原网页包获取失败（HTTP ' + resp.status + '）');
+      const buf = await resp.arrayBuffer();
+      const zip = await JSZip.loadAsync(buf);
+      /* index.html is at the zip root by convention, but be defensive. */
+      const indexPath = Object.keys(zip.files).find(function (p) {
+        return /(^|\/)index\.html$/i.test(p) && !zip.files[p].dir;
+      });
+      if (!indexPath) throw new Error('原网页包内未找到 index.html');
+      zip.file(indexPath, serializeDeckForExport());
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a');
+      const baseName = zipUrl.split('/').pop().replace(/\.zip$/i, '');
+      a.href = URL.createObjectURL(blob);
+      a.download = baseName + '-edited.zip';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
     }
 
     if (!document.querySelector('.edit-panel-toggle-btn')) {

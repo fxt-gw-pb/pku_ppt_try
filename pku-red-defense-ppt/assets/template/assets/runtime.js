@@ -510,6 +510,10 @@
     injectPdfButton();
     injectEditPanel();
     injectNavArrows();
+    /* Replay persisted field-edits against the freshly-rendered slides.
+     * deck-stage rebuilds slides from JSON each load, so DOM edits don't
+     * survive a reload without this. */
+    replaySavedEdits();
   }
 
   function injectPdfButton() {
@@ -559,7 +563,35 @@
    * Same UX as the html-ppt runtime: a 360px sidebar with two textareas
    * (verbatim find / replace) that mutates text nodes of the currently
    * visible slide. Slides are light-DOM children of <deck-stage> projected
-   * through a <slot>, so a normal TreeWalker works. */
+   * through a <slot>, so a normal TreeWalker works. Edits are persisted to
+   * localStorage and re-applied on reload; re-export rewrites both
+   * index.html and data/slides.json so the edits survive a fresh open. */
+  const EDITS_KEY = "fxt-ppt-deck-edits:" + location.pathname;
+  function loadStoredEdits() {
+    try {
+      const raw = localStorage.getItem(EDITS_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function saveStoredEdits(arr) {
+    try { localStorage.setItem(EDITS_KEY, JSON.stringify(arr)); } catch (e) {}
+  }
+  function appendStoredEdit(find, replace) {
+    const arr = loadStoredEdits();
+    arr.push({ find: find, replace: replace, ts: Date.now() });
+    saveStoredEdits(arr);
+  }
+  function popStoredEdit() {
+    const arr = loadStoredEdits();
+    const last = arr.pop();
+    saveStoredEdits(arr);
+    return last;
+  }
+  function clearStoredEdits() {
+    try { localStorage.removeItem(EDITS_KEY); } catch (e) {}
+  }
   function activeSlideEl() {
     const stage = document.querySelector("deck-stage");
     if (!stage) return null;
@@ -589,6 +621,107 @@
     });
     return result;
   }
+  function replaySavedEdits() {
+    const saved = loadStoredEdits();
+    if (!saved.length) return;
+    const stage = document.querySelector("deck-stage");
+    if (!stage) return;
+    saved.forEach((op) => {
+      if (op && op.find != null && op.replace != null) {
+        replaceInTextNodes(stage, op.find, op.replace);
+      }
+    });
+  }
+  /* Recursively walk a value (parsed JSON) applying find/replace ops to
+   * every string. Used to rewrite data/slides.json on re-export. */
+  function applyEditsToJson(value, ops) {
+    if (typeof value === "string") {
+      let out = value;
+      for (const op of ops) {
+        if (op && op.find != null && op.replace != null && op.find !== "") {
+          out = out.split(op.find).join(op.replace);
+        }
+      }
+      return out;
+    }
+    if (Array.isArray(value)) return value.map((v) => applyEditsToJson(v, ops));
+    if (value && typeof value === "object") {
+      const out = {};
+      for (const k of Object.keys(value)) out[k] = applyEditsToJson(value[k], ops);
+      return out;
+    }
+    return value;
+  }
+  function deriveDeckZipUrl() {
+    if (location.protocol === "file:") return null;
+    const m = /^(.*)\/index\.html$/i.exec(location.pathname);
+    const base = m ? m[1] : location.pathname.replace(/\/$/, "");
+    if (!/\/decks\/[^/]+$/.test(base)) return null;
+    return location.origin + base + ".zip";
+  }
+  function loadJSZip() {
+    if (window.JSZip) return Promise.resolve(window.JSZip);
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js";
+      s.onload = () => window.JSZip ? resolve(window.JSZip) : reject(new Error("JSZip 未加载成功"));
+      s.onerror = () => reject(new Error("JSZip 加载失败，请检查网络"));
+      document.head.appendChild(s);
+    });
+  }
+  function serializeDeckForExport() {
+    const clone = document.documentElement.cloneNode(true);
+    const dropSelectors = [
+      ".edit-panel", ".edit-panel-toggle-btn",
+      ".pdf-export-btn",
+      ".nav-arrows"
+    ];
+    dropSelectors.forEach((sel) => {
+      clone.querySelectorAll(sel).forEach((el) => el.remove());
+    });
+    return "<!doctype html>\n<html" + (clone.getAttribute("lang") ? ' lang="' + clone.getAttribute("lang") + '"' : "") + ">\n" + clone.innerHTML + "\n</html>";
+  }
+  async function downloadEditedZip() {
+    const zipUrl = deriveDeckZipUrl();
+    if (!zipUrl) {
+      throw new Error("当前页不是可下载的生成结果（仅生成结果页支持二次导出）");
+    }
+    const ops = loadStoredEdits();
+    const JSZip = await loadJSZip();
+    const resp = await fetch(zipUrl);
+    if (!resp.ok) throw new Error("原网页包获取失败（HTTP " + resp.status + "）");
+    const buf = await resp.arrayBuffer();
+    const zip = await JSZip.loadAsync(buf);
+    const indexPath = Object.keys(zip.files).find((p) =>
+      /(^|\/)index\.html$/i.test(p) && !zip.files[p].dir
+    );
+    if (!indexPath) throw new Error("原网页包内未找到 index.html");
+    zip.file(indexPath, serializeDeckForExport());
+    /* PKU decks re-render from data/slides.json on every load, so the
+     * edits must be baked into the JSON or they'd be wiped on reopen. */
+    const slidesPath = Object.keys(zip.files).find((p) =>
+      /(^|\/)data\/slides\.json$/i.test(p) && !zip.files[p].dir
+    );
+    if (slidesPath && ops.length) {
+      const raw = await zip.files[slidesPath].async("string");
+      try {
+        const parsed = JSON.parse(raw);
+        const rewritten = applyEditsToJson(parsed, ops);
+        zip.file(slidesPath, JSON.stringify(rewritten, null, 2));
+      } catch (e) {
+        console.warn("[PKU] failed to rewrite slides.json:", e);
+      }
+    }
+    const blob = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement("a");
+    const baseName = zipUrl.split("/").pop().replace(/\.zip$/i, "");
+    a.href = URL.createObjectURL(blob);
+    a.download = baseName + "-edited.zip";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  }
   function injectEditPanel() {
     if (document.querySelector(".edit-panel-toggle-btn")) return;
 
@@ -615,13 +748,20 @@
       ' font:13px/1.55 ui-monospace,"JetBrains Mono",SFMono-Regular,Menlo,monospace}',
       '.edit-panel textarea:focus{outline:none;border-color:#9A0000;box-shadow:0 0 0 2px rgba(154,0,0,.25)}',
       '.edit-panel .apply-row{display:flex;flex-direction:column;gap:8px}',
-      '.edit-panel .apply-btn,.edit-panel .undo-btn{appearance:none;border-radius:8px;',
-      ' padding:10px 14px;font:600 13px/1 -apple-system,sans-serif;cursor:pointer;letter-spacing:.04em}',
+      '.edit-panel .apply-btn,.edit-panel .undo-btn,.edit-panel .export-btn,.edit-panel .clear-btn{',
+      ' appearance:none;border-radius:8px;padding:10px 14px;',
+      ' font:600 13px/1 -apple-system,sans-serif;cursor:pointer;letter-spacing:.04em}',
       '.edit-panel .apply-btn{background:#9A0000;color:#fff;border:none}',
       '.edit-panel .apply-btn:hover{background:#b50000}',
       '.edit-panel .undo-btn{background:transparent;color:#e6edf3;border:1px solid rgba(255,255,255,.22)}',
       '.edit-panel .undo-btn:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4)}',
-      '.edit-panel .apply-btn:disabled,.edit-panel .undo-btn:disabled{opacity:.4;cursor:not-allowed}',
+      '.edit-panel .export-btn{background:#1aaf6c;color:#fff;border:none;margin-top:4px}',
+      '.edit-panel .export-btn:hover:not(:disabled){background:#16955c}',
+      '.edit-panel .clear-btn{background:transparent;color:#f5a524;',
+      ' border:1px dashed rgba(245,165,36,.45);font-size:12px;padding:8px 12px}',
+      '.edit-panel .clear-btn:hover{background:rgba(245,165,36,.08);border-color:rgba(245,165,36,.7)}',
+      '.edit-panel .apply-btn:disabled,.edit-panel .undo-btn:disabled,',
+      '.edit-panel .export-btn:disabled,.edit-panel .clear-btn:disabled{opacity:.4;cursor:not-allowed}',
       '.edit-panel .status{font-size:12px;line-height:1.5;margin:0;min-height:18px}',
       '.edit-panel .status.ok{color:#3fb950}',
       '.edit-panel .status.err{color:#f85149}',
@@ -647,7 +787,7 @@
       '  <h3>字段修改</h3>',
       '  <button type="button" class="edit-panel-close" title="关闭">×</button>',
       '</div>',
-      '<p class="hint">只支持基于当前预览页字段的修改，不支持版式调整。修改即时生效，仅在当前浏览器内有效（刷新或重新生成会丢失）。</p>',
+      '<p class="hint">只支持基于当前预览页字段的修改，不支持版式调整。修改保存在本浏览器，刷新仍生效；重新生成会丢失。</p>',
       '<label for="pku-edit-find">要替换的字段（请从当前页面完整粘贴）</label>',
       '<textarea id="pku-edit-find" spellcheck="false" placeholder="例如：基于注意力机制的医学影像分割研究"></textarea>',
       '<label for="pku-edit-replace">替换为</label>',
@@ -656,6 +796,8 @@
       '<div class="apply-row">',
       '  <button type="button" class="apply-btn">应用替换（仅作用于当前页）</button>',
       '  <button type="button" class="undo-btn" disabled title="撤回上次修改">↶ 撤回上次修改</button>',
+      '  <button type="button" class="export-btn" title="下载已编辑后的网页包">⇩ 下载修改后的网页包</button>',
+      '  <button type="button" class="clear-btn" title="清空本浏览器内已保存的全部修改">清空所有已保存修改</button>',
       '</div>',
       '<p class="status" role="status"></p>'
     ].join("");
@@ -665,6 +807,8 @@
     const replEl = panel.querySelector("#pku-edit-replace");
     const status = panel.querySelector(".status");
     const undoBtn = panel.querySelector(".undo-btn");
+    const exportBtn = panel.querySelector(".export-btn");
+    const clearBtn = panel.querySelector(".clear-btn");
     let lastEdit = null; /* [{ node, before }] — restored on undo */
     function setOpen(open) {
       document.body.classList.toggle("has-edit-panel", !!open);
@@ -687,9 +831,10 @@
       const result = replaceInTextNodes(slide, needle, replacement);
       if (result.count > 0) {
         lastEdit = result.snapshots;
+        appendStoredEdit(needle, replacement);
         undoBtn.disabled = false;
         status.className = "status ok";
-        status.textContent = "✓ 已在当前页替换 " + result.count + " 处。";
+        status.textContent = "✓ 已在当前页替换 " + result.count + " 处（已保存，刷新仍生效）。";
       } else {
         status.className = "status err";
         status.textContent = "✗ 当前页没有找到该字段。请检查是否完整粘贴自当前预览页（区分空格、标点）。";
@@ -704,12 +849,38 @@
           restored++;
         }
       });
+      popStoredEdit();
       lastEdit = null;
       undoBtn.disabled = true;
       status.className = restored ? "status ok" : "status err";
       status.textContent = restored
         ? "↶ 已撤回上一次修改（" + restored + " 处文本恢复）。"
         : "✗ 上次修改的节点已失效，无法撤回。";
+    });
+    clearBtn.addEventListener("click", () => {
+      if (!loadStoredEdits().length) {
+        status.className = "status";
+        status.textContent = "没有需要清空的已保存修改。";
+        return;
+      }
+      if (!confirm("清空本浏览器中已保存的所有修改？页面会重新加载。")) return;
+      clearStoredEdits();
+      location.reload();
+    });
+    exportBtn.addEventListener("click", async () => {
+      status.className = "status";
+      status.textContent = "正在打包修改后的网页包...";
+      exportBtn.disabled = true;
+      try {
+        await downloadEditedZip();
+        status.className = "status ok";
+        status.textContent = "✓ 已开始下载修改后的网页包。";
+      } catch (e) {
+        status.className = "status err";
+        status.textContent = "✗ 导出失败：" + (e && e.message ? e.message : e);
+      } finally {
+        exportBtn.disabled = false;
+      }
     });
 
     /* Toggle button */

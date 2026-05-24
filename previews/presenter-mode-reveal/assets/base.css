@@ -253,7 +253,9 @@ body.has-edit-panel .edit-panel{display:flex}
 .edit-panel textarea:focus{outline:none;border-color:#3b6cff;box-shadow:0 0 0 2px rgba(59,108,255,.25)}
 .edit-panel .apply-row{display:flex;flex-direction:column;gap:8px}
 .edit-panel .apply-btn,
-.edit-panel .undo-btn{
+.edit-panel .undo-btn,
+.edit-panel .export-btn,
+.edit-panel .clear-btn{
   appearance:none;border-radius:8px;
   padding:10px 14px;font:600 13px/1 -apple-system,sans-serif;cursor:pointer;letter-spacing:.04em;
 }
@@ -261,8 +263,14 @@ body.has-edit-panel .edit-panel{display:flex}
 .edit-panel .apply-btn:hover{background:#2a55d6}
 .edit-panel .undo-btn{background:transparent;color:#e6edf3;border:1px solid rgba(255,255,255,.22)}
 .edit-panel .undo-btn:hover:not(:disabled){background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.4)}
+.edit-panel .export-btn{background:#1aaf6c;color:#fff;border:none;margin-top:4px}
+.edit-panel .export-btn:hover:not(:disabled){background:#16955c}
+.edit-panel .clear-btn{background:transparent;color:#f5a524;border:1px dashed rgba(245,165,36,.45);font-size:12px;padding:8px 12px}
+.edit-panel .clear-btn:hover{background:rgba(245,165,36,.08);border-color:rgba(245,165,36,.7)}
 .edit-panel .apply-btn:disabled,
-.edit-panel .undo-btn:disabled{opacity:.4;cursor:not-allowed}
+.edit-panel .undo-btn:disabled,
+.edit-panel .export-btn:disabled,
+.edit-panel .clear-btn:disabled{opacity:.4;cursor:not-allowed}
 .edit-panel .status{font-size:12px;line-height:1.5;margin:0;min-height:18px}
 .edit-panel .status.ok{color:#3fb950}
 .edit-panel .status.err{color:#f85149}

@@ -718,6 +718,73 @@ kbd {
   font-size: 13px;
 }
 
+.job-progress {
+  margin-top: 12px;
+}
+
+.prog-track {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.prog-seg {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(20, 17, 15, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+.prog-seg span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: var(--amber);
+  transition: width 0.4s ease;
+}
+
+.prog-seg.done span {
+  width: 100%;
+  background: var(--green);
+}
+
+.prog-seg.active span {
+  width: 100%;
+  background:
+    linear-gradient(90deg,
+      var(--amber) 0%,
+      color-mix(in srgb, var(--amber), white 32%) 50%,
+      var(--amber) 100%);
+  background-size: 240% 100%;
+  animation: prog-shimmer 1.6s linear infinite;
+}
+
+@keyframes prog-shimmer {
+  from { background-position: 240% 0; }
+  to   { background-position: -140% 0; }
+}
+
+.prog-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.prog-label {
+  color: var(--ink);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.prog-hint {
+  color: var(--muted);
+}
+
 .job-actions {
   margin-top: 12px;
 }
