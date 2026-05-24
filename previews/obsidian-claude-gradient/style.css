@@ -73,4 +73,4 @@
 .tpl-obsidian-claude-gradient .oc-quote blockquote{font-size:26px;font-weight:500;line-height:1.6;position:relative;padding:0 36px;margin:0;color:var(--oc-text)}
 .tpl-obsidian-claude-gradient .oc-quote blockquote::before{content:'"';position:absolute;left:-6px;top:-22px;font-size:78px;color:var(--oc-accent);opacity:.4;font-family:Georgia,serif;line-height:1}
 .tpl-obsidian-claude-gradient .oc-quote .attr{margin-top:20px;font-size:13px;color:var(--oc-dim)}
-.tpl-obsidian-claude-gradient .oc-big{font-size:140px;font-weight:900;line-height:.95;letter-spacing:-.04em}
+.tpl-obsidian-claude-gradient .oc-big{font-size:124px;font-weight:900;line-height:.95;letter-spacing:-.04em}

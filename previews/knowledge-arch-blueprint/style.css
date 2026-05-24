@@ -47,4 +47,4 @@
 .tpl-knowledge-arch-blueprint .kb-codebox .kw{color:#e8a87c}
 .tpl-knowledge-arch-blueprint .kb-codebox .st{color:#b3d1bc}
 .tpl-knowledge-arch-blueprint .kb-codebox .hl{color:var(--kb-rust);background:rgba(255,255,255,.08);padding:0 4px;border-radius:3px}
-.tpl-knowledge-arch-blueprint .kb-big-num{font-family:'Playfair Display',Georgia,serif;font-size:200px;font-weight:900;line-height:.9;color:var(--kb-rust);letter-spacing:-.04em}
+.tpl-knowledge-arch-blueprint .kb-big-num{font-family:'Playfair Display',Georgia,serif;font-size:168px;font-weight:900;line-height:.9;color:var(--kb-rust);letter-spacing:-.04em}

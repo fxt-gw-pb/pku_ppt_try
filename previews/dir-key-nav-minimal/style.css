@@ -65,13 +65,13 @@
  * canvas. Latin titles can go much bigger and keep the keynote feel —
  * the renderer adds `lang="zh"` / `lang="en"` on the title so we branch. */
 .tpl-dir-key-nav-minimal .dk-h0{font-size:88px;font-weight:900;line-height:1.04;letter-spacing:-1px;margin:0 0 20px;max-width:1040px;word-break:break-word}
-.tpl-dir-key-nav-minimal .dk-h0:lang(en){font-size:140px;letter-spacing:-4px;line-height:.94}
+.tpl-dir-key-nav-minimal .dk-h0:lang(en){font-size:124px;letter-spacing:-3.5px;line-height:.96}
 .tpl-dir-key-nav-minimal .dk-h1{font-size:72px;font-weight:900;line-height:1.04;letter-spacing:-1px;margin:0 0 18px;max-width:1040px}
 .tpl-dir-key-nav-minimal .dk-h1:lang(en){font-size:100px;letter-spacing:-3px;line-height:.98}
 .tpl-dir-key-nav-minimal .dk-h2{font-size:72px;font-weight:800;line-height:1.05;letter-spacing:-2px;margin:0 0 16px}
 .tpl-dir-key-nav-minimal .dk-lede{font-size:26px;line-height:1.45;opacity:.72;max-width:900px;font-weight:300}
 .tpl-dir-key-nav-minimal .dk-lede strong{font-weight:700;opacity:1}
-.tpl-dir-key-nav-minimal .dk-big{font-family:var(--dk-mono);font-size:240px;font-weight:800;line-height:.9;letter-spacing:-10px}
+.tpl-dir-key-nav-minimal .dk-big{font-family:var(--dk-mono);font-size:180px;font-weight:800;line-height:.9;letter-spacing:-8px}
 
 .tpl-dir-key-nav-minimal .dk-line{display:block;width:90px;height:4px;background:currentColor;margin:30px 0;opacity:.85}
 .tpl-dir-key-nav-minimal .t-indigo .dk-accent{color:#a5b4fc}

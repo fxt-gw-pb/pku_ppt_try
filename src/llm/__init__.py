@@ -20,6 +20,7 @@ from typing import Any
 
 from .deepseek import generate as _deepseek_generate
 from .mock import generate as _mock_generate
+from ..renderer.diversify import diversify_layouts
 
 
 def generate_slide_json(
@@ -28,12 +29,17 @@ def generate_slide_json(
     options = options or {}
     provider = (options.get("provider") or os.environ.get("LLM_PROVIDER") or "mock").lower()
     if provider == "deepseek":
-        return _deepseek_generate(manuscript, options)
-    if provider == "mock":
-        return _mock_generate(manuscript, options)
-    raise ValueError(
-        f"unknown LLM_PROVIDER {provider!r} (expected: 'deepseek' or 'mock')"
-    )
+        raw = _deepseek_generate(manuscript, options)
+    elif provider == "mock":
+        raw = _mock_generate(manuscript, options)
+    else:
+        raise ValueError(
+            f"unknown LLM_PROVIDER {provider!r} (expected: 'deepseek' or 'mock')"
+        )
+    # Post-process: break runs of 3+ consecutive identical content layouts
+    # by picking a content-fit alternative for the offending slides.
+    # Honest swap only — never invents structured data to use a flashier layout.
+    return diversify_layouts(raw)
 
 
 __all__ = ["generate_slide_json"]
