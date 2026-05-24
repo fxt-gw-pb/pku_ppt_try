@@ -10,6 +10,9 @@ import json
 import os
 from typing import Any
 
+DEFAULT_MODEL = "deepseek-v4-pro"
+LEGACY_MODEL_ALIASES = {"deepseek-chat", "deepseek-reasoner"}
+
 SYSTEM_PROMPT = """你是一个专业 PPT 策划助手。你的任务是把用户提供的文稿整理成结构化幻灯片 JSON。
 
 请严格输出 JSON，不要输出 Markdown，不要输出解释，不要使用代码块。
@@ -57,7 +60,9 @@ def generate(manuscript: str, options: dict[str, Any]) -> dict[str, Any]:
         )
 
     base_url = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
-    model = os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-pro")
+    model = (os.environ.get("DEEPSEEK_MODEL") or DEFAULT_MODEL).strip()
+    if model in LEGACY_MODEL_ALIASES:
+        model = DEFAULT_MODEL
 
     # Lazy-import openai so `LLM_PROVIDER=mock` works without it installed.
     try:

@@ -312,7 +312,7 @@ After 15 min idle, free tier spins down. Next request waits ~30 s. The frontend'
 
 - `.env` (gitignored) holds the real local key. `.env.example` always has the placeholder string.
 - Render holds the production key in Settings → Environment.
-- DeepSeek API calls default to `DEEPSEEK_MODEL=deepseek-v4-pro` and explicitly send `extra_body={"thinking":{"type":"disabled"}}`; do not enable thinking mode unless explicitly requested.
+- DeepSeek API calls default to `DEEPSEEK_MODEL=deepseek-v4-pro`, coerce legacy `deepseek-chat` / `deepseek-reasoner` env values to `deepseek-v4-pro`, and explicitly send `extra_body={"thinking":{"type":"disabled"}}`; do not enable thinking mode unless explicitly requested.
 - Never print or inspect `.env` unless the user explicitly asks.
 - The frontend never sees the key. `web/app.js` only knows the backend's public URL.
 - If a real key ever lands in a tracked file, the key is **compromised the moment that commit is pushed** — rotate immediately on the DeepSeek dashboard, even after force-pushing to strip the commit. GitHub keeps detached commits reachable for a while after force-push.
