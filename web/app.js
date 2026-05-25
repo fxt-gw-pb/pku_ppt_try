@@ -191,25 +191,32 @@ async function warmupBackend() {
   }
 }
 
-async function loadHealth() {
+function bootstrapFromCache() {
+  templates = normalizeTemplates([]);
+  limitEl.textContent = MAX_CHARS;
+  templateSource.textContent = `本地缓存：${templates.length} 个模板`;
+  renderTemplates();
+  selectTemplate(readTemplateFromUrl() || selectedTemplateId, false);
+  updateCount();
+}
+
+async function syncHealth() {
   try {
     const response = await fetch(`${API_BASE}/api/health`);
     if (!response.ok) throw new Error(`${response.status}`);
     const health = await response.json();
     lastWarmupAt = Date.now();
     MAX_CHARS = health.max_input_chars || MAX_CHARS;
-    selectedTemplateId = health.default_template_id || selectedTemplateId;
+    const remoteDefault = health.default_template_id || selectedTemplateId;
     templates = normalizeTemplates(health.templates);
     templateSource.textContent = `已加载 ${templates.length} 个模板`;
+    limitEl.textContent = MAX_CHARS;
+    renderTemplates();
+    const urlChoice = readTemplateFromUrl();
+    selectTemplate(urlChoice || selectedTemplateId || remoteDefault, false);
   } catch (error) {
-    templates = normalizeTemplates([]);
-    templateSource.textContent = `离线模板列表：${templates.length} 个`;
+    templateSource.textContent = `离线模板列表：${templates.length} 个（后端唤醒中…）`;
   }
-
-  limitEl.textContent = MAX_CHARS;
-  renderTemplates();
-  selectTemplate(readTemplateFromUrl() || selectedTemplateId, false);
-  updateCount();
 }
 
 function readTemplateFromUrl() {
@@ -499,5 +506,6 @@ donationModal.addEventListener("click", (event) => {
   }
 });
 
-loadHealth();
+bootstrapFromCache();
 route();
+syncHealth();
