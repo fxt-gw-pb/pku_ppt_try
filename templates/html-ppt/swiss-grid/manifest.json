@@ -1,0 +1,7 @@
+{
+  "template_id": "swiss-grid",
+  "name": "swiss-grid",
+  "engine": "html-ppt",
+  "description": "Swiss International grid template adapted from guizang-ppt-skill.",
+  "source": "guizang-ppt-skill/assets/template-swiss.html"
+}

@@ -112,7 +112,7 @@ In `src/renderer/__init__.py`:
 
 `src/templates/registry.py` is the single source of truth. `GET /api/templates` returns `public_dict()`, which **hides** `preview_url` and maps internal engines to `classic` or `template`. Keep public API display data free of skill/source names (no `html-ppt`, `pku-red-defense-ppt` in user-visible copy).
 
-Current `template_id`s: `pku-red` (default) + 15 html-ppt templates (`xhs-white-editorial`, `graphify-dark-graph`, `knowledge-arch-blueprint`, `hermes-cyber-terminal`, `obsidian-claude-gradient`, `testing-safety-alert`, `xhs-pastel-card`, `dir-key-nav-minimal`, `pitch-deck`, `product-launch`, `tech-sharing`, `weekly-report`, `xhs-post`, `course-module`, `presenter-mode-reveal`).
+Current `template_id`s: `pku-red` (default) + 17 html-ppt templates (`xhs-white-editorial`, `graphify-dark-graph`, `knowledge-arch-blueprint`, `hermes-cyber-terminal`, `obsidian-claude-gradient`, `testing-safety-alert`, `xhs-pastel-card`, `dir-key-nav-minimal`, `pitch-deck`, `product-launch`, `tech-sharing`, `weekly-report`, `xhs-post`, `course-module`, `presenter-mode-reveal`, `swiss-grid`, `editorial-monocle`).
 
 ### Job lifecycle
 

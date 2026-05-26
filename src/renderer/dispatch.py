@@ -10,6 +10,7 @@ from typing import Any, Callable
 
 from .course_module import render_course_module
 from .dir_key_nav_minimal import render_dir_key_nav_minimal
+from .editorial_monocle import render_editorial_monocle
 from .graphify_dark_graph import render_graphify_dark_graph
 from .hermes_cyber_terminal import render_hermes_cyber_terminal
 from .html_ppt_generic import render_html_ppt_generic
@@ -18,6 +19,7 @@ from .obsidian_claude_gradient import render_obsidian_claude_gradient
 from .pitch_deck import render_pitch_deck
 from .presenter_mode_reveal import render_presenter_mode_reveal
 from .product_launch import render_product_launch
+from .swiss_grid import render_swiss_grid
 from .tech_sharing import render_tech_sharing
 from .testing_safety_alert import render_testing_safety_alert
 from .weekly_report import render_weekly_report
@@ -50,6 +52,8 @@ _RENDERERS: dict[str, RendererFn] = {
     "dir-key-nav-minimal": _wrap_simple(render_dir_key_nav_minimal),
     "testing-safety-alert": _wrap_simple(render_testing_safety_alert),
     "presenter-mode-reveal": _wrap_simple(render_presenter_mode_reveal),
+    "swiss-grid": _wrap_simple(render_swiss_grid),
+    "editorial-monocle": _wrap_simple(render_editorial_monocle),
 }
 
 

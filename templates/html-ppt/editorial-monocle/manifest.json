@@ -1,0 +1,7 @@
+{
+  "template_id": "editorial-monocle",
+  "name": "editorial-monocle",
+  "engine": "html-ppt",
+  "description": "Editorial magazine template adapted from guizang-ppt-skill.",
+  "source": "guizang-ppt-skill/assets/template.html"
+}

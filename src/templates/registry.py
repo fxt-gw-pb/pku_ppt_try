@@ -148,6 +148,18 @@ _TEMPLATES: dict[str, DeckTemplate] = {
         "带逐字稿和演讲者视图的模板，适合技术分享、课程和正式演讲。",
         renderer="presenter-mode-reveal",
     ),
+    "swiss-grid": _html_ppt(
+        "swiss-grid",
+        "瑞士国际网格",
+        "克莱因蓝单一锚点、极轻 200 字重和 12 列网格，适合研究笔记、白皮书与品牌字段笔记。",
+        renderer="swiss-grid",
+    ),
+    "editorial-monocle": _html_ppt(
+        "editorial-monocle",
+        "墨刻杂志风",
+        "暗墨纸面、衬线大标题与杂志感小标签，适合长文阅读、专题策划与编辑型分享。",
+        renderer="editorial-monocle",
+    ),
 }
 
 
